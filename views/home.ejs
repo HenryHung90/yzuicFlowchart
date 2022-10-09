@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/gojs@2.1/release/go.js"></script>
+
+</head>
+
+<body>
+  <div style="width: 100%; display: flex; justify-content: space-between">
+    <div id="myPaletteDiv"
+      style="width: 170px; margin-right: 2px; background-color: rgb(40, 44, 52); position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0);">
+      <canvas tabindex="0" width="200" height="1500"
+        style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 100px; height: 750px;">This
+        text is displayed if your browser does not support the Canvas HTML element.</canvas>
+      <div style="position: absolute; overflow: auto; width: 100px; height: 750px; z-index: 1;">
+        <div style="position: absolute; width: 1px; height: 1px;"></div>
+      </div>
+    </div>
+    <div id="myDiagramDiv"
+      style="flex-grow: 1; height: 750px; background-color: rgb(40, 44, 52); position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+      <canvas tabindex="0" width="1908" height="1500"
+        style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 954px; height: 750px; cursor: auto;">This
+        text is displayed if your browser does not support the Canvas HTML element.</canvas>
+      <div style="position: absolute; overflow: auto; width: 954px; height: 750px; z-index: 1;">
+        <div style="position: absolute; width: 1px; height: 1px;"></div>
+      </div>
+    </div>
+  </div>
+  <button id="SaveButton" disabled="">Save</button>
+  <button id="LoadButton">Load</button>
+  Diagram Model saved in JSON format:
+  <textarea id="mySavedModel" style="width:100%;height:300px">{ "class": "GraphLinksModel",
+    "linkFromPortIdProperty": "fromPort",
+    "linkToPortIdProperty": "toPort",
+    "nodeDataArray": [
+  {"category":"Comment","loc":"556 268","text":"Kookie Brittle","key":-13},
+  {"key":-1,"category":"Start","loc":"175 0","text":"Start"},
+  {"key":0,"loc":"-62 153","text":"Preheat oven to 375 F"},
+  {"key":1,"loc":"175 181","text":"In a bowl, blend: 1 cup margarine, 1.5 teaspoon vanilla, 1 teaspoon salt"},
+  {"key":2,"loc":"175 327","text":"Gradually beat in 1 cup sugar and 2 cups sifted flour"},
+  {"key":3,"loc":"175 494","text":"Mix in 6 oz (1 cup) Nestle's Semi-Sweet Chocolate Morsels"},
+  {"key":5,"loc":"427 153","text":"Finely chop 1/2 cup of your choice of nuts"},
+  {"text":"Mission 1","key":-14,"loc":"-265.39691162109375 62.5"},
+  {"text":"Mission 2","key":-15,"loc":"-441 147"},
+  {"text":"Mission 3","key":-3,"loc":"-280.39691162109375 357.5"},
+  {"category":"Comment","text":"說到底還不是這樣\n你說你想幹嘛\n我不懂\n你試試看\n我好帥","key":-2,"loc":"-84 303"},
+  {"category":"Conditional","text":"Mission 1","key":-12,"loc":"427 373"}
+  ],
+    "linkDataArray": [
+  {"from":1,"to":2,"fromPort":"B","toPort":"T","points":[175,234.50089721679686,175,244.50089721679686,175,257.9688621520996,175,257.9688621520996,175,271.4368270874023,175,281.4368270874023]},
+  {"from":2,"to":3,"fromPort":"B","toPort":"T","points":[175,372.5631729125976,175,382.5631729125976,175,410.5,175,410.5,175,438.4368270874023,175,448.4368270874023]},
+  {"from":-1,"to":0,"fromPort":"B","toPort":"T","points":[175,36.75,175,46.75,175,69,-45.33333333333334,69,-45.33333333333334,91.24999999999999,-45.33333333333334,101.24999999999999]},
+  {"from":-1,"to":1,"fromPort":"B","toPort":"T","points":[175,36.75,175,46.75,175,82.12455139160156,175,82.12455139160156,175,117.49910278320311,175,127.49910278320311]},
+  {"from":-1,"to":5,"fromPort":"B","toPort":"T","points":[175,36.75,175,46.75,175,69,427,69,427,91.24999999999999,427,101.24999999999999]},
+  {"from":-14,"to":-15,"fromPort":"L","toPort":"T","points":[-320.54705810546875,62.5,-330.54705810546875,62.5,-441,62.5,-441,73.875,-441,85.24999999999999,-441,95.24999999999999]},
+  {"from":-15,"to":-3,"fromPort":"B","toPort":"T","points":[-441,198.75,-441,208.75,-441,252.24999999999997,-280.39691162109375,252.24999999999997,-280.39691162109375,295.74999999999994,-280.39691162109375,305.74999999999994]},
+  {"from":-1,"to":0,"fromPort":"L","toPort":"T","points":[138.25,0,128.25,0,-78.66666666666667,0,-78.66666666666667,41.62499999999999,-78.66666666666667,83.24999999999999,-78.66666666666667,101.24999999999999]},
+  {"from":5,"to":-12,"fromPort":"B","toPort":"T","points":[427,204.75,427,214.75,427,272.0622756958008,427,272.0622756958008,427,329.3745513916016,427,339.3745513916016]},
+  {"from":-12,"to":3,"fromPort":"B","toPort":"R","visible":true,"points":[427,406.6254486083985,427,416.6254486083985,427,494,277.7521286010742,494,267.7521286010742,494]},
+  {"from":-12,"to":2,"fromPort":"B","toPort":"R","visible":true,"points":[427,406.6254486083985,427,416.6254486083985,308.6577390047039,416.6254486083985,308.6577390047039,327,282.1043472290039,327,272.1043472290039,327],"text":"NO"}
+  ]}
+    </textarea>
+  <button id="PrintButton">Print Diagram Using SVG</button>
+</body>
+<script src="../js/list.js"></script>
+
+</html>
