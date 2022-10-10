@@ -1,11 +1,13 @@
-function init() {
+import { showContainer } from "../global/common.js";
+
+const init = () => {
   if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
 
   // Since 2.2 you can also author concise templates with method chaining instead of GraphObject.make
   // For details, see https://gojs.net/latest/intro/buildingObjects.html
   const $ = go.GraphObject.make;  // for conciseness in defining templates
 
-  myDiagram =
+  let myDiagram =
     $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
       {
         // "initialContentAlignment": go.Spot.Center, 
@@ -27,11 +29,8 @@ function init() {
   });
   myDiagram.addDiagramListener("ObjectDoubleClicked", e => {
     const part = e.subject.part;
-    if (!(part instanceof go.Link)) showMessage(part.ob);
+    if (!(part instanceof go.Link)) showContainer(part.ob);
   });
-  function showMessage(s) {
-    console.log(s)
-  }
   // helper definitions for node templates
   function nodeStyle() {
     return [
@@ -101,7 +100,7 @@ function init() {
             maxSize: new go.Size(160, NaN),
             wrap: go.TextBlock.WrapFit,
             editable: false,
-            textAlign:'center',
+            textAlign: 'center',
           },
           //攜結text 呼叫時會使用建立之node 名稱作為內部text
           //綁定TextBlock.text 屬性爲Node.data.name的值，Model對象可以通過Node.data.name獲取和設置TextBlock.text
@@ -235,7 +234,7 @@ function init() {
 
       //箭頭指標樣式
       $(go.Shape,  // the arrowhead
-        { toArrow: "standard", strokeWidth: 2, fill: "gray" }),
+        { toArrow: "standard", strokeWidth: 0, fill: "gray" }),
 
       //自定義一個 Panel 在線上
       //自定義樣式 visible 預設看不到 name=>設定LANBEL 在showLinkLabel() function 中
@@ -268,10 +267,9 @@ function init() {
   myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
   myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
 
-  load();  // load an initial diagram from some JSON text
-
+ 
   // initialize the Palette that is on the left side of the page
-  myPalette =
+  let myPalette =
     $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
       {
         // Instead of the default animation, use a custom fade-down
@@ -281,7 +279,7 @@ function init() {
         nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
         model: new go.GraphLinksModel([  // specify the contents of the Palette
           { category: "Conditional", text: "Mission 1" },
-          { category:"Comment",text: "Mission 2" },
+          { category: "Comment", text: "Mission 2" },
           { text: "Mission 3" },
         ])
       });
@@ -298,50 +296,50 @@ function init() {
     animation.add(diagram, 'opacity', 0, 1);
     animation.start();
   }
+  // Show the diagram's model in JSON format that the user may edit
+  const saveButton = document.getElementById("SaveButton")
+  const loadButton = document.getElementById("LoadButton")
+  const printButton = document.getElementById("PrintButton")
+  saveButton.addEventListener("click", (e) => {
+    save()
+  })
+  loadButton.addEventListener("click", (e) => {
+    load()
+  })
+  // print the diagram by opening a new window holding SVG images of the diagram contents for each page
+  printButton.addEventListener("click", (e) => {
+    printDiagram()
+  })
 
+  const save = () => {
+    document.getElementById("mySavedModel").value = myDiagram.model.toJson();
+    myDiagram.isModified = false;
+  }
+  const load = () => {
+    myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+  }
+  const printDiagram = () => {
+    let svgWindow = window.open();
+    if (!svgWindow) return;  // failure to open a new Window
+    let printSize = new go.Size(700, 960);
+    let bnds = myDiagram.documentBounds;
+    let x = bnds.x;
+    let y = bnds.y;
+    while (y < bnds.bottom) {
+      while (x < bnds.right) {
+        let svg = myDiagram.makeSvg({ scale: 1.0, position: new go.Point(x, y), size: printSize });
+        svgWindow.document.body.appendChild(svg);
+        x += printSize.width;
+      }
+      x = bnds.x;
+      y += printSize.height;
+    }
+    setTimeout(() => svgWindow.print(), 1);
+  }
+
+  load();  // load an initial diagram from some JSON text
 } // end init
 
 
-// Show the diagram's model in JSON format that the user may edit
-const saveButton = document.getElementById("SaveButton")
-const loadButton = document.getElementById("LoadButton")
-const printButton = document.getElementById("PrintButton")
-saveButton.addEventListener("click", (e) => {
-  save()
-})
-loadButton.addEventListener("click", (e) => {
-  load()
-})
-// print the diagram by opening a new window holding SVG images of the diagram contents for each page
-printButton.addEventListener("click", (e) => {
-  printDiagram()
-})
 
-function save() {
-  document.getElementById("mySavedModel").value = myDiagram.model.toJson();
-  myDiagram.isModified = false;
-}
-function load() {
-  if (document.getElementById("mySavedModel") != null) {
-    myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
-  }
-}
-function printDiagram() {
-  let svgWindow = window.open();
-  if (!svgWindow) return;  // failure to open a new Window
-  let printSize = new go.Size(700, 960);
-  let bnds = myDiagram.documentBounds;
-  let x = bnds.x;
-  let y = bnds.y;
-  while (y < bnds.bottom) {
-    while (x < bnds.right) {
-      let svg = myDiagram.makeSvg({ scale: 1.0, position: new go.Point(x, y), size: printSize });
-      svgWindow.document.body.appendChild(svg);
-      x += printSize.width;
-    }
-    x = bnds.x;
-    y += printSize.height;
-  }
-  setTimeout(() => svgWindow.print(), 1);
-}
 window.addEventListener('DOMContentLoaded', init);
