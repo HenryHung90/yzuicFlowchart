@@ -1,0 +1,59 @@
+body{
+    margin:0
+}
+
+
+.block{
+    height:150vh;
+    /* background-color: rgba(0,0,0,0.5); */
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    animation: fadeIn 0.5s steps(100);
+    position:absolute;
+    overflow: hidden;
+}
+
+.contentDiv{
+    background-color: transparent;
+    z-index:1001;
+    animation: fadeIn 0.5s steps(100);
+    position: absolute;
+    top:4%;
+    padding:15px;
+}
+
+.contentContainer{
+    height:85vh;
+    background-color: white;
+    border-radius: 20px;
+    padding:5px 10px;
+}
+
+.content_cancel{
+    width:40px;
+    height:40px;
+    transition-duration: 0.5s;
+}
+
+.content_codingdiv ,
+.content_displaydiv{
+    border:1px solid black;
+    height: 75vh;
+    padding:0;
+    resize: horizontal;
+}
+.content_coding_preloadContainer ,
+.content_coding_createContainer ,
+.content_coding_updateContainer{
+    border:1px solid black;
+    height:25vh;
+}
+
+@keyframes fadeIn {
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}

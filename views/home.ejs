@@ -14,7 +14,26 @@
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.1.min.js"
     integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-    
+  <!-- CodeMirror-->
+
+  <!-- 必要引入 -->
+  <link href="../codemirror-5.65.9/lib/codemirror.css" rel="stylesheet" />
+  <script src="../codemirror-5.65.9/lib/codemirror.js"></script>
+  <!-- 主題引入 -->
+  <link href="../codemirror-5.65.9/theme/dracula.css" rel="stylesheet"/>
+  <!-- JavaScript高亮 -->
+  <script src="../codemirror-5.65.9/mode/javascript/javascript.js"></script>
+  <!-- 支持代碼折疊 -->
+  <link rel="stylesheet" href="../codemirror-5.65.9/addon/fold/foldgutter.css"/>
+  <script src="../codemirror-5.65.9/addon/fold/foldcode.js"></script>
+  <script src="../codemirror-5.65.9/addon/fold/foldgutter.js"></script>
+  <script src="../codemirror-5.65.9/addon/fold/brace-fold.js"></script>
+  <script src="../codemirror-5.65.9/addon/fold/comment-fold.js"></script>
+  <!-- 提供Hint -->
+  <link rel="stylesheet" href="../codemirror-5.65.9/addon/hint/show-hint.css" />
+  <script src="../codemirror-5.65.9/addon/hint/show-hint.js"></script>
+  <script src="../codemirror-5.65.9/addon/hint/anyword-hint.js"></script>
+  <script src="../codemirror-5.65.9/addon/hint/javascript-hint.js"></script>
 </head>
 
 <body>
@@ -35,41 +54,31 @@
   <button id="SaveButton" disabled="">Save</button>
   <button id="LoadButton">Load</button>
   Diagram Model saved in JSON format:
-  <textarea id="mySavedModel" style="width:100%;height:300px">{ "class": "GraphLinksModel",
+  <textarea id="mySavedModel" style="width:100%;height:300px">
+    { "class": "GraphLinksModel",
     "linkFromPortIdProperty": "fromPort",
     "linkToPortIdProperty": "toPort",
     "nodeDataArray": [
-  {"category":"Comment","loc":"556 268","text":"Kookie Brittle","key":-13},
-  {"key":-1,"category":"Start","loc":"175 0","text":"Start"},
-  {"key":0,"loc":"-62 153","text":"Preheat oven to 375 F"},
-  {"key":1,"loc":"175 181","text":"In a bowl, blend: 1 cup margarine, 1.5 teaspoon vanilla, 1 teaspoon salt"},
-  {"key":2,"loc":"175 327","text":"Gradually beat in 1 cup sugar and 2 cups sifted flour"},
-  {"key":3,"loc":"175 494","text":"Mix in 6 oz (1 cup) Nestle's Semi-Sweet Chocolate Morsels"},
-  {"key":5,"loc":"427 153","text":"Finely chop 1/2 cup of your choice of nuts"},
-  {"text":"Mission 1","key":-14,"loc":"-265.39691162109375 62.5"},
-  {"text":"Mission 2","key":-15,"loc":"-441 147"},
-  {"text":"Mission 3","key":-3,"loc":"-280.39691162109375 357.5"},
-  {"category":"Comment","text":"說到底還不是這樣\n你說你想幹嘛\n我不懂\n你試試看\n我好帥","key":-2,"loc":"-84 303"},
-  {"category":"Conditional","text":"Mission 1","key":-12,"loc":"427 373"}
+  {"category":"Start","text":"任務一:小炸彈","key":"1","loc":"-129 -132"},
+  {"category":"Start","text":"任務二:小飛機","key":"2","loc":"-127 57"},
+  {"category":"Start","text":"任務三:小坦克","key":"3","loc":"-124.35 228.7499999999999"},
+  {"category":"Understanding","text":"探索與理解","key":-1,"loc":"59 -57"},
+  {"category":"Formulating","text":"表徵與制定","key":-2,"loc":"248 -239"},
+  {"category":"Programming","text":"計畫與執行","key":-3,"loc":"499.2121539916991 -92.50000000000011"},
+  {"category":"Reflection","text":"監控與反思","key":-4,"loc":"712 -270"},
+  {"category":"Comment","text":"筆記","key":-6,"loc":"27 -204"},
+  {"category":"Comment","text":"筆記","key":-9,"loc":"486 -258"}
   ],
     "linkDataArray": [
-  {"from":1,"to":2,"fromPort":"B","toPort":"T","points":[175,234.50089721679686,175,244.50089721679686,175,257.9688621520996,175,257.9688621520996,175,271.4368270874023,175,281.4368270874023]},
-  {"from":2,"to":3,"fromPort":"B","toPort":"T","points":[175,372.5631729125976,175,382.5631729125976,175,410.5,175,410.5,175,438.4368270874023,175,448.4368270874023]},
-  {"from":-1,"to":0,"fromPort":"B","toPort":"T","points":[175,36.75,175,46.75,175,69,-45.33333333333334,69,-45.33333333333334,91.24999999999999,-45.33333333333334,101.24999999999999]},
-  {"from":-1,"to":1,"fromPort":"B","toPort":"T","points":[175,36.75,175,46.75,175,82.12455139160156,175,82.12455139160156,175,117.49910278320311,175,127.49910278320311]},
-  {"from":-1,"to":5,"fromPort":"B","toPort":"T","points":[175,36.75,175,46.75,175,69,427,69,427,91.24999999999999,427,101.24999999999999]},
-  {"from":-14,"to":-15,"fromPort":"L","toPort":"T","points":[-320.54705810546875,62.5,-330.54705810546875,62.5,-441,62.5,-441,73.875,-441,85.24999999999999,-441,95.24999999999999]},
-  {"from":-15,"to":-3,"fromPort":"B","toPort":"T","points":[-441,198.75,-441,208.75,-441,252.24999999999997,-280.39691162109375,252.24999999999997,-280.39691162109375,295.74999999999994,-280.39691162109375,305.74999999999994]},
-  {"from":-1,"to":0,"fromPort":"L","toPort":"T","points":[138.25,0,128.25,0,-78.66666666666667,0,-78.66666666666667,41.62499999999999,-78.66666666666667,83.24999999999999,-78.66666666666667,101.24999999999999]},
-  {"from":5,"to":-12,"fromPort":"B","toPort":"T","points":[427,204.75,427,214.75,427,272.0622756958008,427,272.0622756958008,427,329.3745513916016,427,339.3745513916016]},
-  {"from":-12,"to":3,"fromPort":"B","toPort":"R","visible":true,"points":[427,406.6254486083985,427,416.6254486083985,427,494,277.7521286010742,494,267.7521286010742,494]},
-  {"from":-12,"to":2,"fromPort":"B","toPort":"R","visible":true,"points":[427,406.6254486083985,427,416.6254486083985,308.6577390047039,416.6254486083985,308.6577390047039,327,282.1043472290039,327,272.1043472290039,327],"text":"NO"}
+  {"from":"1","to":-1,"fromPort":"R","toPort":"L","points":[-82.57909393310547,-132,-72.57909393310547,-132,-38.489532470703125,-132,-38.489532470703125,-57,-4.399971008300783,-57,5.600028991699217,-57]},
+  {"from":-1,"to":-2,"fromPort":"R","toPort":"L","points":[112.39997100830078,-57,122.39997100830078,-57,153.5,-57,153.5,-239.00000000000006,184.60002899169922,-239.00000000000006,194.60002899169922,-239.00000000000006]},
+  {"from":-2,"to":-3,"fromPort":"R","toPort":"L","points":[301.3999710083008,-239.00000000000006,311.3999710083008,-239.00000000000006,373.60607699584955,-239.00000000000006,373.60607699584955,-92.50000000000011,435.8121829833983,-92.50000000000011,445.8121829833983,-92.50000000000011]},
+  {"from":-3,"to":-4,"fromPort":"R","toPort":"L","points":[552.6121249999999,-92.50000000000011,562.6121249999999,-92.50000000000011,564,-92.50000000000011,564,-92.50000000000011,612,-92.50000000000011,612,-270.00000000000006,648.6000289916992,-270.00000000000006,658.6000289916992,-270.00000000000006]}
   ]}
     </textarea>
   <button id="PrintButton">Print Diagram Using SVG</button>
 </body>
-<script type="module" src="../global/common.js"></script>
-<script type="module" src="../js/list.js"></script>
-<link rel="stylesheet" href="../css/list.css" type="text/css"/>
+<script type="module" src="../js/gogrammingList.js"></script>
+<link rel="stylesheet" href="../css/gogrammingList.css" type="text/css" />
 
 </html>

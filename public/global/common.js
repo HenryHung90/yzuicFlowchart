@@ -1,4 +1,19 @@
+import { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "./gogrammingPage.js"
+
 const showContainer = (s) => {
+    //click close function
+    const closePage = () => {
+        block.fadeOut(200)
+        contentDiv.fadeOut(200)
+        setTimeout(() => {
+            $('body').css({
+                'overflow': 'auto',
+            })
+            contentDiv.remove()
+            block.remove()
+        }, 200)
+    }
+
     //辨別任務
     console.log(s)
     //禁止滾動
@@ -7,23 +22,101 @@ const showContainer = (s) => {
     })
     //blocking
     const block = $('<div>').prop({
-        className:'container-fluid',
-        id:'block'
-    }).click(()=>{
-        block.fadeOut(200)
-        setTimeout(()=>{
-            $('body').css({
-                'overflow': 'auto',
-            })
-            block.remove()
-        },200)
-    }).insertBefore($('body'))
+        className: 'container-fluid block',
+    }).css({
+        'margin-top': `calc(${window.pageYOffset}px - 20px)`
+    }).click(() => {
+        closePage()
+    }).prependTo($('body'))
 
-    const content = $('<div>').prop({
-        className:'container',
-        id:'content'
-    }).prependTo(block)
+    //contentDiv
+    const contentDiv = $('<div>').prop({
+        className: 'container-fluid contentDiv',
+    }).css({
+        'margin-top': `calc(${window.pageYOffset}px + 25px)`
+    }).prependTo($('body'))
+
+    //contentContainer
+    const contentContainer = $('<div>').prop({
+        className: 'container-md contentContainer'
+    }).appendTo(contentDiv)
+
+    //Cancel Btn
+    const content_CancelBtn = $('<div>').prop({
+        className: 'content_cancel',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"/></svg>'
+    }).hover((e) => {
+        content_CancelBtn.css({
+            'transition-duration': '0.3s',
+            'background-color': 'rgba(0,0,0,0.2)',
+            'border-radius': '20px',
+        })
+    }, (e) => {
+        content_CancelBtn.css({
+            'transition-duration': '0.3s',
+            'background-color': 'transparent',
+            'border-radius': '0',
+        })
+    }).click((e) => {
+        closePage()
+    }).appendTo(contentContainer)
+
+
+    //Start 任務欄
+    //Comment 筆記
+    //Understanding 探索理解
+    //Formulating 表徵制定
+    //Programming 計畫執行
+    //Reflection 監控反思
+    //利用 Key 值紀錄內容
+    switch (s.category) {
+        case "Start":
+            break;
+        case "Comment":
+            break;
+        case "Undestanding":
+            break;
+        case "Formulating":
+            break;
+        case "Programming":
+            ProgrammingBox().appendTo(contentContainer)
+            codeMirror()
+            break;
+        case "Reflection":
+            break;
+    }
+
    
+}
+
+const codeMirror = () =>{
+    const textProgram = document.getElementById("preload")
+    CodeMirror.commands.autocomplete = function(cm) {
+        cm.showHint({hint: CodeMirror.hint.anyword});
+      }
+    const preloadEditor = CodeMirror.fromTextArea(textProgram,{
+        value:"function preload(){\n}",
+        //編譯模式
+        mode:'javascript',
+        //主題
+        theme:'dracula',
+        //行號
+        lineNumbers:true,
+        //過長自動換行
+        lineWrapping: true,
+        //支持代碼折疊
+        foldGutter:true,
+        //括號匹配
+        matchBrackets: true,
+        //縮排單位
+        indentUnit:2,
+        //tab寬度
+        tabSize:2,
+        //選擇時是否顯示光標
+        showCursorWhenSelecting: false,
+        extraKeys: {"Ctrl-Space": "autocomplete"}
+    })
+    preloadEditor.setSize("100%","100%")
 }
 
 

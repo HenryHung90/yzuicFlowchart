@@ -46,9 +46,8 @@ app.use(bodyParser.json());
 app.use(urlencodedParser);
 
 app.get('/', async (req, res) => {
-    res.render('home')
+    res.render('./home')
 })
-
 
 
 app.listen(port, () => { console.log("Server is runing at " + host + " : " + port) })
