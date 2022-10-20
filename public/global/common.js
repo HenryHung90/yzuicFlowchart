@@ -73,6 +73,7 @@ const showContainer = (s) => {
         case "Start":
             break;
         case "Comment":
+            CommentBox().appendTo(contentContainer)
             break;
         case "Undestanding":
             break;
@@ -80,43 +81,55 @@ const showContainer = (s) => {
             break;
         case "Programming":
             ProgrammingBox().appendTo(contentContainer)
-            codeMirror()
+            codeMirrorProgram('preload')
+            codeMirrorProgram('create')
+            codeMirrorProgram('update')
             break;
         case "Reflection":
             break;
     }
 
-   
+
 }
 
-const codeMirror = () =>{
-    const textProgram = document.getElementById("preload")
-    CodeMirror.commands.autocomplete = function(cm) {
-        cm.showHint({hint: CodeMirror.hint.anyword});
-      }
-    const preloadEditor = CodeMirror.fromTextArea(textProgram,{
-        value:"function preload(){\n}",
+const codeMirrorProgram = (name) => {
+    const textProgram = document.getElementById(name)
+    CodeMirror.commands.autocomplete = function (cm) {
+        cm.showHint({ hint: CodeMirror.hint.javascript });
+    }
+    const preloadEditor = CodeMirror.fromTextArea(textProgram, {
         //編譯模式
-        mode:'javascript',
+        mode: 'javascript',
         //主題
-        theme:'dracula',
+        theme: 'blackboard',
         //行號
-        lineNumbers:true,
+        lineNumbers: true,
         //過長自動換行
         lineWrapping: true,
         //支持代碼折疊
-        foldGutter:true,
+        foldGutter: true,
         //括號匹配
         matchBrackets: true,
         //縮排單位
-        indentUnit:2,
+        indentUnit: 2,
         //tab寬度
-        tabSize:2,
+        tabSize: 2,
         //選擇時是否顯示光標
         showCursorWhenSelecting: false,
-        extraKeys: {"Ctrl-Space": "autocomplete"}
+        keyMap: "sublime",
+        autoCloseTags: true,
+        autohint: true,
+        hintOptions: {
+            completeSingle: false
+        },
+        extraKeys: {
+            "Alt-Space": "autocomplete"
+        },
     })
-    preloadEditor.setSize("100%","100%")
+    preloadEditor.on('inputRead',(e)=>{
+        preloadEditor.showHint()
+    })
+    preloadEditor.setValue(`function ${name}(){\n\n}`)
 }
 
 
