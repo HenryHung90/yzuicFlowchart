@@ -10,12 +10,11 @@ $('#formSubmit').click((e) => {
             studentPassword: password,
         }
     }).then(response => {
-        console.log(response.data)
         if (response.data.status == 401) {
             window.alert(response.data.message)
             return
         }
-        sessionStorage.setItem('token', response.data.token)
-        window.location.href = `/home/${response.data.userId}`
+        
+        window.location.href = `/home/${response.data.studentId}`
     })
 })

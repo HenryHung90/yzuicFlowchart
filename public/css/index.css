@@ -1,38 +1,49 @@
-.container {
-    height: 100vh;
-}
-
 .loginDiv {
     margin: 0 auto;
     margin-top: 20vh;
     width: 50%;
-    height: 300px;
     border: 3px solid black;
     border-radius: 15px;
     padding: 5px 15px;
 }
 
-.formTitle{
+.formTitle {
     margin-top: 20px;
 }
 
 .loginInput {
-    height: 280px;
+    height: 300px;
 }
 
 .auther {
+    height: 250px;
     border-left: 2px solid black;
-    height: 280px;
 }
 
-#formSubmit{
+.authorImg {
+    width: 100px;
+}
+
+#formSubmit {
     margin-top: 20px;
     width: 70px;
 }
 
-@media (max-width:1400px) {
+@media (max-width: 1400px) {
     .loginDiv {
         width: auto;
-        height: 200px;
+    }
+    .auther {
+        width: auto;
+        height: 100px;
+        display: flex;
+        border-top: 2px solid black;
+        border-left: none;
+    }
+    .row {
+        display: inherit;
+    }
+    .loginInput {
+       width: auto;
     }
 }

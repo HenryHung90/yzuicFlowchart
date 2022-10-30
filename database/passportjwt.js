@@ -1,5 +1,5 @@
 import Promise from 'bluebird'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import passportJWT from 'passport-jwt'
@@ -14,9 +14,9 @@ const extractJWT = passportJWT.ExtractJwt
 
 const secret_key = 'secret-cat'
 
-const EXPRIE_SECOND = 10
-const EXPIRE_MIN = 1
-const EXPIRE_TIME = EXPIRE_MIN * EXPRIE_SECOND * 1000
+const EXPIRE_TIME = '1h'
+//ms 毫秒單位
+const EXPIRE_SECOND = 60 * 60 * 1000
 
 const checkPassword = async (user, inputPassword) => {
     let compareResult = false
@@ -60,17 +60,31 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
         })
 }))
 
-passport.use('token', new JWTStrategy({
-    jwtFromRequest: extractJWT.fromExtractors([
-        extractJWT.versionOneCompatibility({ authScheme: 'Bearer' }),
-    ]),
-    secretOrKey: secret_key
-},
+
+let cookieExtractor = function (req) {
+    let token = null;
+    if (req && req.cookies) token = req.cookies['token'];
+    return token;
+};
+let opts = {}
+opts.jwtFromRequest = cookieExtractor
+opts.secretOrKey = secret_key
+opts.failureRedirect = '/'
+opts.failureMessage = true
+
+
+passport.use('token', new JWTStrategy(opts,
     (jwtPayload, done) => {
-        console.log('user', jwtPayload, 'get')
-        studentConfig.findOne({ _id: jwtPayload._id })
+        console.log('user', jwtPayload, 'getIn')
+        studentConfig.findOne({ _id: jwtPayload._id, studentId: jwtPayload.studentId })
             .then(user => {
-                done(null, user)
+                const returnUser = {
+                    _id: user._id,
+                    studentClass: user.studentClass,
+                    studentId: user.studentId,
+                    studentName: user.studentName,
+                }
+                done(null, returnUser)
             })
             .catch(err => {
                 done(err)
@@ -84,11 +98,14 @@ const signIn = (req, res) => {
             status: 401
         })
     } else {
-        const token = jwt.sign({ _id: req.user._id.toString(), expiresIn: EXPIRE_TIME }, secret_key)
-        res.setHeader('Authorization', 'Bearer ' + token).json({
-            userId: req.user.studentId,
-            status: 200,
+        const token = jwt.sign({ _id: req.user._id.toString(), studentId: req.user.studentId.toString() }, secret_key, { expiresIn: EXPIRE_TIME })
+        // res.setHeader('Authorization',token).redirect(`/home/${req.user.studentId}`)
+        res.cookie('token', token, { maxAge: EXPIRE_SECOND }).cookie('studentId', req.user.studentId, { maxAge: EXPIRE_SECOND }).json({
+            studentId: req.user.studentId,
+            token: token,
+            status: 200
         })
+        // res.setHeader('token', token).redirect(`/home/${req.user.studentId}`)
     }
 }
 

@@ -7,6 +7,7 @@ import launchroutes from './router/launchroutes.js'
 import adminroutes from './router/adminroutes.js'
 //用於解析json row txt URL-encoded格式
 import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
 //取得靜態物件from public 之用
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -17,6 +18,7 @@ import './database/mongodb.js'
 import helmet from 'helmet'
 //passport
 import { passport, signIn } from './database/passportjwt.js'
+
 
 const app = express()
 const host = '127.0.0.1'
@@ -29,20 +31,8 @@ dotenv.config()
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.use(bodyParser.json());
 app.use(urlencodedParser);
+app.use(cookieParser())
 
-
-//靜態物件取得從public
-app.use(express.json())
-app.use(express.static('public'))
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use(express.static(path.join(__dirname, 'public')))
-
-//設定view ejs
-app.set("view engine", "ejs")
 
 //mongodb
 const mongoDbStatus = mongoose.connection
@@ -56,26 +46,70 @@ app.use(helmet({ dnsPrefetchControl: { allow: true } }))
 app.use(helmet.noSniff());
 //CSP
 app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'",
-                "https://code.jquery.com",
-                "https://cdn.jsdelivr.net",
-                'https://cdnjs.cloudflare.com'
-            ],
-        },
-    })
+    helmet(
+        {
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: [
+                        "'self'",
+                        'http://localhost:3000'
+                    ],
+                    scriptSrc: [
+                        "'self'",
+                        "https://code.jquery.com",
+                        "https://cdn.jsdelivr.net",
+                        'https://cdnjs.cloudflare.com'
+                    ],
+                    frameAncestors: [
+                        "'self'",
+                        "http://localhost:3000"
+                    ],
+                    frameSrc: [
+                        "'self'",
+                        "http://localhost:3000"
+                    ],
+                    childSrc: [
+                        "'self'",
+                        "http://localhost:3000"
+                    ],
+                    imgSrc: [
+                        'https://media.giphy.com',
+                        'http://localhost:3000',
+                        'data:'
+                    ]
+                },
+            },
+
+        })
 );
 
-//passport
 
+//設定view ejs
+app.set("view engine", "ejs")
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// app.get('/access/:file/:filename', async (req, res) => {
+//     res.sendFile(`${__dirname}/public/access/${req.params.file}/${req.params.filename}`)
+//     console.log(req.params.file, req.params.filename)
+// })
+//靜態物件取得從public
+app.use(express.json())
+app.use(express.static('public'))
+
+app.use(express.static(path.join(__dirname, 'public')))
+
+//passport
 
 app.use('/launch', launchroutes)
 app.use('/admin', adminroutes)
 
 app.get('/', async (req, res) => {
-    res.render('./index')
+    if (req.cookies['token'] == undefined) {
+        res.render('./index')
+    } else {
+        res.redirect(`./home/${req.cookies.studentId}`)
+    }
 })
 //登入
 // app.post('/login',async(req,res)=>{
@@ -84,7 +118,11 @@ app.get('/', async (req, res) => {
 app.post('/login', passport.authenticate('login', { session: false }), signIn)
 
 app.get('/home/:studentId', passport.authenticate('token', { session: false }), async (req, res) => {
-    res.render('./home', { studentId: req.params.studentId})
+    if (req.user.studentId != req.params.studentId) {
+        res.redirect('/')
+    } else {
+        res.render('./home', { studentId: req.params.studentId })
+    }
 })
 
 

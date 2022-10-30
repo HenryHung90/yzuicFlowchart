@@ -130,13 +130,11 @@ const ProgrammingBox = () => {
     //Content Row 分行器
     const contentRowDiv = $('<div>').prop({
         className: 'row justify-content-left contentColDiv',
-    }).css({
-        'width': '121%',
     })
 
     //Coding Div----------------------------------------------------
     const content_CodingDiv = $('<div>').prop({
-        className: 'col-9 content_codingdiv'
+        className: 'col-11 content_codingdiv'
     }).appendTo(contentRowDiv)
 
     //Setting
@@ -223,18 +221,26 @@ const ProgrammingBox = () => {
         id: 'custom'
     }).appendTo(content_CodingCustomContainer)
     //--------------------------------------------------------------
-    //Lanch
-    const content_LanchBtn = $('<div>').prop({
-        className: 'col-1 content_lanchbtndiv',
+    //Lanch area
+    const content_LanchDiv = $('<div>').prop({
+        className: 'col-1 content_lanchbtndiv'
     }).appendTo(contentRowDiv)
+
     $('<button>').prop({
         className: 'btn btn-success',
         innerHTML: 'Launch'
     }).click((e) => {
         launchDemo()
-    }).appendTo(content_LanchBtn)
+    }).appendTo(content_LanchDiv)
 
-
+    // $('<button>').prop({
+    //     className: 'btn btn-outline-primary',
+    //     id: 'demobtn',
+    //     innerHTML: 'Demo'
+    // }).click((e) => {
+    //     slideDemoDiv()
+    // }).appendTo(content_LanchDiv)
+    //--------------------------------------------------------------
 
     //Launch function
     const launchDemo = async () => {
@@ -245,7 +251,6 @@ const ProgrammingBox = () => {
         const createCode = $('#create').data('CodeMirror')
         const updateCode = $('#update').data('CodeMirror')
         const customCode = $("#custom").data('CodeMirror')
-
 
         await axios({
             url: '/launch/launchdemo',
@@ -273,38 +278,36 @@ const ProgrammingBox = () => {
                 return
             }
 
-            const DemoDiv = $('<div>').prop({
-                className: 'container-fluid DemoDiv',
+            const demoDiv = $('<div>').prop({
+                className: 'DemoDiv',
             }).prependTo($('.contentDiv'))
 
-            const block = $('<div>').prop({
-                className: 'container-fluid block',
-            }).css({
-                'margin-top': `calc(${window.pageYOffset}px - 20px)`
-            }).click(() => {
-                block.fadeOut(200)
-                DemoDiv.fadeOut(200)
-                setTimeout(() => {
-                    $('body').css({
-                        'overflow': 'auto',
-                    })
-                    DemoDiv.remove()
-                    block.remove()
-                }, 200)
-            }).appendTo(DemoDiv)
 
             $('<iframe>')
                 .prop({
-                    className: 'container-sm',
-                    src: `./access/${response}/${response}.html`
+                    className: 'container-lg',
+                    src: `../access/${response}/${response}.html`
                 })
                 .css({
-                    'position': 'relative',
-                    'height': '600px',
+                    'position': 'absolute',
+                    'margin':'0 auto',
+                    'height': '900px',
                     'z-index': '1000000',
                     'margin': '0 auto'
                 })
-                .appendTo(DemoDiv)
+                .appendTo(demoDiv)
+
+            const demoBlock = $('<div>').prop({
+                className: 'container-fluid demoblock',
+            }).click(() => {
+                demoDiv.fadeOut(200)
+                demoBlock.fadeOut(200)
+                setTimeout(() => {
+                    demoDiv.remove()
+                    demoBlock.remove()
+                }, 200)
+            }).appendTo(demoDiv)
+
 
         })
     }
