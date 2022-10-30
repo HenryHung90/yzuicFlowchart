@@ -15,7 +15,7 @@ const showContainer = (s) => {
     }
 
     //辨別任務
-    console.log(s)
+    //console.log(s)
     //禁止滾動
     $('body').css({
         'overflow': 'hidden',
@@ -71,21 +71,28 @@ const showContainer = (s) => {
     //利用 Key 值紀錄內容
     switch (s.category) {
         case "Start":
+            StartBox().appendTo(contentContainer)
             break;
         case "Comment":
             CommentBox().appendTo(contentContainer)
             break;
         case "Undestanding":
+            UnderstandingBox().appendTo(contentContainer)
             break;
         case "Formulating":
+            FormulatingBox().appendTo(contentContainer)
             break;
         case "Programming":
             ProgrammingBox().appendTo(contentContainer)
+            codeMirrorProgram('setting')
+            codeMirrorProgram('config')
             codeMirrorProgram('preload')
             codeMirrorProgram('create')
             codeMirrorProgram('update')
+            codeMirrorProgram('custom')
             break;
         case "Reflection":
+            ReflectionBox().appendTo(contentContainer)
             break;
     }
 
@@ -97,7 +104,7 @@ const codeMirrorProgram = (name) => {
     CodeMirror.commands.autocomplete = function (cm) {
         cm.showHint({ hint: CodeMirror.hint.javascript });
     }
-    const preloadEditor = CodeMirror.fromTextArea(textProgram, {
+    const Editor = CodeMirror.fromTextArea(textProgram, {
         //編譯模式
         mode: 'javascript',
         //主題
@@ -122,16 +129,51 @@ const codeMirrorProgram = (name) => {
         hintOptions: {
             completeSingle: false
         },
-        extraKeys: {
-            "Alt-Space": "autocomplete"
-        },
+        // extraKeys: {
+        //     "Alt-Space": "autocomplete"
+        // },
+        //光標接近邊緣時，上下距離
+        cursorScrollMargin:250,
+        //光標高度
+        cursorHeight:0.85
     })
-    preloadEditor.on('inputRead',(e)=>{
-        preloadEditor.showHint()
+    Editor.on('inputRead', (e) => {
+        Editor.showHint()
     })
-    preloadEditor.setValue(`function ${name}(){\n\n}`)
+
+    if (name == 'custom') {
+        Editor.setValue(
+            `//all custom function writing here\n`
+        )
+    } else if (name == 'setting') {
+        Editor.setValue(
+            `//global variable writing here\n`
+        )
+    } else if (name == 'config') {
+        Editor.setValue(
+            `//Config writing here
+let config = {
+    type: Phaser.AUTO,
+    width: 1200,
+    height: 800,
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    },
+    parent:'container',
+};
+let game = new Phaser.Game(config);`
+        )
+    }
+    else {
+        Editor.setValue(
+            `//function ${name} writing here\nfunction ${name}(){\n\n}`)
+    }
+    //save the Instance
+    $(`#${name}`).data('CodeMirror', Editor)
 }
 
 
 
-export { showContainer }
+export { showContainer, codeMirrorProgram }

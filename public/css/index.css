@@ -1,0 +1,38 @@
+.container {
+    height: 100vh;
+}
+
+.loginDiv {
+    margin: 0 auto;
+    margin-top: 20vh;
+    width: 50%;
+    height: 300px;
+    border: 3px solid black;
+    border-radius: 15px;
+    padding: 5px 15px;
+}
+
+.formTitle{
+    margin-top: 20px;
+}
+
+.loginInput {
+    height: 280px;
+}
+
+.auther {
+    border-left: 2px solid black;
+    height: 280px;
+}
+
+#formSubmit{
+    margin-top: 20px;
+    width: 70px;
+}
+
+@media (max-width:1400px) {
+    .loginDiv {
+        width: auto;
+        height: 200px;
+    }
+}

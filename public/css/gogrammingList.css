@@ -35,22 +35,39 @@ body {
     transition-duration: 0.5s;
 }
 
-.content_codingdiv,
-.content_displaydiv {
+/*Programing*/
+.content_codingdiv{
     border: 1px solid black;
     height: 75vh;
     padding: 0;
-    resize: horizontal;
+    overflow-y: auto;
 }
 
+.content_coding_settingContainer,
+.content_coding_configContainer,
 .content_coding_preloadContainer,
 .content_coding_createContainer,
-.content_coding_updateContainer {
-    border: 2px solid gray;
-    height: 25vh;
+.content_coding_updateContainer ,
+.content_coding_customContainer{
+    border: 1px solid gray;
+    height: 35vh;
     overflow-y: auto;
     padding: 0;
 }
+@import 'https://fonts.googleapis.com/css?family=Inconsolata';
+.function_title{
+    background-color: rgb(12, 16, 32);
+    font-family: 'Inconsolata', Helvetica, sans-serif;
+    color:white;
+    margin:0;
+    padding-top:10px;
+}
+
+.DemoDiv{
+    position: absolute;
+}
+
+
 
 /*Comment*/
 .commentContentDiv{

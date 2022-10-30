@@ -138,81 +138,139 @@ const ProgrammingBox = () => {
     const content_CodingDiv = $('<div>').prop({
         className: 'col-9 content_codingdiv'
     }).appendTo(contentRowDiv)
+
+    //Setting
+    $("<h3>").prop({
+        className: 'function_title',
+        innerHTML: 'Setting'
+    }).appendTo(content_CodingDiv)
+    const content_CodingSettingContainer = $('<div>').prop({
+        className: 'container-sm content_coding_settingContainer',
+    }).appendTo(content_CodingDiv)
+    //custom textarea
+    $('<textarea>').prop({
+        className: 'form-control',
+        id: 'setting'
+    }).appendTo(content_CodingSettingContainer)
+
+    //Config
+    $("<h3>").prop({
+        className: 'function_title',
+        innerHTML: 'Config'
+    }).appendTo(content_CodingDiv)
+    const content_CodingConfigContainer = $('<div>').prop({
+        className: 'container-sm content_coding_configContainer',
+    }).appendTo(content_CodingDiv)
+    //custom textarea
+    $('<textarea>').prop({
+        className: 'form-control',
+        id: 'config'
+    }).appendTo(content_CodingConfigContainer)
+
     //Preload
+    $("<h3>").prop({
+        className: 'function_title',
+        innerHTML: 'Preload'
+    }).appendTo(content_CodingDiv)
     const content_CodingPreloadContainer = $('<div>').prop({
         className: 'container-sm content_coding_preloadContainer',
     }).appendTo(content_CodingDiv)
     /////preload textarea
-    const preloadTextarea = $('<textarea>').prop({
+    $('<textarea>').prop({
         className: 'form-control',
         id: 'preload'
     }).appendTo(content_CodingPreloadContainer)
 
     //create
+    $("<h3>").prop({
+        className: 'function_title',
+        innerHTML: 'Create'
+    }).appendTo(content_CodingDiv)
     const content_CodingCreateContainer = $('<div>').prop({
         className: 'container-sm content_coding_createContainer',
     }).appendTo(content_CodingDiv)
     /////create textarea
-    const createTextarea = $('<textarea>').prop({
+    $('<textarea>').prop({
         className: 'form-control',
         id: 'create'
     }).appendTo(content_CodingCreateContainer)
 
     //update
+    $("<h3>").prop({
+        className: 'function_title',
+        innerHTML: 'Update'
+    }).appendTo(content_CodingDiv)
     const content_CodingUpdateContainer = $('<div>').prop({
         className: 'container-sm content_coding_updateContainer',
     }).appendTo(content_CodingDiv)
     /////update textarea
-    const updateTextarea = $('<textarea>').prop({
+    $('<textarea>').prop({
         className: 'form-control',
         id: 'update'
     }).appendTo(content_CodingUpdateContainer)
 
+    //custom
+    $("<h3>").prop({
+        className: 'function_title',
+        innerHTML: 'Custom function'
+    }).appendTo(content_CodingDiv)
+    const content_CodingCustomContainer = $('<div>').prop({
+        className: 'container-sm content_coding_customContainer',
+    }).appendTo(content_CodingDiv)
+    //custom textarea
+    $('<textarea>').prop({
+        className: 'form-control',
+        id: 'custom'
+    }).appendTo(content_CodingCustomContainer)
     //--------------------------------------------------------------
     //Lanch
     const content_LanchBtn = $('<div>').prop({
         className: 'col-1 content_lanchbtndiv',
     }).appendTo(contentRowDiv)
-    const lanchBtn = $('<button>').prop({
+    $('<button>').prop({
         className: 'btn btn-success',
         innerHTML: 'Launch'
     }).click((e) => {
         launchDemo()
     }).appendTo(content_LanchBtn)
 
-    //Display Div
-    const content_DisplayDiv = $('<div>').prop({
-        className: 'col-3 content_displaydiv',
-        innerHTML: 'display Monitor'
-    })
 
 
     //Launch function
     const launchDemo = async () => {
-        let fileLocation = ''
-       
-        axios({
-            url: 'http://localhost:3000/launchdemo',
+        //取得各階段程式碼
+        const settingCode = $("#setting").data('CodeMirror')
+        const configCode = $('#config').data('CodeMirror')
+        const preloadCode = $("#preload").data('CodeMirror')
+        const createCode = $('#create').data('CodeMirror')
+        const updateCode = $('#update').data('CodeMirror')
+        const customCode = $("#custom").data('CodeMirror')
+
+
+        await axios({
+            url: '/launch/launchdemo',
             method: 'post',
+            data: {
+                setting: settingCode.getValue(),
+                config: configCode.getValue(),
+                preload: preloadCode.getValue(),
+                create: createCode.getValue(),
+                update: updateCode.getValue(),
+                custom: customCode.getValue()
+            }
         }).then(response => {
-            if (response.status == 200) {
-                fileLocation = response.data
+            //成功執行並將access隨機碼載入
+            if (response.data.status == 200) {
+                return response.data.message
             }
-            if (response.status == 500) {
-                window.alert(response.data)
+            //失敗則告知失敗位置
+            if (response.data.status == 500) {
+                window.alert(response.data.message)
+                return 'fail'
+            }
+        }).then(response => {
+            if (response == 'fail') {
                 return
-            }
-            //click close function
-            const closePage = () => {
-                block.fadeOut(200)
-                DemoDiv.fadeOut(200)
-                setTimeout(() => {
-                    $('body').css({
-                        'overflow': 'auto',
-                    })
-                    DemoDiv.remove()
-                    block.remove()
-                }, 200)
             }
 
             const DemoDiv = $('<div>').prop({
@@ -224,21 +282,30 @@ const ProgrammingBox = () => {
             }).css({
                 'margin-top': `calc(${window.pageYOffset}px - 20px)`
             }).click(() => {
-                closePage()
+                block.fadeOut(200)
+                DemoDiv.fadeOut(200)
+                setTimeout(() => {
+                    $('body').css({
+                        'overflow': 'auto',
+                    })
+                    DemoDiv.remove()
+                    block.remove()
+                }, 200)
             }).appendTo(DemoDiv)
 
             $('<iframe>')
                 .prop({
-                    className: 'container-sm'
+                    className: 'container-sm',
+                    src: `./access/${response}/${response}.html`
                 })
                 .css({
-                    'position': 'absolute',
+                    'position': 'relative',
                     'height': '600px',
-                    'left': '10vw',
                     'z-index': '1000000',
+                    'margin': '0 auto'
                 })
-                .attr('src', `access/${fileLocation}/${fileLocation}.html`)
                 .appendTo(DemoDiv)
+
         })
     }
 
