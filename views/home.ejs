@@ -44,53 +44,60 @@
 </head>
 
 <body>
-  <div>
-    <h3>
-      <%= studentId %>
-    </h3>
+  <div class="container-fluid loadingContainer">
+    <div class="loadingDiv">
+      <div class="loader">
+        <span>Loading...</span>
+      </div>
+    </div>
   </div>
-  <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 20px;">
-    <div id="myPaletteDiv"
-      style="width: 200px; margin-right: 2px; background-color: rgb(40, 44, 52); position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0);">
-      <canvas tabindex="0" width="200" height="1800"
+  <div class="navBarContainer">
+    <!-- open nav -->
+    <div class="row justify-content-start navBarOpen">
+      <div class="col-12 navBarOpen_content" id="content_title">
+        <h3 class="navBarOpen_title">
+          Go List
+        </h3>
+      </div>
+      <div class="col-2 navBarOpen_content">
+        <h5 class="navBarOpen_title">
+          ID:<%= studentId %>
+        </h5>
+      </div>
+      <div class="col-2 navBarOpen_content" id="print">
+        <div class="navBarOpen_text">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 512 512">
+            <path
+              d="M96 0H368h13.3l9.4 9.4 48 48 9.4 9.4V80v80H384V93.3L354.7 64H128v96H64V32 0H96zM64 384H0V192H512V384H448v96 32H416 96 64V480 384zm64 0v64H384V384 352H128v16 16zM408 248v48h48V248H408z" />
+          </svg>
+        </div>
+      </div>
+      <div class="col-2 offset-md-6 navBarOpen_content">
+        <div class="navBarOpen_text" id="logout">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 512 512">
+            <path
+              d="M160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96C43 32 0 75 0 128V384c0 53 43 96 96 96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H96c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32h64zM504.5 273.4c4.8-4.5 7.5-10.8 7.5-17.4s-2.7-12.9-7.5-17.4l-144-136c-7-6.6-17.2-8.4-26-4.6s-14.5 12.5-14.5 22v72H192c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32H320v72c0 9.6 5.7 18.2 14.5 22s19 2 26-4.6l144-136z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Diagram Area -->
+  <div class="diagramContainer container-fluid">
+    <div id="myPaletteDiv">
+      <canvas tabindex="0" width="200"
         style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 100px; height: 750px;">This
         text is displayed if your browser does not support the Canvas HTML element.</canvas>
     </div>
-    <div id="myDiagramDiv"
-      style="flex-grow: 1; height: 900px; background-color: rgb(40, 44, 52); position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
-      <canvas tabindex="0" width="1900" height="1800"
+    <div id="myDiagramDiv">
+      <canvas tabindex="0" width="1900"
         style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 954px; height: 750px; cursor: auto;">This
         text is displayed if your browser does not support the Canvas HTML element.</canvas>
     </div>
   </div>
-  <button id="SaveButton" disabled="">Save</button>
-  <button id="LoadButton">Load</button>
-  Diagram Model saved in JSON format:
-  <textarea id="mySavedModel" style="width:100%;height:300px">
-    { "class": "GraphLinksModel",
-    "linkFromPortIdProperty": "fromPort",
-    "linkToPortIdProperty": "toPort",
-    "nodeDataArray": [
-  {"category":"Start","text":"任務一:小炸彈","key":"1","loc":"-129 -132"},
-  {"category":"Start","text":"任務二:小飛機","key":"2","loc":"-127 57"},
-  {"category":"Start","text":"任務三:小坦克","key":"3","loc":"-124.35 228.7499999999999"},
-  {"category":"Understanding","text":"探索與理解","key":-1,"loc":"59 -57"},
-  {"category":"Formulating","text":"表徵與制定","key":-2,"loc":"248 -239"},
-  {"category":"Programming","text":"計畫與執行","key":-3,"loc":"499.2121539916991 -92.50000000000011"},
-  {"category":"Reflection","text":"監控與反思","key":-4,"loc":"712 -270"},
-  {"category":"Comment","text":"筆記","key":-6,"loc":"27 -204"},
-  {"category":"Comment","text":"筆記","key":-9,"loc":"486 -258"}
-  ],
-    "linkDataArray": [
-  {"from":"1","to":-1,"fromPort":"R","toPort":"L","points":[-82.57909393310547,-132,-72.57909393310547,-132,-38.489532470703125,-132,-38.489532470703125,-57,-4.399971008300783,-57,5.600028991699217,-57]},
-  {"from":-1,"to":-2,"fromPort":"R","toPort":"L","points":[112.39997100830078,-57,122.39997100830078,-57,153.5,-57,153.5,-239.00000000000006,184.60002899169922,-239.00000000000006,194.60002899169922,-239.00000000000006]},
-  {"from":-2,"to":-3,"fromPort":"R","toPort":"L","points":[301.3999710083008,-239.00000000000006,311.3999710083008,-239.00000000000006,373.60607699584955,-239.00000000000006,373.60607699584955,-92.50000000000011,435.8121829833983,-92.50000000000011,445.8121829833983,-92.50000000000011]},
-  {"from":-3,"to":-4,"fromPort":"R","toPort":"L","points":[552.6121249999999,-92.50000000000011,562.6121249999999,-92.50000000000011,564,-92.50000000000011,564,-92.50000000000011,612,-92.50000000000011,612,-270.00000000000006,648.6000289916992,-270.00000000000006,658.6000289916992,-270.00000000000006]}
-  ]}
-    </textarea>
-  <button id="PrintButton">Print Diagram Using SVG</button>
 </body>
 <script type="module" src="../js/gogrammingList.js"></script>
 <link rel="stylesheet" href="../css/gogrammingList.css" type="text/css" />
+<link rel="stylesheet" href="../global/loader.css">
 
 </html>

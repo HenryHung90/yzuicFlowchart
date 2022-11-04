@@ -8,11 +8,11 @@
 //using in common.js => to show messageBox
 
 //StartBox return function
-const StartBox = () => {
+const StartBox = (startKey) => {
 
 }
 //CommentBox return function
-const CommentBox = () => {
+const CommentBox = (commentKey) => {
 
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
@@ -118,15 +118,16 @@ const CommentBox = () => {
     return contentDiv
 }
 //UnderstandingBox return function
-const UnderstandingBox = () => {
+const UnderstandingBox = (understandKey) => {
 
 }
 //FormulatingBox return function
-const FormulatingBox = () => {
+const FormulatingBox = (FormulatingKey) => {
 
 }
 //Programming return function
-const ProgrammingBox = () => {
+const ProgrammingBox = (programmingKey) => {
+    console.log(programmingKey)
     //Content Row 分行器
     const contentRowDiv = $('<div>').prop({
         className: 'row justify-content-left contentColDiv',
@@ -286,7 +287,9 @@ const ProgrammingBox = () => {
             $('<iframe>')
                 .prop({
                     className: 'container-lg',
-                    src: `../access/${response}/${response}.html`
+                    src: `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`
+                    //document.cookie.split("; ")[1].split("=")[1]
+                    //cookie 0 token , cookie 1 studentId
                 })
                 .css({
                     'position': 'absolute',

@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 //routes
 import launchroutes from './router/launchroutes.js'
 import adminroutes from './router/adminroutes.js'
+import studentroutes from './router/studentroutes.js'
 //用於解析json row txt URL-encoded格式
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
@@ -99,10 +100,6 @@ app.use(express.static('public'))
 
 app.use(express.static(path.join(__dirname, 'public')))
 
-//passport
-
-app.use('/launch', launchroutes)
-app.use('/admin', adminroutes)
 
 app.get('/', async (req, res) => {
     if (req.cookies['token'] == undefined) {
@@ -110,6 +107,11 @@ app.get('/', async (req, res) => {
     } else {
         res.redirect(`./home/${req.cookies.studentId}`)
     }
+})
+app.post('/logout',async(req,res)=>{
+    res.clearCookie('token')
+    res.clearCookie('studentId')
+    res.send('/')
 })
 //登入
 // app.post('/login',async(req,res)=>{
@@ -124,7 +126,10 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
         res.render('./home', { studentId: req.params.studentId })
     }
 })
-
+//routes
+app.use('/launch',  passport.authenticate('token', { session: false }),launchroutes)
+app.use('/admin', passport.authenticate('token', { session: false }), adminroutes)
+app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
 
 //404
 app.use((req, res, next) => {

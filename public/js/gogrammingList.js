@@ -1,11 +1,17 @@
-import { showContainer } from "../global/common.js";
+import { showContainer, loadingPage } from "../global/common.js";
 
-const init = () => {
+
+//init Diagram varible
+let myDiagram
+
+loadingPage(true)
+
+const goListInit = () => {
   // Since 2.2 you can also author concise templates with method chaining instead of GraphObject.make
   // For details, see https://gojs.net/latest/intro/buildingObjects.html
   const $ = go.GraphObject.make;  // for conciseness in defining templates
 
-  let myDiagram =
+  myDiagram =
     $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
       {
         // "initialContentAlignment": go.Spot.Center, 
@@ -16,8 +22,6 @@ const init = () => {
 
   // when the document is modified, add a "*" to the title and enable the "Save" button
   myDiagram.addDiagramListener("Modified", e => {
-    let button = document.getElementById("SaveButton");
-    if (button) button.disabled = !myDiagram.isModified;
     let idx = document.title.indexOf("*");
     if (myDiagram.isModified) {
       if (idx < 0) document.title += "*";
@@ -299,50 +303,116 @@ const init = () => {
     animation.add(diagram, 'opacity', 0, 1);
     animation.start();
   }
-  // Show the diagram's model in JSON format that the user may edit
-  const saveButton = document.getElementById("SaveButton")
-  const loadButton = document.getElementById("LoadButton")
-  const printButton = document.getElementById("PrintButton")
-  saveButton.addEventListener("click", (e) => {
-    save()
-  })
-  loadButton.addEventListener("click", (e) => {
-    load()
-  })
-  // print the diagram by opening a new window holding SVG images of the diagram contents for each page
-  printButton.addEventListener("click", (e) => {
-    printDiagram()
-  })
-
-  const save = () => {
-    document.getElementById("mySavedModel").value = myDiagram.model.toJson();
-    myDiagram.isModified = false;
-  }
-  const load = () => {
-    myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
-  }
-  const printDiagram = () => {
-    let svgWindow = window.open();
-    if (!svgWindow) return;  // failure to open a new Window
-    let printSize = new go.Size(700, 960);
-    let bnds = myDiagram.documentBounds;
-    let x = bnds.x;
-    let y = bnds.y;
-    while (y < bnds.bottom) {
-      while (x < bnds.right) {
-        let svg = myDiagram.makeSvg({ scale: 1.0, position: new go.Point(x, y), size: printSize });
-        svgWindow.document.body.appendChild(svg);
-        x += printSize.width;
-      }
-      x = bnds.x;
-      y += printSize.height;
-    }
-    setTimeout(() => svgWindow.print(), 1);
-  }
+  // // Show the diagram's model in JSON format that the user may edit
+  // const printButton = document.getElementById("PrintButton")
+  // // print the diagram by opening a new window holding SVG images of the diagram contents for each page
+  // printButton.addEventListener("click", (e) => {
+  //   printDiagram()
+  // })
 
   load();  // load an initial diagram from some JSON text
+
 } // end init
 
 
+//nav & click function
+const navInit = () => {
+  //nav
+  $('#print').click((e) => {
+    print()
+  })
+  $('#logout').click((e) => {
+    logout()
+  })
+  //Save Btn
+  $(document).keydown((e) => {
+    if (e.ctrlKey && e.keyCode == 83) {
+      e.preventDefault()
+      console.log('save')
+      save()
+    }
+    if (e.metaKey && e.keyCode == 83) {
+      e.preventDefault()
+      console.log('save')
+      save()
+    }
+  })
 
-window.addEventListener('DOMContentLoaded', init);
+  loadingPage(false)
+}
+
+///save & load  & print & logout function
+//----------------------------------------------------------------------------------------
+const save = async () => {
+  loadingPage(true)
+  //Json Parse
+  const goData = JSON.parse(myDiagram.model.toJson());
+  //刪除 * 字號
+  let idx = document.title.indexOf("*");
+  document.title = document.title.slice(0, idx);
+  //存入資料庫
+  await axios({
+    method: "post",
+    url: '/student/savegolist',
+    data: {
+      goList: goData
+    }
+  }).then(response => {
+    if (response.data.status == 500) {
+      window.alert(response.data.message)
+      return
+    }
+    loadingPage(false)
+  })
+
+  myDiagram.isModified = false;
+}
+const load = async () => {
+  let goListData = {}
+
+  await axios({
+    method: 'post',
+    url: '/student/readgolist'
+  }).then(response => {
+    if (response.data.status == 500) {
+      window.alert(response.data.message)
+      return
+    }
+    goListData = JSON.stringify(response.data.message)
+  })
+
+  // myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+  myDiagram.model = go.Model.fromJson(goListData)
+}
+const print = () => {
+  let svgWindow = window.open();
+  if (!svgWindow) return;  // failure to open a new Window
+  let printSize = new go.Size(700, 960);
+  let bnds = myDiagram.documentBounds;
+  let x = bnds.x;
+  let y = bnds.y;
+  while (y < bnds.bottom) {
+    while (x < bnds.right) {
+      let svg = myDiagram.makeSvg({ scale: 1.0, position: new go.Point(x, y), size: printSize });
+      svgWindow.document.body.appendChild(svg);
+      x += printSize.width;
+    }
+    x = bnds.x;
+    y += printSize.height;
+  }
+  setTimeout(() => svgWindow.print(), 1);
+}
+const logout = () => {
+  loadingPage(true)
+  axios({
+    method: 'post',
+    url: '/logout'
+  }).then(response => {
+    window.location.href = '/'
+  })
+}
+//----------------------------------------------------------------------------------------
+
+
+window.addEventListener('DOMContentLoaded', goListInit);
+window.addEventListener('DOMContentLoaded', navInit);

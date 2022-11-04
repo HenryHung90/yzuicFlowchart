@@ -1,5 +1,13 @@
 import { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "./gogrammingPage.js"
 
+const loadingPage = (state) =>{
+    if(state){
+        $('.loadingContainer').fadeIn(200)
+    }else{
+        $('.loadingContainer').fadeOut(200)
+    }
+}
+
 const showContainer = (s) => {
     //click close function
     const closePage = () => {
@@ -71,19 +79,19 @@ const showContainer = (s) => {
     //利用 Key 值紀錄內容
     switch (s.category) {
         case "Start":
-            StartBox().appendTo(contentContainer)
+            StartBox(s).appendTo(contentContainer)
             break;
         case "Comment":
-            CommentBox().appendTo(contentContainer)
+            CommentBox(s).appendTo(contentContainer)
             break;
         case "Undestanding":
-            UnderstandingBox().appendTo(contentContainer)
+            UnderstandingBox(s).appendTo(contentContainer)
             break;
         case "Formulating":
-            FormulatingBox().appendTo(contentContainer)
+            FormulatingBox(s).appendTo(contentContainer)
             break;
         case "Programming":
-            ProgrammingBox().appendTo(contentContainer)
+            ProgrammingBox(s).appendTo(contentContainer)
             codeMirrorProgram('setting')
             codeMirrorProgram('config')
             codeMirrorProgram('preload')
@@ -176,4 +184,4 @@ let game = new Phaser.Game(config);`
 
 
 
-export { showContainer, codeMirrorProgram }
+export { showContainer, codeMirrorProgram , loadingPage }

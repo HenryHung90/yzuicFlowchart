@@ -21,9 +21,13 @@ const studentsConfig = new mongoose.Schema({
         type: 'boolean',
         required: true,
     },
-    studentDetail: {
+    studentGoList: {
         type: 'object',
         required: false
+    },
+    studentCodeLst: {
+        type:'object',
+        required:false,
     }
 })
 
