@@ -2,7 +2,7 @@ import express from 'express'
 import bcrypt from 'bcryptjs'
 const router = express.Router()
 
-import studentConifg from '../models/studentconifg.js'
+import studentConifg from '../models/studentconfig.js'
 
 const saltRound = 10
 

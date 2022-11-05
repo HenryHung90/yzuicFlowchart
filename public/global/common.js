@@ -1,24 +1,51 @@
 import { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "./gogrammingPage.js"
 
-const loadingPage = (state) =>{
-    if(state){
+//loading Page
+const loadingPage = (state) => {
+    if (state) {
         $('.loadingContainer').fadeIn(200)
-    }else{
+    } else {
         $('.loadingContainer').fadeOut(200)
     }
 }
 
-const showContainer = (s) => {
+//save code sync Icon
+const saveCodeStatus = (state) => {
+    if (state) {
+        $('.content_status').fadeIn(200)
+        $('.content_complete').animate({
+            'color': 'black',
+            'border': '1px solid black',
+            'font-size': '12px',
+            'font-weight': "normal",
+            'opacity': '0.3',
+        }, 500)
+    } else {
+        $('.content_status').fadeOut(200)
+        $('.content_complete').animate({
+            'color': 'green',
+            'border': '1px solid green',
+            'font-size': '20px',
+            'font-weight': "bolder",
+            'opacity': '1',
+        }, 500)
+    }
+}
+
+const showContainer = async (s) => {
+    loadingPage(true)
     //click close function
     const closePage = () => {
         block.fadeOut(200)
         contentDiv.fadeOut(200)
+        $('.DemoDiv').fadeOut(200)
         setTimeout(() => {
             $('body').css({
                 'overflow': 'auto',
             })
             contentDiv.remove()
             block.remove()
+            $('.DemoDiv').remove()
         }, 200)
     }
 
@@ -49,10 +76,13 @@ const showContainer = (s) => {
         className: 'container-md contentContainer'
     }).appendTo(contentDiv)
 
+    const content_iconContainer = $('<div>').prop({
+        className: 'row justify-content-start'
+    }).appendTo(contentContainer)
     //Cancel Btn
     const content_CancelBtn = $('<div>').prop({
-        className: 'content_cancel',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"/></svg>'
+        className: 'col-1 content_cancel',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 320 512"><path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"/></svg>'
     }).hover((e) => {
         content_CancelBtn.css({
             'transition-duration': '0.3s',
@@ -67,7 +97,21 @@ const showContainer = (s) => {
         })
     }).click((e) => {
         closePage()
-    }).appendTo(contentContainer)
+    }).appendTo(content_iconContainer)
+
+
+    //complete Icon
+    $('<div>').prop({
+        className: 'col-1 content_complete',
+        innerHTML: 'Sync'
+    }).appendTo(content_iconContainer)
+    //status Icon
+    $('<div>').prop({
+        className: 'col-2 content_status',
+        innerHTML: '<svg id="content_status_icon" xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 512 512"><path d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160H336c-17.7 0-32 14.3-32 32s14.3 32 32 32H463.5c0 0 0 0 0 0h.4c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1V448c0 17.7 14.3 32 32 32s32-14.3 32-32V396.9l17.6 17.5 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352H176c17.7 0 32-14.3 32-32s-14.3-32-32-32H48.4c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"/></svg>' +
+            ' save code...'
+    }).appendTo(content_iconContainer)
+
 
 
     //Start 任務欄
@@ -91,23 +135,47 @@ const showContainer = (s) => {
             FormulatingBox(s).appendTo(contentContainer)
             break;
         case "Programming":
-            ProgrammingBox(s).appendTo(contentContainer)
-            codeMirrorProgram('setting')
-            codeMirrorProgram('config')
-            codeMirrorProgram('preload')
-            codeMirrorProgram('create')
-            codeMirrorProgram('update')
-            codeMirrorProgram('custom')
+            //確認userId資料夾是否建立
+            await axios({
+                method: 'post',
+                url: '/launch/createdemo'
+            }).then(response => {
+                if (response.data.status != 200) {
+                    window.alert(response.data.message)
+                    return
+                }
+            })
+            //讀取該key值的Code內容
+            await axios({
+                method: 'post',
+                url: '/student/readcode',
+                data: {
+                    keyCode: s.key,
+                }
+            }).then(response => {
+                //response.data.data == code內容
+                if (response.data.status != 200) {
+                    window.alert(response.data.message)
+                    return
+                }
+                // console.log(response.data)
+                ProgrammingBox(s).appendTo(contentContainer)
+                codeMirrorProgram('setting', response.data.data.setting || '')
+                codeMirrorProgram('config', response.data.data.config || '')
+                codeMirrorProgram('preload', response.data.data.preload || '')
+                codeMirrorProgram('create', response.data.data.create || '')
+                codeMirrorProgram('update', response.data.data.update || '')
+                codeMirrorProgram('custom', response.data.data.custom || '')
+                loadingPage(false)
+            })
             break;
         case "Reflection":
             ReflectionBox().appendTo(contentContainer)
             break;
     }
-
-
 }
 
-const codeMirrorProgram = (name) => {
+const codeMirrorProgram = (name, content) => {
     const textProgram = document.getElementById(name)
     CodeMirror.commands.autocomplete = function (cm) {
         cm.showHint({ hint: CodeMirror.hint.javascript });
@@ -141,47 +209,54 @@ const codeMirrorProgram = (name) => {
         //     "Alt-Space": "autocomplete"
         // },
         //光標接近邊緣時，上下距離
-        cursorScrollMargin:250,
+        cursorScrollMargin: 250,
         //光標高度
-        cursorHeight:0.85
+        cursorHeight: 0.85
     })
     Editor.on('inputRead', (e) => {
         Editor.showHint()
     })
 
-    if (name == 'custom') {
-        Editor.setValue(
-            `//all custom function writing here\n`
-        )
-    } else if (name == 'setting') {
-        Editor.setValue(
-            `//global variable writing here\n`
-        )
-    } else if (name == 'config') {
-        Editor.setValue(
-            `//Config writing here
-let config = {
-    type: Phaser.AUTO,
-    width: 1200,
-    height: 800,
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    },
-    parent:'container',
-};
-let game = new Phaser.Game(config);`
-        )
+    if (content == '') {
+        switch (name) {
+            case 'setting':
+                Editor.setValue(
+                    `//global variable writing here\n`)
+                break
+            case 'config':
+                Editor.setValue(
+                    '//Config writing here\n' +
+                    'let config = {\n' +
+                    'type: Phaser.AUTO,\n' +
+                    'width: 1200,\n' +
+                    'height: 800,\n' +
+                    'scene: {\n' +
+                    'preload: preload,\n' +
+                    'create: create,\n' +
+                    'update: update\n' +
+                    '},\n' +
+                    'parent:"container",\n' +
+                    '};\n' +
+                    'let game = new Phaser.Game(config);\n'
+                )
+                break
+            case 'custom':
+                Editor.setValue(
+                    `//all custom function writing here\n`
+                )
+                break
+            default:
+                Editor.setValue(
+                    `//function ${name} writing here\nfunction ${name}(){\n\n}`)
+        }
+    } else {
+        Editor.setValue(content)
     }
-    else {
-        Editor.setValue(
-            `//function ${name} writing here\nfunction ${name}(){\n\n}`)
-    }
+
     //save the Instance
     $(`#${name}`).data('CodeMirror', Editor)
 }
 
 
 
-export { showContainer, codeMirrorProgram , loadingPage }
+export { showContainer, codeMirrorProgram, loadingPage, saveCodeStatus }

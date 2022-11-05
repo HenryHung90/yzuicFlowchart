@@ -1,9 +1,11 @@
+import { showContainer, saveCodeStatus } from "./common.js"
 //Start
 //Comment
 //Understanding
 //Formulating
 //Programming
 //Reflection
+
 
 //using in common.js => to show messageBox
 
@@ -127,7 +129,6 @@ const FormulatingBox = (FormulatingKey) => {
 }
 //Programming return function
 const ProgrammingBox = (programmingKey) => {
-    console.log(programmingKey)
     //Content Row 分行器
     const contentRowDiv = $('<div>').prop({
         className: 'row justify-content-left contentColDiv',
@@ -149,7 +150,8 @@ const ProgrammingBox = (programmingKey) => {
     //custom textarea
     $('<textarea>').prop({
         className: 'form-control',
-        id: 'setting'
+        id: 'setting',
+        value: '12314141423'
     }).appendTo(content_CodingSettingContainer)
 
     //Config
@@ -222,17 +224,29 @@ const ProgrammingBox = (programmingKey) => {
         id: 'custom'
     }).appendTo(content_CodingCustomContainer)
     //--------------------------------------------------------------
-    //Lanch area
+    //Button area
     const content_LanchDiv = $('<div>').prop({
         className: 'col-1 content_lanchbtndiv'
     }).appendTo(contentRowDiv)
 
+    //launch
     $('<button>').prop({
-        className: 'btn btn-success',
-        innerHTML: 'Launch'
+        className: 'btn btn-success content_lanchbtn',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>'
     }).click((e) => {
         launchDemo()
     }).appendTo(content_LanchDiv)
+
+    //save code
+    $('<button>').prop({
+        className: 'btn btn-outline-primary content_lanchbtn',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 448 512"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 416c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z"/></svg>'
+    }).click((e) => {
+        saveCode()
+    }).appendTo(content_LanchDiv)
+
+
+
 
     // $('<button>').prop({
     //     className: 'btn btn-outline-primary',
@@ -242,8 +256,7 @@ const ProgrammingBox = (programmingKey) => {
     //     slideDemoDiv()
     // }).appendTo(content_LanchDiv)
     //--------------------------------------------------------------
-
-    //Launch function
+    //Launch demo function
     const launchDemo = async () => {
         //取得各階段程式碼
         const settingCode = $("#setting").data('CodeMirror')
@@ -252,7 +265,6 @@ const ProgrammingBox = (programmingKey) => {
         const createCode = $('#create').data('CodeMirror')
         const updateCode = $('#update').data('CodeMirror')
         const customCode = $("#custom").data('CodeMirror')
-
         await axios({
             url: '/launch/launchdemo',
             method: 'post',
@@ -279,39 +291,78 @@ const ProgrammingBox = (programmingKey) => {
                 return
             }
 
-            const demoDiv = $('<div>').prop({
-                className: 'DemoDiv',
-            }).prependTo($('.contentDiv'))
+            if ($('.DemoDiv').length == 0) {
+                const demoDiv = $('<div>').prop({
+                    className: 'container-fluid DemoDiv',
+                }).prependTo($('body'))
+
+                const demoIframe = $('<div>').prop({
+                    className: 'row justify-content-start iframeContainer'
+                }).appendTo(demoDiv)
+
+                const demoContent = $('<div>').prop({
+                    className: 'col-12 demoContent'
+                }).appendTo(demoIframe)
+                $('<iframe>')
+                    .prop({
+                        className: 'col-12',
+                        id: 'demoIframe',
+                        src: `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`
+                        //document.cookie.split("; ")[1].split("=")[1]
+                        //cookie 0 token , cookie 1 studentId
+                    })
+                    .css({
+                        'width': '100%',
+                        'height': '95%',
+                        'margin': '0 auto',
+                        'margin-top': '5px',
+                        'border': '1px dashed black',
+                        'border-radius': '20px'
+                    })
+                    .appendTo(demoContent)
+                //DownIcon
+                $('<div>').prop({
+                    className: 'col-1 offset-md-5 downIcon',
+                    innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+                }).appendTo(demoContent)
+            } else {
+                $('#demoIframe').attr('src', `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`)
+            }
 
 
-            $('<iframe>')
-                .prop({
-                    className: 'container-lg',
-                    src: `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`
-                    //document.cookie.split("; ")[1].split("=")[1]
-                    //cookie 0 token , cookie 1 studentId
-                })
-                .css({
-                    'position': 'absolute',
-                    'margin':'0 auto',
-                    'height': '900px',
-                    'z-index': '1000000',
-                    'margin': '0 auto'
-                })
-                .appendTo(demoDiv)
 
-            const demoBlock = $('<div>').prop({
-                className: 'container-fluid demoblock',
-            }).click(() => {
-                demoDiv.fadeOut(200)
-                demoBlock.fadeOut(200)
-                setTimeout(() => {
-                    demoDiv.remove()
-                    demoBlock.remove()
-                }, 200)
-            }).appendTo(demoDiv)
+        })
+    }
 
-
+    //save code function
+    const saveCode = async () => {
+        saveCodeStatus(true)
+        //取得各階段程式碼
+        const settingCode = $("#setting").data('CodeMirror')
+        const configCode = $('#config').data('CodeMirror')
+        const preloadCode = $("#preload").data('CodeMirror')
+        const createCode = $('#create').data('CodeMirror')
+        const updateCode = $('#update').data('CodeMirror')
+        const customCode = $("#custom").data('CodeMirror')
+        const keyCode = programmingKey.key
+        await axios({
+            method: 'post',
+            url: '/student/savecode',
+            data: {
+                setting: settingCode.getValue(),
+                config: configCode.getValue(),
+                preload: preloadCode.getValue(),
+                create: createCode.getValue(),
+                update: updateCode.getValue(),
+                custom: customCode.getValue(),
+                keyCode: keyCode,
+            }
+        }).then(response => {
+            if(response.data.status != 200){
+                window.alert(response.data.message)
+                return
+            }
+            saveCodeStatus(false)
         })
     }
 

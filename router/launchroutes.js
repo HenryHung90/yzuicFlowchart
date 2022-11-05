@@ -10,8 +10,8 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-const detectCreatingError = (res, errorObj) => {
+//回報錯誤
+const detectCreatingError = (res, errorObj, fileId) => {
     for (let value of Object.values(errorObj)) {
         if (value.status == "失敗") {
             res.json(
@@ -32,9 +32,10 @@ const detectCreatingError = (res, errorObj) => {
         })
 }
 
+//建立Access file for studentId
 router.post('/createdemo', async (req, res) => {
     try {
-        console.log(req.user)
+        // console.log(req.user)
         //將 '/router' 字樣刪除 
         const dirname = __dirname.substring(0, __dirname.length - 7)
         //檢測進度是否正常
@@ -43,35 +44,47 @@ router.post('/createdemo', async (req, res) => {
         ]
         //write file
         //user ID file
-        fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}`, (err) => {
-            if (err) {
-                fileWritingStatus[0].status = "失敗"
-            }
-        })
-        //user media file
-        fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}/media`, (err) => {
-            if (err) {
-                fileWritingStatus[0].status = "失敗"
-            }
-        })
+        if(fs.existsSync(`${dirname}/public/Access/${req.user.studentId}`)){
+            res.json(
+                {
+                    message:'success',
+                    status:200,
+                }
+            )
+        }else{
+            fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}`, (err) => {
+                if (err) {
+                    console.log(err)
+                    fileWritingStatus[0].status = "失敗"
+                }
+            })
+            //user media file
+            fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}/media`, (err) => {
+                if (err) {
+                    fileWritingStatus[0].status = "失敗"
+                }
+            })
+    
+            //res wirte in this function
+            detectCreatingError(res, fileWritingStatus, '')
+        }
 
-        //res wirte in this function
-        detectCreatingError(res, fileWritingStatus)
     }
     catch (err) {
         console.log(err)
         res.json(
             {
-                message: err,
+                message: '建立 Access 失敗，請聯絡管理員 (err)',
                 status: 500
             }
         )
     }
 })
 
+//建立Access file for html and js
 router.post('/launchdemo', async (req, res) => {
     try {
-        console.log(req.user)
+        // console.log(req.user)
         //將 /router 字樣刪除 
         const dirname = __dirname.substring(0, __dirname.length - 7)
         //建立程式隨機碼
@@ -85,13 +98,7 @@ router.post('/launchdemo', async (req, res) => {
 
         //write file
         //user ID file
-        fs.mkdirSync(`${dirname}/public/Access/${fileId}`, (err) => {
-            if (err) {
-                fileWritingStatus[0].status = "失敗"
-            }
-        })
-        //user media file
-        fs.mkdirSync(`${dirname}/public/Access/${fileId}/media`, (err) => {
+        fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}/${fileId}`, (err) => {
             if (err) {
                 fileWritingStatus[0].status = "失敗"
             }
@@ -100,7 +107,7 @@ router.post('/launchdemo', async (req, res) => {
         //html file write
         const htmlFileName = `${dirname}/public/Access/${req.user.studentId}/${fileId}/${fileId}.html`
         const htmlFileContent =
-        `<!DOCTYPE html>
+            `<!DOCTYPE html>
         <html lang="en" class=''>
         <head>
             <meta charset="UTF-8">
@@ -118,8 +125,9 @@ router.post('/launchdemo', async (req, res) => {
                 fileWritingStatus[1].status = "失敗"
             }
         })
+
         //js file write
-        const jsFileName = `${dirname}/public/Access/${fileId}/${fileId}.js`
+        const jsFileName = `${dirname}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
         const jsFileContent =
             `console.log("------------------------")
             console.log("Phaser is running now !!!")
@@ -150,13 +158,13 @@ router.post('/launchdemo', async (req, res) => {
         })
 
         //res wirte in this function
-        detectCreatingError(res, fileWritingStatus)
+        detectCreatingError(res, fileWritingStatus, fileId)
     }
     catch (err) {
         console.log(err)
         res.json(
             {
-                message: err,
+                message: '建立 access 失敗，請聯絡管理員 (err)',
                 status: 500
             }
         )

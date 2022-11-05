@@ -6,7 +6,7 @@ import passportJWT from 'passport-jwt'
 
 import localStrategy from 'passport-local'
 
-import studentConfig from '../models/studentconifg.js'
+import studentConfig from '../models/studentconfig.js'
 
 const LocalStrategy = localStrategy.Strategy
 const JWTStrategy = passportJWT.Strategy
