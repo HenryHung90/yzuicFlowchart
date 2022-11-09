@@ -76,7 +76,8 @@ app.use(
                     imgSrc: [
                         'https://media.giphy.com',
                         'http://localhost:3000',
-                        'data:'
+                        'data:',
+                        'blob:'
                     ]
                 },
             },
@@ -108,7 +109,7 @@ app.get('/', async (req, res) => {
         res.redirect(`./home/${req.cookies.studentId}`)
     }
 })
-app.post('/logout',async(req,res)=>{
+app.post('/logout', async (req, res) => {
     res.clearCookie('token')
     res.clearCookie('studentId')
     res.send('/')
@@ -119,6 +120,13 @@ app.post('/logout',async(req,res)=>{
 // })
 app.post('/login', passport.authenticate('login', { session: false }), signIn)
 
+app.use((req, res, next) => {
+    if (req.cookies['token'] == undefined) {
+        res.redirect('/')
+        return
+    }
+    next()
+})
 app.get('/home/:studentId', passport.authenticate('token', { session: false }), async (req, res) => {
     if (req.user.studentId != req.params.studentId) {
         res.redirect('/')
@@ -127,7 +135,7 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
     }
 })
 //routes
-app.use('/launch',  passport.authenticate('token', { session: false }),launchroutes)
+app.use('/launch', passport.authenticate('token', { session: false }), launchroutes)
 app.use('/admin', passport.authenticate('token', { session: false }), adminroutes)
 app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
 

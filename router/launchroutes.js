@@ -1,16 +1,50 @@
 import express from 'express'
 const router = express.Router()
 
-
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url);
+//將 '/router' 字樣刪除 
 const __dirname = path.dirname(__filename);
+const directName = __dirname.substring(0, __dirname.length - 7);
 
-//回報錯誤
+//------------------------------------------------------
+//multer
+import multer from 'multer'
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, `${directName}/public/Access/${req.user.studentId}/media`)
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    // reject a file
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+        //cb(new Error('I don\'t have a clue!'))       
+    }
+}
+
+const upload = multer(
+    {
+        storage: storage,
+        limits: {
+            //後端限制最大 25 MB 之圖片
+            fileSize: 25 * 1024 * 1024
+        },
+        fileFilter: fileFilter
+    });
+//------------------------------------------------------
+
+//Access File
 const detectCreatingError = (res, errorObj, fileId) => {
     for (let value of Object.values(errorObj)) {
         if (value.status == "失敗") {
@@ -36,23 +70,21 @@ const detectCreatingError = (res, errorObj, fileId) => {
 router.post('/createdemo', async (req, res) => {
     try {
         // console.log(req.user)
-        //將 '/router' 字樣刪除 
-        const dirname = __dirname.substring(0, __dirname.length - 7)
         //檢測進度是否正常
         const fileWritingStatus = [
             { name: "建立資料夾", status: "成功" }
         ]
         //write file
         //user ID file
-        if(fs.existsSync(`${dirname}/public/Access/${req.user.studentId}`)){
+        if (fs.existsSync(`${directName}/public/Access/${req.user.studentId}`)) {
             res.json(
                 {
-                    message:'success',
-                    status:200,
+                    message: 'success',
+                    status: 200,
                 }
             )
-        }else{
-            fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}`, (err) => {
+        } else {
+            fs.mkdirSync(`${directName}/public/Access/${req.user.studentId}`, (err) => {
                 if (err) {
                     console.log(err)
                     fileWritingStatus[0].status = "失敗"
@@ -64,7 +96,7 @@ router.post('/createdemo', async (req, res) => {
                     fileWritingStatus[0].status = "失敗"
                 }
             })
-    
+
             //res wirte in this function
             detectCreatingError(res, fileWritingStatus, '')
         }
@@ -80,13 +112,10 @@ router.post('/createdemo', async (req, res) => {
         )
     }
 })
-
 //建立Access file for html and js
 router.post('/launchdemo', async (req, res) => {
     try {
         // console.log(req.user)
-        //將 /router 字樣刪除 
-        const dirname = __dirname.substring(0, __dirname.length - 7)
         //建立程式隨機碼
         const fileId = uuidv4()
         //檢測進度是否正常
@@ -98,14 +127,14 @@ router.post('/launchdemo', async (req, res) => {
 
         //write file
         //user ID file
-        fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}/${fileId}`, (err) => {
+        fs.mkdirSync(`${directName}/public/Access/${req.user.studentId}/${fileId}`, (err) => {
             if (err) {
                 fileWritingStatus[0].status = "失敗"
             }
         })
 
         //html file write
-        const htmlFileName = `${dirname}/public/Access/${req.user.studentId}/${fileId}/${fileId}.html`
+        const htmlFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.html`
         const htmlFileContent =
             `<!DOCTYPE html>
         <html lang="en" class=''>
@@ -125,9 +154,8 @@ router.post('/launchdemo', async (req, res) => {
                 fileWritingStatus[1].status = "失敗"
             }
         })
-
         //js file write
-        const jsFileName = `${dirname}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
+        const jsFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
         const jsFileContent =
             `console.log("------------------------")
             console.log("Phaser is running now !!!")
@@ -171,4 +199,82 @@ router.post('/launchdemo', async (req, res) => {
     }
 })
 
+//--------------------------------------------------------------
+
+//media
+//輸入img file
+router.post('/uploadimg', upload.array("image", 5), async (req, res) => {
+    try {
+        res.json(
+            {
+                message: 'success',
+                status: 200
+            }
+        )
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '上傳圖片失敗，請聯繫管理員 (err)',
+                status: 500
+            }
+        )
+    }
+})
+//讀取media file
+router.post('/searchmedia', async (req, res) => {
+    try {
+        let fileList = []
+
+        fs.readdirSync(`${directName}/public/Access/${req.user.studentId}/media`).forEach(filename => {
+            fileList.push(
+                {
+                    src: `../access/${req.user.studentId}/media/${filename}`,
+                    name: filename
+                }
+            )
+        })
+
+        res.json({
+            files: fileList,
+            status: 200
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: '讀取 Access/Media 失敗，請聯繫管理員 (err)',
+            status: 500
+        })
+    }
+})
+//刪除media file
+router.post('/deletemedia', async (req, res) => {
+    try {
+        fs.unlinkSync(`${directName}/public/Access/${req.user.studentId}/media/${req.body.imageName}`, (err) => {
+            if (err) {
+                console.log(err)
+                res.json({
+                    message: '刪除 Access 圖像失敗，請重新整理網頁!',
+                    status: 500
+                })
+            }
+        })
+        res.json({
+            message: 'success',
+            status: 200
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: '刪除 Access 圖像失敗，請聯繫管理員 (err)',
+            status: 500
+        }
+        )
+    }
+})
+
+//--------------------------------------------------------------
 export default router 

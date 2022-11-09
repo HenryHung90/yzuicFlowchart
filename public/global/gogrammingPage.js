@@ -1,4 +1,4 @@
-import { showContainer, saveCodeStatus } from "./common.js"
+import { loadingPage, saveCodeStatus, maximumSizeInMegaByte } from "./common.js"
 //Start
 //Comment
 //Understanding
@@ -139,122 +139,162 @@ const ProgrammingBox = (programmingKey) => {
         className: 'col-11 content_codingdiv'
     }).appendTo(contentRowDiv)
 
-    //Setting
-    $("<h3>").prop({
-        className: 'function_title',
-        innerHTML: 'Setting'
-    }).appendTo(content_CodingDiv)
-    const content_CodingSettingContainer = $('<div>').prop({
-        className: 'container-sm content_coding_settingContainer',
-    }).appendTo(content_CodingDiv)
-    //custom textarea
-    $('<textarea>').prop({
-        className: 'form-control',
-        id: 'setting',
-        value: '12314141423'
-    }).appendTo(content_CodingSettingContainer)
-
-    //Config
-    $("<h3>").prop({
-        className: 'function_title',
-        innerHTML: 'Config'
-    }).appendTo(content_CodingDiv)
-    const content_CodingConfigContainer = $('<div>').prop({
-        className: 'container-sm content_coding_configContainer',
-    }).appendTo(content_CodingDiv)
-    //custom textarea
-    $('<textarea>').prop({
-        className: 'form-control',
-        id: 'config'
-    }).appendTo(content_CodingConfigContainer)
-
-    //Preload
-    $("<h3>").prop({
-        className: 'function_title',
-        innerHTML: 'Preload'
-    }).appendTo(content_CodingDiv)
-    const content_CodingPreloadContainer = $('<div>').prop({
-        className: 'container-sm content_coding_preloadContainer',
-    }).appendTo(content_CodingDiv)
-    /////preload textarea
-    $('<textarea>').prop({
-        className: 'form-control',
-        id: 'preload'
-    }).appendTo(content_CodingPreloadContainer)
-
-    //create
-    $("<h3>").prop({
-        className: 'function_title',
-        innerHTML: 'Create'
-    }).appendTo(content_CodingDiv)
-    const content_CodingCreateContainer = $('<div>').prop({
-        className: 'container-sm content_coding_createContainer',
-    }).appendTo(content_CodingDiv)
-    /////create textarea
-    $('<textarea>').prop({
-        className: 'form-control',
-        id: 'create'
-    }).appendTo(content_CodingCreateContainer)
-
-    //update
-    $("<h3>").prop({
-        className: 'function_title',
-        innerHTML: 'Update'
-    }).appendTo(content_CodingDiv)
-    const content_CodingUpdateContainer = $('<div>').prop({
-        className: 'container-sm content_coding_updateContainer',
-    }).appendTo(content_CodingDiv)
-    /////update textarea
-    $('<textarea>').prop({
-        className: 'form-control',
-        id: 'update'
-    }).appendTo(content_CodingUpdateContainer)
-
-    //custom
-    $("<h3>").prop({
-        className: 'function_title',
-        innerHTML: 'Custom function'
-    }).appendTo(content_CodingDiv)
-    const content_CodingCustomContainer = $('<div>').prop({
-        className: 'container-sm content_coding_customContainer',
-    }).appendTo(content_CodingDiv)
-    //custom textarea
-    $('<textarea>').prop({
-        className: 'form-control',
-        id: 'custom'
-    }).appendTo(content_CodingCustomContainer)
+    const content_codingContainer = [
+        {
+            title: 'Setting',
+            container: 'content_coding_settingContainer',
+            id: 'setting'
+        },
+        {
+            title: 'Config',
+            container: 'content_coding_configContainer',
+            id: 'config'
+        },
+        {
+            title: 'Preload',
+            container: 'content_coding_preloadContainer',
+            id: 'preload'
+        },
+        {
+            title: 'Create',
+            container: 'content_coding_createContainer',
+            id: 'create'
+        },
+        {
+            title: 'Update',
+            container: 'content_coding_updateContainer',
+            id: 'update'
+        },
+        {
+            title: 'Custom',
+            container: 'content_coding_customContainer',
+            id: 'custom'
+        }
+    ]
+    //render coding Area
+    for (let codingType of content_codingContainer) {
+        //title
+        $("<h3>").prop({
+            className: 'function_title',
+            innerHTML: codingType.title
+        }).appendTo(content_CodingDiv)
+        const content_CodingSettingContainer = $('<div>').prop({
+            className: `container-sm ${codingType.container}`,
+        }).appendTo(content_CodingDiv)
+        //textarea
+        $('<textarea>').prop({
+            className: 'form-control',
+            id: codingType.id
+        }).appendTo(content_CodingSettingContainer)
+    }
     //--------------------------------------------------------------
     //Button area
-    const content_LanchDiv = $('<div>').prop({
-        className: 'col-1 content_lanchbtndiv'
+    const content_LaunchDiv = $('<div>').prop({
+        className: 'col-1 content_launchbtndiv'
     }).appendTo(contentRowDiv)
 
     //launch
     $('<button>').prop({
-        className: 'btn btn-success content_lanchbtn',
+        className: 'btn btn-success content_launchbtn',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>'
     }).click((e) => {
         launchDemo()
-    }).appendTo(content_LanchDiv)
+    }).appendTo(content_LaunchDiv)
 
     //save code
     $('<button>').prop({
-        className: 'btn btn-outline-primary content_lanchbtn',
+        className: 'btn btn-outline-primary content_launchbtn',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 448 512"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 416c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z"/></svg>'
     }).click((e) => {
         saveCode()
-    }).appendTo(content_LanchDiv)
+    }).appendTo(content_LaunchDiv)
+
+    $('<input>').prop({
+        className: 'uploadfileInput',
+        type: 'file',
+        accept: 'image/png, image/jpeg, image/jpg'
+    }).css({
+        'display': 'none'
+    }).change((e) => {
+        uploadFile(e.target.files)
+    }).appendTo(content_LaunchDiv)
+    //upload file
+    $('<button>').prop({
+        className: 'btn btn-outline-primary content_lanchbtn',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM216 408c0 13.3-10.7 24-24 24s-24-10.7-24-24V305.9l-31 31c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l72-72c9.4-9.4 24.6-9.4 33.9 0l72 72c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-31-31V408z"/></svg>'
+    }).click((e) => {
+        uploadFileClick()
+    }).appendTo(content_LaunchDiv)
+
+    //-----------------------------------------------------------------------
+    //Data Visualization Area
+    const dataVisualizationArea = $('<div>').prop({
+        className: 'justify-content-center content_dataVisualizationArea'
+    }).prependTo($('body'))
+
+    const dataVisualization_container = $('<div>').prop({
+        className: 'row dataVisualizationArea_container'
+    }).hover(
+        (e) => {
+            dataVisualizationArea_upIcon.css({
+                'transform': 'rotate(180deg)'
+            })
+        }, (e) => {
+            dataVisualizationArea_upIcon.css({
+                'margin-top': '5px',
+                'transform': 'rotate(0deg)'
+            })
+        }).appendTo(dataVisualizationArea)
+
+    //upIcon
+    const dataVisualizationArea_upIcon = $('<div>').prop({
+        className: 'col-12 dataVisualizationArea_upIcon',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>'
+    }).appendTo(dataVisualization_container)
+
+    //fileDisk
+    const dataVisualizationArea_filedisk = $('<div>').prop({
+        className: 'col-2 dataVisualizationArea_filedisk',
+    }).appendTo(dataVisualization_container)
+
+    const dataVisualizationArea_showing = $('<div>').prop({
+        className: 'col-10 dataVisualizationArea_showing'
+    }).appendTo(dataVisualization_container)
 
 
+    ////html icon
+    $('<div>').prop({
+        className: 'dataVisualizationArea_filedisk_icon',
+        innerHTML:
+            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 384 512"><path d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>' +
+            '<p>phaserView.html</p>'
+    }).click((e) => {
+        dataVisualizationArea_showing.empty()
+        dataVisualizationArea_showing.append(dataHtml())
+    }).appendTo(dataVisualizationArea_filedisk)
+    ////js icon
+    $('<div>').prop({
+        className: 'dataVisualizationArea_filedisk_icon',
+        innerHTML:
+            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>' +
+            '<p>phaserScript.js</p>'
+    }).click((e) => {
+        dataVisualizationArea_showing.empty()
+        dataVisualizationArea_showing.append(dataJs())
+    }).appendTo(dataVisualizationArea_filedisk)
+    ////media folder icon
+    $('<div>').prop({
+        className: 'dataVisualizationArea_filedisk_icon',
+        innerHTML:
+            '<svg xmlns="http://www.w3.org/2000/svg"  width="100%" height="50px" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
+            '<p>media</p>'
+    }).click((e) => {
+        dataVisualizationArea_showing.empty()
+        dataVisualizationArea_showing.append(dataMedia())
+    }).appendTo(dataVisualizationArea_filedisk)
 
+    //-----------------------------------------------------------------------
 
-    // $('<button>').prop({
-    //     className: 'btn btn-outline-primary',
-    //     id: 'demobtn',
-    //     innerHTML: 'Demo'
-    // }).click((e) => {
-    //     slideDemoDiv()
-    // }).appendTo(content_LanchDiv)
     //--------------------------------------------------------------
     //Launch demo function
     const launchDemo = async () => {
@@ -358,13 +398,184 @@ const ProgrammingBox = (programmingKey) => {
                 keyCode: keyCode,
             }
         }).then(response => {
-            if(response.data.status != 200){
+            if (response.data.status != 200) {
                 window.alert(response.data.message)
                 return
             }
             saveCodeStatus(false)
         })
     }
+
+    //upload flie & click function
+    //click
+    const uploadFileClick = async () => {
+        return $('.uploadfileInput').click()
+    }
+    //upload
+    const uploadFile = async (files) => {
+        loadingPage(true)
+        let uploadFile = new FormData()
+
+        for (let file of files) {
+            const extension = file.name.substring(file.name.lastIndexOf('.'), file.name.length).toLowerCase();
+
+            //檢查檔案大小
+            if (file.size >= maximumSizeInMegaByte(20)) {
+                window.alert("上傳檔案禁止超過 20 MB")
+                loadingPage(false)
+                return
+            }
+            //檢查檔案副檔名結構
+            if (extension == '.png' || extension == '.jpg' || extension == '.jpeg') {
+                uploadFile.append('image', file)
+            } else {
+                window.alert("上傳檔案僅限 png jpg jpeg")
+                loadingPage(false)
+                return
+            }
+        }
+        await axios({
+            method: 'post',
+            url: '/launch/uploadimg',
+            data: uploadFile
+        }).then(response => {
+            if (response.data.status != 200) {
+                window.alert(response.data.message)
+                return
+            }
+            loadingPage(false)
+        })
+
+    }
+    //--------------------------------------------------------------
+    //data Visualization function
+    const dataHtml = () => {
+        const datahtmlContainer = $('<div>').prop({
+            className: 'container-fluid dataVisualizationArea_data',
+        })
+
+        $('<h2>').prop({
+            innerHTML: 'You can\'t not edit html'
+        }).css({
+            'margin': '0 auto',
+            'text-align': 'center',
+            'line-height': '100%',
+        }).appendTo(datahtmlContainer)
+
+        return datahtmlContainer
+    }
+    const dataJs = () => {
+        const datajsContainer = $('<div>').prop({
+            className: 'container-fluid dataVisualizationArea_data',
+        })
+
+        $('<h2>').prop({
+            innerHTML: 'Edit javascript in the box<br><br>' +
+                'If you want import media file<br>' +
+                'For Example: \'./media/[filename]\''
+        }).css({
+            'margin': '0 auto',
+            'text-align': 'center',
+            'line-height': '100%',
+        }).appendTo(datajsContainer)
+
+
+        return datajsContainer
+    }
+    const dataMedia = () => {
+        const datamediaContainer = $('<div>').prop({
+            className: 'row dataVisualizationArea_data'
+        })
+
+        const datamediaLoading = $('<div>').prop({
+            innerHTML: '<svg id="content_status_icon" xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 512 512"><path d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160H336c-17.7 0-32 14.3-32 32s14.3 32 32 32H463.5c0 0 0 0 0 0h.4c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1V448c0 17.7 14.3 32 32 32s32-14.3 32-32V396.9l17.6 17.5 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352H176c17.7 0 32-14.3 32-32s-14.3-32-32-32H48.4c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"/></svg>' +
+                'Seacrhing Folder...'
+        }).css({
+            'width': '100%',
+            'height': '100%',
+            'text-align': 'center'
+        }).appendTo(datamediaContainer)
+
+        //搜尋file
+        axios({
+            method: 'post',
+            url: '/launch/searchmedia'
+        }).then(response => {
+            if (response.data.status != 200) {
+                window.alert(response.data.message)
+                return
+            }
+            //去除Loading畫面
+            datamediaLoading.remove()
+
+            if (response.data.files != undefined) {
+                //製作 IMG 的列表圖
+                for (let mediaFile of response.data.files) {
+                    const fileItem = $('<div>').prop({
+                        className: 'col-2 media_item',
+                        innerHTML: `<img src=${mediaFile.src} style="width:40px;height:40px"></img>` +
+                            `<p>${mediaFile.name}</p>`,
+                        name: mediaFile.name
+                    }).hover(
+                        (e) => {
+                            deleteIcon.fadeIn(200)
+                        },
+                        (e) => {
+                            deleteIcon.fadeOut(50)
+                        }).appendTo(datamediaContainer)
+
+                    const deleteIcon = $('<div>').prop({
+                        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="10px" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>'
+                    }).css({
+                        'display': 'none',
+                        'background-color': 'rgba(0,0,0,0.3)',
+                        'width': '50%',
+                        'border-radius': '10px',
+                        'margin': '0 auto',
+                        'transition-duration': '0.3s'
+                    }).hover(
+                        (e) => {
+                            deleteIcon.css({
+                                'background-color': 'rgba(255,0,0,0.7)'
+                            })
+                        }, (e) => {
+                            deleteIcon.css({
+                                'background-color': 'rgba(0,0,0,0.3)'
+                            })
+                        }).click((e) => {
+                            deleteMedia(fileItem)
+                        }).appendTo(fileItem)
+                }
+            } else {
+                $('<h3>').prop({
+                    innerHTML: 'no file exist'
+                }).css({
+                    'margin': '0 auto'
+                }).appendTo(datamediaContainer)
+            }
+        })
+        return datamediaContainer
+    }
+    //delete Media
+    const deleteMedia = (file) => {
+        console.log(file)
+        if(window.confirm(`確定刪除圖像 ${file[0].name} ?`)){
+            axios({
+                method:'post',
+                url:'/launch/deletemedia',
+                data:{
+                    imageName:file[0].name
+                }
+            }).then(response=>{
+                if(response.data.status != 200){
+                    window.alert(response.data.message)
+                    return
+                }
+                file.remove()
+            })
+        }
+    }
+
 
     return contentRowDiv
 }

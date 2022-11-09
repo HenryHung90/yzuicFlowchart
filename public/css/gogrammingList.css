@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
 body {
     margin: 0;
     overflow: hidden;
@@ -12,6 +13,42 @@ body {
     animation: fadeIn 0.5s steps(100);
     position: absolute;
     overflow: hidden;
+}
+
+.paletteContainer {
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: left;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+}
+
+.paletteDiv {
+    display: flex;
+    width: 230px;
+    height: 95%;
+    margin: 2% 0;
+    padding-top: 20px;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: 5px 5px 2px 0 rgba(0, 0, 0, 0.7);
+    pointer-events: all;
+    transition-duration: 0.3s;
+    transform: translateX(-200px);
+}
+
+.paletteDiv:hover {
+    transition-duration: 0.3s;
+    transform: translateX(-20px);
+}
+
+#myPaletteDiv {
+    height: 95%;
+    pointer-events: all;
 }
 
 /* NavBar */
@@ -36,6 +73,7 @@ body {
 .navBarOpen {
     pointer-events: all;
     background-color: white;
+    box-shadow: 3px 3px 2px 0 rgba(0, 0, 0, 0.7);
     transform: translateY(100px);
     transition-duration: 0.3s;
     border-radius: 40px;
@@ -53,10 +91,15 @@ body {
 }
 
 .navBarOpen_title {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
     line-height: 80px;
     text-align: center;
     user-select: none;
     font-weight: bolder;
+}
+#studentId{
+    border-right: 2px solid rgba(0,0,0,0.5);
 }
 
 .navBarOpen_text {
@@ -110,7 +153,6 @@ body {
     z-index: 1001;
     animation: fadeIn 0.5s steps(100);
     position: absolute;
-    top: 4%;
     padding: 15px;
 }
 
@@ -159,7 +201,7 @@ body {
     border: 1px solid black;
     height: 75vh;
     padding: 0;
-    margin-top:5px;
+    margin-top: 5px;
     overflow-y: auto;
 }
 
@@ -186,6 +228,7 @@ body {
     padding-top: 10px;
 }
 
+/**Demo**/
 .DemoDiv {
     overflow: hidden;
     pointer-events: none;
@@ -196,7 +239,7 @@ body {
     width: 100vw;
     height: 100vh;
     padding: 24px;
-    z-index: 1002;
+    z-index: 1004;
 }
 
 .iframeContainer {
@@ -208,23 +251,13 @@ body {
     background-color: white;
     height: 95vh;
     transition-duration: 0.5s;
-    transform: translateY(-90vh);
+    transform: translateY(-95vh);
     border-radius: 20px;
 }
 
 .demoContent:hover {
     transition-duration: 0.5s;
-    transform: translateY(0px);
-}
-
-.content_lanchbtn {
-    margin: 0 auto;
-    margin-bottom: 10px;
-}
-
-#demobtn {
-    margin-top: 10px;
-    height: 90%;
+    transform: translateY(-10px);
 }
 
 .downIcon {
@@ -232,8 +265,88 @@ body {
     animation: upanddown 2s infinite steps(3000);
 }
 
+.content_launchbtndiv {
+    margin-top: 5px;
+}
 
+.content_launchbtn {
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
 
+/**dataVisulization**/
+.content_dataVisualizationArea {
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1002;
+}
+
+.dataVisualizationArea_container {
+    pointer-events: all;
+    width: 80%;
+    height: 300px;
+    background-color: white;
+    border: 5px solid black;
+    border-radius: 20px;
+    transition-duration: 0.3s;
+    transform: translateY(250px);
+}
+
+.dataVisualizationArea_container:hover {
+    transition-duration: 0.3s;
+    transform: translateY(0px);
+}
+
+.dataVisualizationArea_upIcon {
+    height: 20px;
+    transition-duration: 0.3s;
+}
+
+.dataVisualizationArea_filedisk {
+    height: 90%;
+    border-right: 2px solid black;
+}
+
+.dataVisualizationArea_filedisk_icon {
+    margin: 0 auto;
+    text-align: center;
+    transition-duration: 0.3s;
+}
+
+.dataVisualizationArea_filedisk_icon:hover {
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dataVisualizationArea_filedisk_icon p {
+    font-size: 10px;
+    font-weight: bolder;
+    user-select: none;
+}
+
+.dataVisualizationArea_data {
+    height: 95%;
+    padding: 10px;
+}
+
+/** Media **/
+.media_item {
+    word-break: break-all;
+    height: 50px;
+    text-align: center;
+}
+
+.media_item p {
+    font-size: 10px;
+    margin:0;
+    font-weight: bolder;
+}
 
 /*Comment*/
 .commentContentDiv {

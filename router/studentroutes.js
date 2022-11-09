@@ -1,8 +1,8 @@
 import express from 'express'
-import bcrypt from 'bcryptjs'
 const router = express.Router()
 
 import studentConfig from '../models/studentconfig.js'
+import standardcontent from '../models/standardcontent.js'
 
 
 //學生讀取 goList
@@ -26,41 +26,6 @@ router.post('/readgolist', async (req, res) => {
         )
     }
 })
-//學生讀取 code
-router.post('/readcode', async (req, res) => {
-    try {
-        await studentConfig.findOne({ studentId: req.user.studentId, studentAccess: true }).then(response => {
-            if (response.studentCodeList[req.body.keyCode] == undefined ||
-                response.studentCodeList[req.body.keyCode] == null ||
-                response.studentCodeList[req.body.keyCode] == {}
-            ) {
-                res.json(
-                    {
-                        message: '讀取 code 失敗，請重新整理網頁！',
-                        status: 500,
-                    }
-                )
-            } else {
-                res.json(
-                    {
-                        data: response.studentCodeList[req.body.keyCode],
-                        status: 200
-                    }
-                )
-            }
-        })
-    }
-    catch (err) {
-        console.log(err)
-        res.json(
-            {
-                message:'讀取 code 失敗，請聯絡管理員 (err)',
-                status:500,
-            }
-        )
-    }
-})
-
 //學生儲存 goList
 router.post('/savegolist', async (req, res) => {
     try {
@@ -86,11 +51,69 @@ router.post('/savegolist', async (req, res) => {
 
         })
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         res.json(
             {
                 message: 'error',
+                status: 500,
+            }
+        )
+    }
+})
+//學生重整 goList
+router.post('/restartgolist', async (req, res) => {
+    try {
+        let standardGoList = {}
+        //尋找 GoList
+        await standardcontent.findOne({ class: req.user.studentClass, access: true }).then(response => {
+            standardGoList = response.standardGoList
+        })
+        //更新 GoList
+        await studentConfig.updateOne(
+            { studentId: req.user.studentId, studentAccess: true },
+            { studentGoList: standardGoList })
+            .then(response => {
+                if (response.acknowledged) {
+                    res.json({
+                        message: 'success',
+                        status: 200
+                    })
+                } else {
+                    res.json({
+                        message: '重整 GoList 失敗，請重新整理網頁！',
+                        status: 500
+                    })
+                }
+
+            })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: '重整 golist 失敗，請聯繫管理員 (err)',
+            status: 500
+        })
+    }
+})
+
+//學生讀取 code
+router.post('/readcode', async (req, res) => {
+    try {
+        await studentConfig.findOne({ studentId: req.user.studentId, studentAccess: true }).then(response => {
+            res.json(
+                {
+                    data: response.studentCodeList[req.body.keyCode] || '',
+                    status: 200
+                }
+            )
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '讀取 code 失敗，請聯絡管理員 (err)',
                 status: 500,
             }
         )
@@ -149,6 +172,84 @@ router.post('/savecode', async (req, res) => {
                 status: 500
             }
         )
+    }
+})
+//學生刪除 code
+router.post('/deletecode', async (req, res) => {
+    try {
+        //取得目前檔案
+        let studentUpdateData = {}
+        //刪除狀態
+        let deleteStatus = false
+
+        await studentConfig.findOne({ studentId: req.user.studentId, studentAccess: true }).then(response => {
+            studentUpdateData = response.studentCodeList
+        })
+
+        delete studentUpdateData[req.body.keyCode]
+
+        await studentConfig.updateOne(
+            { studentId: req.user.studentId, studentAccess: true },
+            { studentCodeList: studentUpdateData }
+        ).then(response => {
+            deleteStatus = response.acknowledged
+        })
+        if (deleteStatus) {
+            res.json({
+                message: 'success',
+                status: 200
+            })
+        } else {
+            res.json({
+                message: '刪除該 node code 失敗，請重新整理網頁！',
+                status: 500
+            })
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '刪除失敗，請聯繫管理員 (err)',
+                status: 500
+            }
+        )
+    }
+})
+//學生重整 code
+router.post('/restartcode', async (req, res) => {
+    try {
+        let standardCodeList = {}
+        //尋找 Code
+        await standardcontent.findOne({ class: req.user.studentClass, access: true }).then(response => {
+            standardCodeList  = response.standardCodeList || {}
+        })
+        //更新 Code
+        await studentConfig.updateOne(
+            { studentId: req.user.studentId, studentAccess: true },
+            { studentCodeList:standardCodeList })
+            .then(response => {
+                if (response.acknowledged) {
+                    res.json({
+                        message: 'success',
+                        status: 200
+                    })
+                } else {
+                    res.json({
+                        message: '重整 Code 失敗，請重新整理網頁！',
+                        status: 500
+                    })
+                }
+
+            })
+
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: '重整 Code 失敗，請聯繫管理員 (err)',
+            status: 500
+        })
     }
 })
 

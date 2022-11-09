@@ -29,10 +29,21 @@ const goListInit = () => {
       if (idx >= 0) document.title = document.title.slice(0, idx);
     }
   });
+
+
+  //event function
   myDiagram.addDiagramListener("ObjectDoubleClicked", e => {
     const part = e.subject.part;
     if (!(part instanceof go.Link)) showContainer(part.ob);
   });
+  myDiagram.addDiagramListener('SelectionDeleting', function (e) {
+    // the DiagramEvent.subject is the collection of Parts about to be deleted
+    e.subject.each(async function (part) {
+      // console.log(part.ob)
+      deleteNode(part)
+    });
+  });
+
   // helper definitions for node templates
   function nodeStyle() {
     return [
@@ -87,7 +98,7 @@ const goListInit = () => {
   }
 
   // define the Node templates for regular nodes
-  let standardSetting = $(go.Node, "Table", nodeStyle(),
+  let standardSetting = $(go.Node, "Table", nodeStyle(), { deletable: false },
     // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
     $(go.Panel, "Auto",
       $(go.Shape, "RoundedRectangle",
@@ -143,7 +154,7 @@ const goListInit = () => {
     ));
 
   myDiagram.nodeTemplateMap.add("Start",
-    $(go.Node, "Table", nodeStyle(),
+    $(go.Node, "Table", nodeStyle(), { deletable: false },
       $(go.Panel, "Spot",
         $(go.Shape, "Circle",
           { desiredSize: new go.Size(70, 70), fill: "#282c34", stroke: "#09d3ac", strokeWidth: 3.5 }),
@@ -279,6 +290,8 @@ const goListInit = () => {
         // Instead of the default animation, use a custom fade-down
         "animationManager.initialAnimationStyle": go.AnimationManager.None,
         "InitialAnimationStarting": animateFadeDown, // Instead, animate with this function
+        //禁止縮放
+        allowZoom: false,
 
         nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
         model: new go.GraphLinksModel([  // specify the contents of the Palette
@@ -311,15 +324,18 @@ const goListInit = () => {
   // })
 
   load();  // load an initial diagram from some JSON text
-
-} // end init
-
-
+}
 //nav & click function
 const navInit = () => {
   //nav
   $('#print').click((e) => {
     print()
+  })
+  $('#save').click((e) => {
+    save()
+  })
+  $('#restart').click((e) => {
+    restart()
   })
   $('#logout').click((e) => {
     logout()
@@ -328,12 +344,10 @@ const navInit = () => {
   $(document).keydown((e) => {
     if (e.ctrlKey && e.keyCode == 83) {
       e.preventDefault()
-      console.log('save')
       save()
     }
     if (e.metaKey && e.keyCode == 83) {
       e.preventDefault()
-      console.log('save')
       save()
     }
   })
@@ -343,6 +357,7 @@ const navInit = () => {
 
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
+//save
 const save = async () => {
   loadingPage(true)
   //Json Parse
@@ -367,6 +382,7 @@ const save = async () => {
 
   myDiagram.isModified = false;
 }
+//load
 const load = async () => {
   let goListData = {}
 
@@ -384,6 +400,7 @@ const load = async () => {
   // myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
   myDiagram.model = go.Model.fromJson(goListData)
 }
+//print
 const print = () => {
   let svgWindow = window.open();
   if (!svgWindow) return;  // failure to open a new Window
@@ -402,17 +419,99 @@ const print = () => {
   }
   setTimeout(() => svgWindow.print(), 1);
 }
+//restart code & golist
+const restart = async () => {
+  if (window.confirm('確定重整嗎？所有內容將被清除！')) {
+    loadingPage(true)
+
+    //重整 goList
+    await axios({
+      method: 'post',
+      url: '/student/restartgolist'
+    }).then(response => {
+      if (response.data.status != 200) {
+        window.alert(response.data.message)
+        loadingPage(false)
+        return
+      }
+    })
+
+    //重整 code
+    await axios({
+      method:'post',
+      url:'/student/restartcode'
+    }).then(response=>{
+      if(response.data.status != 200){
+        window.alert(response.data.message)
+        loadingPage(false)
+        return
+      }
+    })
+
+    load()
+    loadingPage(false)
+  }
+}
+//logout
 const logout = () => {
-  loadingPage(true)
-  axios({
-    method: 'post',
-    url: '/logout'
-  }).then(response => {
-    window.location.href = '/'
-  })
+  if (window.confirm("確定登出嗎？退出前請記得儲存內容喔!")) {
+    loadingPage(true)
+    axios({
+      method: 'post',
+      url: '/logout'
+    }).then(response => {
+      window.location.href = '/'
+    })
+  }
 }
 //----------------------------------------------------------------------------------------
+//special for deleting node function
+const deleteNode = (part) => {
+  const animateDeletion = (part) => {
+    if (!(part instanceof go.Node)) return; // only animate Nodes
+    let animation = new go.Animation();
+    let deletePart = part.copy();
+    animation.add(deletePart, "scale", deletePart.scale, 0.01);
+    animation.add(deletePart, "angle", deletePart.angle, 360);
+    animation.addTemporaryPart(deletePart, myDiagram);
+    animation.start();
+  }
 
+  switch (part.ob.category) {
+    case 'Start':
+      window.alert('此為必須結構，禁止刪除！')
+      return
+    case 'Programming':
+      if (window.confirm('確定是否刪除 計畫與執行？\n這將導致該內容全部遭到刪除')) {
+        axios({
+          method: 'post',
+          url: '/student/deletecode',
+          data: {
+            keyCode: part.ob.key,
+          }
+        }).then(response => {
+          if (response.data.status != 200) {
+            window.alert(response.data.message)
+            return
+          }
+          myDiagram.remove(part)
+          animateDeletion(part)
+          save()
+        })
+      }
+      return
+    case 'Comment':
+      if (window.confirm('確定是否刪除該筆記？\n這將導致該內容全部遭到刪除')) {
+        myDiagram.remove(part)
+        animateDeletion(part)
+        save()
+      }
+      break
+    default:
+      myDiagram.remove(part)
+      animateDeletion(part)
+  }
+}
 
 window.addEventListener('DOMContentLoaded', goListInit);
 window.addEventListener('DOMContentLoaded', navInit);
