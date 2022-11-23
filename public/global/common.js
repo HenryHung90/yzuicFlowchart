@@ -47,6 +47,7 @@ const showContainer = async (s) => {
         //iframe
         $('.DemoDiv').fadeOut(200)
         $('.content_dataVisualizationArea').fadeOut(200)
+        $('.content_consoleErrorArea').fadeOut(200)
         setTimeout(() => {
             $('body').css({
                 'overflow': 'auto',
@@ -55,6 +56,7 @@ const showContainer = async (s) => {
             block.remove()
             //iframe
             $('.DemoDiv').remove()
+            $('.content_consoleErrorArea').remove()
             $('.content_dataVisualizationArea').remove()
         }, 200)
     }

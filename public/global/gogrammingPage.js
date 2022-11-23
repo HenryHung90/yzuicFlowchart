@@ -292,12 +292,40 @@ const ProgrammingBox = (programmingKey) => {
         dataVisualizationArea_showing.empty()
         dataVisualizationArea_showing.append(dataMedia())
     }).appendTo(dataVisualizationArea_filedisk)
-
     //-----------------------------------------------------------------------
+    //console error area
+    const consoleErrorArea = $('<div>').prop({
+        className: 'justify-content-center content_consoleErrorArea'
+    }).prependTo($('body'))
 
+    const consoleError_container = $('<div>').prop({
+        className: 'row consoleErrorArea_container'
+    }).hover(
+        (e) => {
+            consoleErrorArea_leftIcon.css({
+                'transform': 'rotate(180deg)'
+            })
+        }, (e) => {
+            consoleErrorArea_leftIcon.css({
+                'transform': 'rotate(0deg)'
+            })
+        }).appendTo(consoleErrorArea)
+
+    //leftIcon
+    const consoleErrorArea_leftIcon = $('<div>').prop({
+        className: 'col-1 consoleErrorArea_leftIcon',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg);" width="100%" height="100%" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>'
+    }).appendTo(consoleError_container)
+    //errorText
+    const consoleErrorArea_errorText = $('<div>').prop({
+        className: 'col-11 consoleErrorArea_errorText',
+        id: 'testingCode'
+    }).appendTo(consoleError_container)
     //--------------------------------------------------------------
     //Launch demo function
     const launchDemo = async () => {
+        loadingPage(true)
+        consoleText()
         //取得各階段程式碼
         const settingCode = $("#setting").data('CodeMirror')
         const configCode = $('#config').data('CodeMirror')
@@ -326,7 +354,7 @@ const ProgrammingBox = (programmingKey) => {
                 window.alert(response.data.message)
                 return 'fail'
             }
-        }).then(response => {
+        }).then(async response => {
             if (response == 'fail') {
                 return
             }
@@ -343,11 +371,14 @@ const ProgrammingBox = (programmingKey) => {
                 const demoContent = $('<div>').prop({
                     className: 'col-12 demoContent'
                 }).appendTo(demoIframe)
-                $('<iframe>')
+
+
+                const demoIframeInfo = $('<iframe>')
                     .prop({
                         className: 'col-12',
                         id: 'demoIframe',
-                        src: `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`
+                        src: `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`,
+                        sandBox: "allow-scripts"
                         //document.cookie.split("; ")[1].split("=")[1]
                         //cookie 0 token , cookie 1 studentId
                     })
@@ -360,6 +391,16 @@ const ProgrammingBox = (programmingKey) => {
                         'border-radius': '20px'
                     })
                     .appendTo(demoContent)
+
+                demoIframeInfo.on('load', (e) => {
+                    e.preventDefault()
+                    loadingPage(false)
+                    demoContent.addClass('demoFinish')
+                    setTimeout((e) => {
+                        demoContent.removeClass('demoFinish')
+                    }, 1000)
+                })
+
                 //DownIcon
                 $('<div>').prop({
                     className: 'col-1 offset-md-5 downIcon',
@@ -367,10 +408,15 @@ const ProgrammingBox = (programmingKey) => {
                 }).appendTo(demoContent)
             } else {
                 $('#demoIframe').attr('src', `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`)
+                $('#demoIframe').on('load', (e) => {
+                    e.preventDefault()
+                    loadingPage(false)
+                    $('.demoContent').addClass('demoFinish')
+                    setTimeout((e) => {
+                        $('.demoContent').removeClass('demoFinish')
+                    }, 1000)
+                })
             }
-
-
-
         })
     }
 
@@ -559,15 +605,15 @@ const ProgrammingBox = (programmingKey) => {
     //delete Media
     const deleteMedia = (file) => {
         console.log(file)
-        if(window.confirm(`確定刪除圖像 ${file[0].name} ?`)){
+        if (window.confirm(`確定刪除圖像 ${file[0].name} ?`)) {
             axios({
-                method:'post',
-                url:'/launch/deletemedia',
-                data:{
-                    imageName:file[0].name
+                method: 'post',
+                url: '/launch/deletemedia',
+                data: {
+                    imageName: file[0].name
                 }
-            }).then(response=>{
-                if(response.data.status != 200){
+            }).then(response => {
+                if (response.data.status != 200) {
                     window.alert(response.data.message)
                     return
                 }
@@ -575,7 +621,37 @@ const ProgrammingBox = (programmingKey) => {
             })
         }
     }
-
+    const consoleText = () => {
+        let logger = document.getElementById('testingCode');
+        console.log = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        console.trace = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        console.error = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        console.warn = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+    }
 
     return contentRowDiv
 }

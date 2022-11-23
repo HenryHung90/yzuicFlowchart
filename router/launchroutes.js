@@ -122,7 +122,8 @@ router.post('/launchdemo', async (req, res) => {
         const fileWritingStatus = [
             { name: "建立資料夾", status: "成功" },
             { name: "建立html檔案", status: "成功" },
-            { name: "建立js檔案", status: "成功" }
+            { name: "建立js檔案", status: "成功" },
+            { name: "監聽檔案", status: "成功" },
         ]
 
         //write file
@@ -132,56 +133,104 @@ router.post('/launchdemo', async (req, res) => {
                 fileWritingStatus[0].status = "失敗"
             }
         })
+        //js file write
+        const jsFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
+        const jsFileContent =
+            `            
+            window.onload = () => {
+                console.log("------------------------")
+                console.log("Phaser is running now !!!")
+                console.log("------------------------")
+                ${req.body.setting}
+    
+    
+                //config
+                ${req.body.config}
+    
+                //preload function
+                ${req.body.preload}
+    
+                //create function
+                ${req.body.create}
+
+    
+                //update function
+                ${req.body.update}
+    
+                //custom function
+                ${req.body.custom}
+            }
+            `
+        fs.writeFileSync(jsFileName, jsFileContent, (err) => {
+            if (err) {
+                fileWritingStatus[2].status = "失敗"
+            }
+        })
+
+        //console file write
+        const consoleFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/consoleListen.js`
+        const consoleFileContent =
+            `
+        let logger = window.top.document.getElementById('testingCode');
+        console.log('launch logger')
+        console.log = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        console.trace = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        console.error = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        console.warn = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        `
+        fs.writeFileSync(consoleFileName, consoleFileContent, (err) => {
+            if (err) {
+                fileWritingStatus[3].status = "失敗"
+            }
+        })
 
         //html file write
         const htmlFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.html`
         const htmlFileContent =
             `<!DOCTYPE html>
-        <html lang="en" class=''>
-        <head>
-            <meta charset="UTF-8">
-            <title>Demo</title>
-            <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
-        </head>
-        <body>
-            <div id="container"></div>
-        </body>
-        <script src="${fileId}.js"></script>
-        </html>
-        `
+         <html lang="en" class=''>
+         <head>
+             <meta charset="UTF-8">
+             <title>Demo</title>
+             <script src='./consoleListen.js' defer></script>
+             <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+             <!-- jQuery -->
+             <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+         </head>
+         <body>
+             <div id="container"></div>
+         </body>
+         <script src="./${fileId}.js"></script>
+         </html>
+         `
         fs.writeFileSync(htmlFileName, htmlFileContent, (err) => {
             if (err) {
                 fileWritingStatus[1].status = "失敗"
-            }
-        })
-        //js file write
-        const jsFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
-        const jsFileContent =
-            `console.log("------------------------")
-            console.log("Phaser is running now !!!")
-            console.log("------------------------")
-            ${req.body.setting}
-
-
-            //config
-            ${req.body.config}
-
-            //preload function
-            ${req.body.preload}
-
-            //create function
-            ${req.body.create}
-
-            //update function
-            ${req.body.update}
-
-            //custom function
-            ${req.body.custom}
-            `
-        //js file write
-        fs.writeFileSync(jsFileName, jsFileContent, (err) => {
-            if (err) {
-                fileWritingStatus[2].status = "失敗"
             }
         })
 

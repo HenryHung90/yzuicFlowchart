@@ -75,7 +75,7 @@ opts.failureMessage = true
 
 passport.use('token', new JWTStrategy(opts,
     (jwtPayload, done) => {
-        console.log('user', jwtPayload, 'getIn')
+        console.log('user', jwtPayload.studentId, 'get in at ',new Date())
         studentConfig.findOne({ _id: jwtPayload._id, studentId: jwtPayload.studentId })
             .then(user => {
                 const returnUser = {
