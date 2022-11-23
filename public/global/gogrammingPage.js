@@ -1,4 +1,4 @@
-import { loadingPage, saveCodeStatus, maximumSizeInMegaByte } from "./common.js"
+import { loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximumSizeInMegaByte } from "./common.js"
 //Start
 //Comment
 //Understanding
@@ -317,7 +317,7 @@ const ProgrammingBox = (programmingKey) => {
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg);" width="100%" height="100%" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>'
     }).appendTo(consoleError_container)
     //errorText
-    const consoleErrorArea_errorText = $('<div>').prop({
+    $('<div>').prop({
         className: 'col-11 consoleErrorArea_errorText',
         id: 'testingCode'
     }).appendTo(consoleError_container)
@@ -325,7 +325,7 @@ const ProgrammingBox = (programmingKey) => {
     //Launch demo function
     const launchDemo = async () => {
         loadingPage(true)
-        consoleText()
+        // consoleText()
         //取得各階段程式碼
         const settingCode = $("#setting").data('CodeMirror')
         const configCode = $('#config').data('CodeMirror')
@@ -333,6 +333,15 @@ const ProgrammingBox = (programmingKey) => {
         const createCode = $('#create').data('CodeMirror')
         const updateCode = $('#update').data('CodeMirror')
         const customCode = $("#custom").data('CodeMirror')
+
+        //重整Code Line 以便查詢錯誤位置
+        const EditorName = ['setting', 'config', 'preload', 'create', 'update', 'custom']
+        for (let name of EditorName) {
+            $(`#${name}`)
+                .data('CodeMirror')
+                .setOption('firstLineNumber', swtichEditorNameToStartLineNumber(name));
+        }
+
         await axios({
             url: '/launch/launchdemo',
             method: 'post',
@@ -430,6 +439,7 @@ const ProgrammingBox = (programmingKey) => {
         const createCode = $('#create').data('CodeMirror')
         const updateCode = $('#update').data('CodeMirror')
         const customCode = $("#custom").data('CodeMirror')
+
         const keyCode = programmingKey.key
         await axios({
             method: 'post',
@@ -622,7 +632,7 @@ const ProgrammingBox = (programmingKey) => {
         }
     }
     const consoleText = () => {
-        let logger = document.getElementById('testingCode');
+        let logger = window.top.document.getElementById('testingCode');
         console.log = function (message) {
             if (typeof message == 'object') {
                 logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
@@ -645,6 +655,35 @@ const ProgrammingBox = (programmingKey) => {
             }
         }
         console.warn = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        console.assert = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        Error = function (message) {
+            console.log('catch error', message);
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        TypeError = function (message) {
+            if (typeof message == 'object') {
+                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+            } else {
+                logger.innerHTML += message + '<br />';
+            }
+        }
+        SyntaxError = function (message) {
             if (typeof message == 'object') {
                 logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
             } else {

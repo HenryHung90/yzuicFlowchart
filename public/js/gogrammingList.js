@@ -28,6 +28,7 @@ const goListInit = () => {
     } else {
       if (idx >= 0) document.title = document.title.slice(0, idx);
     }
+    
   });
 
 

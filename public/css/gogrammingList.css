@@ -372,7 +372,21 @@ body {
     overflow: auto;
     border: 1px solid black;
     background-color: gray;
+    height: 100%;
 }
+.consoleErrorArea_logCode{
+    font-family: monospace;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    padding:3px 5px;
+}
+.consoleErrorArea_errorCode{
+    font-family: monospace;
+    background-color: rgb(226, 69, 69);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    padding:2px;
+    margin:2px;
+}
+
 
 /** Media **/
 .media_item {

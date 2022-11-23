@@ -62,7 +62,7 @@ const showContainer = async (s) => {
     }
 
     // loadingPage(true)
-    
+
     //辨別任務
     //console.log(s)
     //禁止滾動
@@ -189,6 +189,48 @@ const showContainer = async (s) => {
     }
 }
 
+
+//codeMirror Function
+//轉換各組行數
+const swtichEditorNameToStartLineNumber = (EditorName) => {
+    switch (EditorName) {
+        case "setting":
+            return 2
+        case "config":
+            return $("#setting").data('CodeMirror').lineCount() + 3
+        case 'preload':
+            return (
+                $("#setting").data('CodeMirror').lineCount() +
+                $("#config").data('CodeMirror').lineCount() + 4
+            )
+        case 'create':
+            return (
+                $("#setting").data('CodeMirror').lineCount() +
+                $("#config").data('CodeMirror').lineCount() +
+                $("#preload").data('CodeMirror').lineCount() +
+                5
+            )
+        case 'update':
+            return (
+                $("#setting").data('CodeMirror').lineCount() +
+                $("#config").data('CodeMirror').lineCount() +
+                $("#preload").data('CodeMirror').lineCount() +
+                $("#create").data('CodeMirror').lineCount() +
+                6
+            )
+        case 'custom':
+            return (
+                $("#setting").data('CodeMirror').lineCount() +
+                $("#config").data('CodeMirror').lineCount() +
+                $("#preload").data('CodeMirror').lineCount() +
+                $("#create").data('CodeMirror').lineCount() +
+                $("#update").data('CodeMirror').lineCount() +
+                7
+            )
+    }
+}
+
+//初始化各個Editor
 const codeMirrorProgram = (name, content) => {
     const textProgram = document.getElementById(name)
     CodeMirror.commands.autocomplete = function (cm) {
@@ -201,6 +243,8 @@ const codeMirrorProgram = (name, content) => {
         theme: 'blackboard',
         //行號
         lineNumbers: true,
+        //開始行號
+        firstLineNumber: swtichEditorNameToStartLineNumber(name),
         //過長自動換行
         lineWrapping: true,
         //支持代碼折疊
@@ -229,6 +273,15 @@ const codeMirrorProgram = (name, content) => {
     })
     Editor.on('inputRead', (e) => {
         Editor.showHint()
+    })
+    Editor.on('change', (e) => {
+        $('.content_complete').animate({
+            'color': 'black',
+            'border': '1px solid black',
+            'font-size': '12px',
+            'font-weight': "normal",
+            'opacity': '0.3',
+        }, 500)
     })
 
     if (content == '') {
@@ -273,4 +326,4 @@ const codeMirrorProgram = (name, content) => {
 
 
 
-export { showContainer, codeMirrorProgram, loadingPage, saveCodeStatus, maximumSizeInMegaByte }
+export { showContainer, swtichEditorNameToStartLineNumber, codeMirrorProgram, loadingPage, saveCodeStatus, maximumSizeInMegaByte }

@@ -122,8 +122,7 @@ router.post('/launchdemo', async (req, res) => {
         const fileWritingStatus = [
             { name: "建立資料夾", status: "成功" },
             { name: "建立html檔案", status: "成功" },
-            { name: "建立js檔案", status: "成功" },
-            { name: "監聽檔案", status: "成功" },
+            { name: "建立js檔案", status: "成功" }
         ]
 
         //write file
@@ -136,75 +135,29 @@ router.post('/launchdemo', async (req, res) => {
         //js file write
         const jsFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
         const jsFileContent =
-            `            
-            window.onload = () => {
-                console.log("------------------------")
-                console.log("Phaser is running now !!!")
-                console.log("------------------------")
-                ${req.body.setting}
-    
-    
-                //config
-                ${req.body.config}
-    
-                //preload function
-                ${req.body.preload}
-    
-                //create function
-                ${req.body.create}
-
-    
-                //update function
-                ${req.body.update}
-    
-                //custom function
-                ${req.body.custom}
+            `try{console.log("------------------------");console.log("Phaser is running now !!!");console.log("------------------------")
+${req.body.setting}
+//config
+${req.body.config}
+//preload function
+${req.body.preload}
+//create function
+${req.body.create}
+//update function
+${req.body.update}
+//custom function
+${req.body.custom}
+            }catch(err){
+                console.error(err.stack)
+                // console.log('stack',err.stack)
+                // console.log('fileName',err.fileName)
+                // console.log('cause',err.cause)
             }
+                
             `
         fs.writeFileSync(jsFileName, jsFileContent, (err) => {
             if (err) {
                 fileWritingStatus[2].status = "失敗"
-            }
-        })
-
-        //console file write
-        const consoleFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/consoleListen.js`
-        const consoleFileContent =
-            `
-        let logger = window.top.document.getElementById('testingCode');
-        console.log('launch logger')
-        console.log = function (message) {
-            if (typeof message == 'object') {
-                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
-            } else {
-                logger.innerHTML += message + '<br />';
-            }
-        }
-        console.trace = function (message) {
-            if (typeof message == 'object') {
-                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
-            } else {
-                logger.innerHTML += message + '<br />';
-            }
-        }
-        console.error = function (message) {
-            if (typeof message == 'object') {
-                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
-            } else {
-                logger.innerHTML += message + '<br />';
-            }
-        }
-        console.warn = function (message) {
-            if (typeof message == 'object') {
-                logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
-            } else {
-                logger.innerHTML += message + '<br />';
-            }
-        }
-        `
-        fs.writeFileSync(consoleFileName, consoleFileContent, (err) => {
-            if (err) {
-                fileWritingStatus[3].status = "失敗"
             }
         })
 
@@ -216,8 +169,7 @@ router.post('/launchdemo', async (req, res) => {
          <head>
              <meta charset="UTF-8">
              <title>Demo</title>
-             <script src='./consoleListen.js' defer></script>
-             <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+             <script src="../../../global/consoleListen.js"></script>
              <!-- jQuery -->
              <script src="https://code.jquery.com/jquery-3.6.1.min.js"
              integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
@@ -225,7 +177,8 @@ router.post('/launchdemo', async (req, res) => {
          <body>
              <div id="container"></div>
          </body>
-         <script src="./${fileId}.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js" defer></script>
+         <script src="./${fileId}.js" defer></script>
          </html>
          `
         fs.writeFileSync(htmlFileName, htmlFileContent, (err) => {
@@ -275,6 +228,12 @@ router.post('/uploadimg', upload.array("image", 5), async (req, res) => {
 router.post('/searchmedia', async (req, res) => {
     try {
         let fileList = []
+
+        //若新增 Media 失敗之備案
+        if (!fs.existsSync(`${directName}/public/Access/${req.user.studentId}/media`)) {
+            //user media file
+            fs.mkdirSync(`${directName}/public/Access/${req.user.studentId}/media`)
+        }
 
         fs.readdirSync(`${directName}/public/Access/${req.user.studentId}/media`).forEach(filename => {
             fileList.push(
