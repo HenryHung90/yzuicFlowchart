@@ -1,5 +1,5 @@
 // let logger = document.getElementById('testingCode');
-
+console.log("Listen working...")
 // console.log = function (message) {
 //     logger.innerHTML += '<div class="consoleErrorArea_logCode">' + message + '</div>';
 // }
@@ -240,12 +240,12 @@ function() {
         if (_ === HUB_EVENTS.CONSOLE_RUN_COMMAND)
             try {
                 const E = window.eval(e.command);
-                console.log("E",E)
+                console.log(E)
             } catch (E) {
                 return void console.error(E.message)
             }
     }
     const N = ["clear", "count", "debug", "error", "info", "log", "table", "time", "timeEnd", "warn"];
-    E(),
-    window.addEventListener("message", e, !1)
+    E()
+    // window.addEventListener("message", e, !1)
 }();

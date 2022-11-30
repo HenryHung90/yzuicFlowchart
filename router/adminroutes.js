@@ -4,6 +4,7 @@ const router = express.Router()
 
 import studentConifg from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
+import studentconfig from '../models/studentconfig.js'
 
 const saltRound = 10
 
@@ -29,6 +30,7 @@ router.post('/addstudent', async (req, res) => {
         if (req.body.studentAccess == null) {
             throw 'studentaccess require'
         }
+
 
         await studentConifg.findOne({ studentId: req.body.studentId, studentClass: req.body.studentClass }).then(response => {
             if (response == null) {

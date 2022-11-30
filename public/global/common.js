@@ -40,6 +40,28 @@ const maximumSizeInMegaByte = (megaByte) => {
 
 //show Each Box
 const showContainer = async (s) => {
+    const reciveMessage = (e) => {
+        e.preventDefault()
+        const sendPort = e.origin
+        const sendMessage = e.data.data.arguments.join()
+        const sendStatus = e.data.data.function
+        // console.log(e.data.data.function)
+        if (sendPort == "http://localhost:3000") {
+            let logger = document.getElementById('testingCode');
+            if (sendStatus == 'log') {
+                logger.innerHTML += '<div class="consoleErrorArea_logCode">' + sendMessage + '</div>';
+            } else if (sendStatus == 'error') {
+                logger.innerHTML += '<div class="consoleErrorArea_errorCode">' + sendMessage + '</div>';
+            }
+        }
+    }
+    //listen Message from iframe
+    const listenMessageBind = () => {
+        window.addEventListener('message', reciveMessage, false)
+    }
+    const listenMessageUnbind = () => {
+        window.removeEventListener('message', reciveMessage, false)
+    }
     //click close function
     const closePage = () => {
         block.fadeOut(200)
@@ -48,6 +70,8 @@ const showContainer = async (s) => {
         $('.DemoDiv').fadeOut(200)
         $('.content_dataVisualizationArea').fadeOut(200)
         $('.content_consoleErrorArea').fadeOut(200)
+        //unbind listenEvent
+        listenMessageUnbind()
         setTimeout(() => {
             $('body').css({
                 'overflow': 'auto',
@@ -126,8 +150,6 @@ const showContainer = async (s) => {
             ' Save code...'
     }).appendTo(content_iconContainer)
 
-
-
     //Start 任務欄
     //Comment 筆記
     //Understanding 探索理解
@@ -174,6 +196,8 @@ const showContainer = async (s) => {
                 }
                 // console.log(response.data)
                 ProgrammingBox(s).appendTo(contentContainer)
+                // create listenEvent
+                listenMessageBind()
                 codeMirrorProgram('setting', response.data.data.setting || '')
                 codeMirrorProgram('config', response.data.data.config || '')
                 codeMirrorProgram('preload', response.data.data.preload || '')
