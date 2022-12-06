@@ -291,7 +291,7 @@ const codeMirrorProgram = (name, content) => {
         //     "Alt-Space": "autocomplete"
         // },
         //光標接近邊緣時，上下距離
-        cursorScrollMargin: 250,
+        // cursorScrollMargin: 250,
         //光標高度
         cursorHeight: 0.85
     })

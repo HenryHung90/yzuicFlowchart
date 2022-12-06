@@ -1,5 +1,5 @@
 // let logger = document.getElementById('testingCode');
-console.log("Listen working...")
+
 // console.log = function (message) {
 //     logger.innerHTML += '<div class="consoleErrorArea_logCode">' + message + '</div>';
 // }
@@ -27,13 +27,14 @@ console.log("Listen working...")
 //         logger.innerHTML += message + '<br />';
 //     }
 // }
-// var TypeError = function(message){
-//     console.error(message.stack)   
-// }
-// var SyntaxError = function(message){
-//     console.error(message.stack)   
-// }
+var TypeError = function(message){
+    console.error(message.stack)   
+}
+var SyntaxError = function(message){
+    console.error(message.stack)   
+}
 !function() {
+    console.log("Listen working...")
     function E(E) {
         var _ = Array.prototype.slice.call(E)
           , e = []
@@ -240,12 +241,11 @@ function() {
         if (_ === HUB_EVENTS.CONSOLE_RUN_COMMAND)
             try {
                 const E = window.eval(e.command);
-                console.log(E)
             } catch (E) {
                 return void console.error(E.message)
             }
     }
     const N = ["clear", "count", "debug", "error", "info", "log", "table", "time", "timeEnd", "warn"];
     E()
-    // window.addEventListener("message", e, !1)
+    window.addEventListener("message", e, !1)
 }();
