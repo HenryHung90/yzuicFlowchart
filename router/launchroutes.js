@@ -135,7 +135,7 @@ router.post('/launchdemo', async (req, res) => {
         //js file write
         const jsFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
         const jsFileContent =
-            `try{console.log("------------------------");console.log("Phaser is running now !!!");console.log("------------------------")
+            `try{console.log("Game Launcher Add...")
 ${req.body.setting}
 //config
 ${req.body.config}
@@ -148,12 +148,18 @@ ${req.body.update}
 //custom function
 ${req.body.custom}
             }catch(err){
-                console.error(err.stack)
-                // console.log('stack',err.stack)
-                // console.log('fileName',err.fileName)
-                // console.log('cause',err.cause)
+                if (err instanceof TypeError) {
+                    console.error("TypeError",err.stack)
+                  } else if (err instanceof RangeError) {
+                    console.error("RangeError",err.stack)
+                  } else if (err instanceof EvalError) {
+                    console.error("EvalError",err.stack)
+                  } else if (err instanceof SyntaxError) {
+                    console.error("SyntaxError",err.stack)
+                  }else{
+                    console.error("Else",err.stack)
+                  }
             }
-                
             `
         fs.writeFileSync(jsFileName, jsFileContent, (err) => {
             if (err) {
@@ -177,7 +183,7 @@ ${req.body.custom}
          <body>
              <div id="container"></div>
          </body>
-         <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js" defer></script>
+         <script src="../../../media/phaser/phaser.js" defer></script>
          <script src="./${fileId}.js" defer></script>
          </html>
          `

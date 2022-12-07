@@ -40,6 +40,7 @@ const maximumSizeInMegaByte = (megaByte) => {
 
 //show Each Box
 const showContainer = async (s) => {
+    //取得 Iframe 發出之 Error 警訊
     const reciveMessage = (e) => {
         e.preventDefault()
         const sendPort = e.origin
@@ -62,6 +63,7 @@ const showContainer = async (s) => {
     const listenMessageUnbind = () => {
         window.removeEventListener('message', reciveMessage, false)
     }
+
     //click close function
     const closePage = () => {
         block.fadeOut(200)
@@ -93,6 +95,7 @@ const showContainer = async (s) => {
     $('body').css({
         'overflow': 'hidden',
     })
+    loadingPage(true)
     //blocking
     const block = $('<div>').prop({
         className: 'container-fluid block',

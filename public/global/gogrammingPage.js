@@ -11,7 +11,7 @@ import { loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximum
 
 //StartBox return function
 const StartBox = (startKey) => {
-
+    loadingPage(false)
 }
 //CommentBox return function
 const CommentBox = (commentKey) => {
@@ -117,15 +117,16 @@ const CommentBox = (commentKey) => {
 
     }
 
+    loadingPage(false)
     return contentDiv
 }
 //UnderstandingBox return function
 const UnderstandingBox = (understandKey) => {
-
+    loadingPage(false)
 }
 //FormulatingBox return function
 const FormulatingBox = (FormulatingKey) => {
-
+    loadingPage(false)
 }
 //Programming return function
 const ProgrammingBox = (programmingKey) => {
@@ -631,11 +632,12 @@ const ProgrammingBox = (programmingKey) => {
         }
     }
 
+    loadingPage(false)
     return contentRowDiv
 }
 //Reflection return function
 const ReflectionBox = () => {
-
+    loadingPage(false)
 }
 
 

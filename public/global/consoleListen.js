@@ -27,12 +27,6 @@
 //         logger.innerHTML += message + '<br />';
 //     }
 // }
-var TypeError = function(message){
-    console.error(message.stack)   
-}
-var SyntaxError = function(message){
-    console.error(message.stack)   
-}
 !function() {
     console.log("Listen working...")
     function E(E) {
