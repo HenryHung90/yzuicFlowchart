@@ -54,34 +54,29 @@ app.use(
                     defaultSrc: [
                         "'self'",
                         'http://localhost:3000',
-                        'http://192.168.0.102:3000'
                     ],
                     scriptSrc: [
                         "'self'",
                         "https://code.jquery.com",
                         "https://cdn.jsdelivr.net",
                         'https://cdnjs.cloudflare.com',
-                        'http://192.168.0.102:3000'
+                        'http://localhost:3000',
                     ],
                     frameAncestors: [
                         "'self'",
                         "http://localhost:3000",
-                        'http://192.168.0.102:3000'
                     ],
                     frameSrc: [
                         "'self'",
                         "http://localhost:3000",
-                        'http://192.168.0.102:3000'
                     ],
                     childSrc: [
                         "'self'",
                         "http://localhost:3000",
-                        'http://192.168.0.102:3000'
                     ],
                     imgSrc: [
                         'https://media.giphy.com',
                         'http://localhost:3000',
-                        'http://192.168.0.102:3000',
                         'data:',
                         'blob:'
                     ]

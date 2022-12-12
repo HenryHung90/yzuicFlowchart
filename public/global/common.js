@@ -163,6 +163,8 @@ const showContainer = async (s) => {
     switch (s.category) {
         case "Start":
             StartBox(s).appendTo(contentContainer)
+
+            codeMirrorProgram('tutorial', '')
             break;
         case "Comment":
             CommentBox(s).appendTo(contentContainer)
@@ -254,6 +256,8 @@ const swtichEditorNameToStartLineNumber = (EditorName) => {
                 $("#update").data('CodeMirror').lineCount() +
                 7
             )
+        case 'tutorial':
+            return 0
     }
 }
 
@@ -296,7 +300,8 @@ const codeMirrorProgram = (name, content) => {
         //光標接近邊緣時，上下距離
         // cursorScrollMargin: 250,
         //光標高度
-        cursorHeight: 0.85
+        cursorHeight: 0.85,
+        readOnly: name == 'tutorial' ? true : false
     })
     Editor.on('inputRead', (e) => {
         Editor.showHint()

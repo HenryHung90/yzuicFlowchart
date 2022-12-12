@@ -11,11 +11,31 @@ import { loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximum
 
 //StartBox return function
 const StartBox = (startKey) => {
+    $('.content_complete').remove()
+
+    const startBoxContainer = $('<div>').prop({
+        className:'row justify-content-start'
+    })
+
+    //container
+    const content_codingContainer = $('<div>').prop({
+        className:'col-5 codeTutorial_container'
+    }).appendTo(startBoxContainer)
+    const content_demoContainer = $('<div>').prop({
+        className:'col-7 codeDemo_container'
+    }).appendTo(startBoxContainer)
+
+    //content
+    $('<textarea>').prop({
+        className:'codeTutorial_code',
+        id:'tutorial'
+    }).appendTo(content_codingContainer)
+
     loadingPage(false)
+    return startBoxContainer
 }
 //CommentBox return function
 const CommentBox = (commentKey) => {
-
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center commentContentDiv'
@@ -140,6 +160,7 @@ const ProgrammingBox = (programmingKey) => {
         className: 'col-11 content_codingdiv'
     }).appendTo(contentRowDiv)
 
+    //Coding 分層
     const content_codingContainer = [
         {
             title: 'Setting',
@@ -378,9 +399,9 @@ const ProgrammingBox = (programmingKey) => {
                 }).appendTo(demoDiv)
 
                 const demoContent = $('<div>').prop({
-                    className: 'col-12 demoContent'
+                    className: 'col-12 demoContent',
+                    id: 'demoContent',
                 }).appendTo(demoIframe)
-
 
                 const demoIframeInfo = $('<iframe>')
                     .prop({
@@ -404,12 +425,11 @@ const ProgrammingBox = (programmingKey) => {
                 demoIframeInfo.on('load', (e) => {
                     e.preventDefault()
                     loadingPage(false)
-                    demoContent.addClass('demoFinish')
+                    $('.demoContent').addClass('demoFinish')
                     setTimeout((e) => {
-                        demoContent.removeClass('demoFinish')
+                        $('.demoContent').removeClass('demoFinish')
                     }, 1000)
                 })
-
                 //DownIcon
                 $('<div>').prop({
                     className: 'col-1 offset-md-5 downIcon',

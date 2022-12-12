@@ -135,7 +135,7 @@ router.post('/launchdemo', async (req, res) => {
         //js file write
         const jsFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
         const jsFileContent =
-            `try{console.log("Game Launcher Add...")
+            `try{console.log("Game Launcher...")
 ${req.body.setting}
 //config
 ${req.body.config}
