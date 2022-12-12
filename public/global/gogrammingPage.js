@@ -31,6 +31,28 @@ const StartBox = (startKey) => {
         id:'tutorial'
     }).appendTo(content_codingContainer)
 
+    const demoIframeInfo = $('<iframe>')
+        .prop({
+            className: 'col-12',
+            id: 'demoIframe',
+            src: `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`,
+            sandBox: "allow-scripts"
+            //document.cookie.split("; ")[1].split("=")[1]
+            //cookie 0 token , cookie 1 studentId
+        })
+        .css({
+            'width': '100%',
+            'height': '95%',
+            'margin': '0 auto',
+            'margin-top': '5px',
+            'border': '1px dashed black',
+            'border-radius': '20px'
+        })
+        .appendTo(demoContent)
+    $('<iframe>').prop({
+        src:''
+    }).appendTo(content_demoContainer)
+
     loadingPage(false)
     return startBoxContainer
 }
