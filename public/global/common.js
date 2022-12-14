@@ -96,6 +96,7 @@ const showContainer = async (s) => {
         'overflow': 'hidden',
     })
     loadingPage(true)
+    
     //blocking
     const block = $('<div>').prop({
         className: 'container-fluid block',
@@ -117,6 +118,8 @@ const showContainer = async (s) => {
         className: 'container-md contentContainer'
     }).appendTo(contentDiv)
 
+    //------------------------------------------------
+    //contentContainer Btn Area
     const content_iconContainer = $('<div>').prop({
         className: 'row justify-content-start'
     }).appendTo(contentContainer)
@@ -139,8 +142,7 @@ const showContainer = async (s) => {
     }).click((e) => {
         closePage()
     }).appendTo(content_iconContainer)
-
-
+    //------------------------------------------------
     //complete Icon
     $('<div>').prop({
         className: 'col-1 content_complete',
@@ -165,6 +167,7 @@ const showContainer = async (s) => {
             StartBox(s).appendTo(contentContainer)
 
             codeMirrorProgram('tutorial', '')
+            $('#tutorial').data('CodeMirror').setSize(null,700)
             break;
         case "Comment":
             CommentBox(s).appendTo(contentContainer)
@@ -209,6 +212,7 @@ const showContainer = async (s) => {
                 codeMirrorProgram('create', response.data.data.create || '')
                 codeMirrorProgram('update', response.data.data.update || '')
                 codeMirrorProgram('custom', response.data.data.custom || '')
+                saveCodeStatus(false)
             })
             loadingPage(false)
             break;
@@ -256,8 +260,9 @@ const swtichEditorNameToStartLineNumber = (EditorName) => {
                 $("#update").data('CodeMirror').lineCount() +
                 7
             )
-        case 'tutorial':
+        default:
             return 0
+
     }
 }
 
@@ -300,7 +305,7 @@ const codeMirrorProgram = (name, content) => {
         //光標接近邊緣時，上下距離
         // cursorScrollMargin: 250,
         //光標高度
-        cursorHeight: 0.85,
+        cursorHeight: name == 'tutorial' ? 0 : 0.85,
         readOnly: name == 'tutorial' ? true : false
     })
     Editor.on('inputRead', (e) => {

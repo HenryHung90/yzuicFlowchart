@@ -2,6 +2,8 @@
 import express from 'express'
 //.env環境檔案
 import dotenv from 'dotenv'
+//morgan
+import morgan from 'morgan'
 //routes
 import launchroutes from './router/launchroutes.js'
 import adminroutes from './router/adminroutes.js'
@@ -27,6 +29,15 @@ const port = '3000'
 
 //.env config
 dotenv.config()
+
+//morgan
+morgan.format('user', '[user] request :remote-addr :date[web] :method :url :status :response-time ms')
+
+app.use(morgan('user', {
+    skip: (req, res) => {
+        return req.url.split('/')[1] != 'home'
+    }
+}))
 
 //用於解析json row txt URL-encoded格式
 const urlencodedParser = bodyParser.urlencoded({ extended: false })

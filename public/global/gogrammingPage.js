@@ -1,4 +1,4 @@
-import { loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximumSizeInMegaByte } from "./common.js"
+import { codeMirrorProgram, loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximumSizeInMegaByte } from "./common.js"
 //Start
 //Comment
 //Understanding
@@ -11,46 +11,35 @@ import { loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximum
 
 //StartBox return function
 const StartBox = (startKey) => {
+    // 把 Sync 字樣刪除
     $('.content_complete').remove()
 
     const startBoxContainer = $('<div>').prop({
-        className:'row justify-content-start'
+        className: 'row justify-content-start startBoxContainer'
     })
 
     //container
     const content_codingContainer = $('<div>').prop({
-        className:'col-5 codeTutorial_container'
+        className: 'col-5 codeTutorial_container'
     }).appendTo(startBoxContainer)
     const content_demoContainer = $('<div>').prop({
-        className:'col-7 codeDemo_container'
+        className: 'col-7 codeDemo_container'
     }).appendTo(startBoxContainer)
 
     //content
     $('<textarea>').prop({
-        className:'codeTutorial_code',
-        id:'tutorial'
+        className: 'codeTutorial_code',
+        id: 'tutorial'
     }).appendTo(content_codingContainer)
 
-    const demoIframeInfo = $('<iframe>')
-        .prop({
-            className: 'col-12',
-            id: 'demoIframe',
-            src: `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`,
-            sandBox: "allow-scripts"
-            //document.cookie.split("; ")[1].split("=")[1]
-            //cookie 0 token , cookie 1 studentId
-        })
-        .css({
-            'width': '100%',
-            'height': '95%',
-            'margin': '0 auto',
-            'margin-top': '5px',
-            'border': '1px dashed black',
-            'border-radius': '20px'
-        })
-        .appendTo(demoContent)
     $('<iframe>').prop({
-        src:''
+        src: ''
+    }).css({
+        'width': '100%',
+        'height': '70%',
+        'margin-top': '10%',
+        'border-radius': '20px',
+        'border': '1px solid black'
     }).appendTo(content_demoContainer)
 
     loadingPage(false)
@@ -58,6 +47,8 @@ const StartBox = (startKey) => {
 }
 //CommentBox return function
 const CommentBox = (commentKey) => {
+    // 把 Sync 字樣刪除
+    $('.content_complete').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center commentContentDiv'
@@ -65,7 +56,7 @@ const CommentBox = (commentKey) => {
 
     //contentTitle
     const contentTitle = $('<div>').prop({
-        className: 'form-floating mb-3 content_Title',
+        className: 'form-floating content_Title',
         innerHTML: '<input type="text" class="form-control" id="contentTitle" placeholder="輸入你的標題">' +
             '<label for="floatingInput">筆記標題</label>'
     }).appendTo(contentDiv)
@@ -82,15 +73,15 @@ const CommentBox = (commentKey) => {
             'transition-duration': '0.3s',
             'background-color': 'rgba(0,0,0,0.2)',
             'border-radius': '20px',
-            'height': '70px',
-            'width': '70px',
+            'height': '60px',
+            'width': '60px',
             'margin-top': '0',
             'margin-left': '0',
         })
         $('#txtBtn').css({
             'transition-duration': '0.3s',
-            'height': '70px',
-            'width': '70px',
+            'height': '60px',
+            'width': '60px',
         })
     }, (e) => {
         createTxtBtn.css({
@@ -99,8 +90,6 @@ const CommentBox = (commentKey) => {
             'border-radius': '0',
             'height': '50px',
             'width': '50px',
-            'margin-top': '10px',
-            'margin-left': '10px',
         })
         $('#txtBtn').css({
             'transition-duration': '0.3s',
@@ -119,15 +108,15 @@ const CommentBox = (commentKey) => {
             'transition-duration': '0.3s',
             'background-color': 'rgba(0,0,0,0.2)',
             'border-radius': '20px',
-            'height': '70px',
-            'width': '70px',
+            'height': '60px',
+            'width': '60px',
             'margin-top': '0',
             'margin-left': '0',
         })
         $('#codeBtn').css({
             'transition-duration': '0.3s',
-            'height': '70px',
-            'width': '70px',
+            'height': '60px',
+            'width': '60px',
         })
     }, (e) => {
         createCodeBtn.css({
@@ -136,8 +125,6 @@ const CommentBox = (commentKey) => {
             'border-radius': '0',
             'height': '50px',
             'width': '50px',
-            'margin-top': '10px',
-            'margin-left': '10px',
         })
         $('#codeBtn').css({
             'transition-duration': '0.3s',
@@ -148,15 +135,90 @@ const CommentBox = (commentKey) => {
         createCodeContent()
     }).appendTo(contentBoxBtnDiv)
 
+    //Comment Container
+    const contentContainer = $("<div>").prop({
+        className: 'justify-content-center CommentContainer'
+    }).appendTo(contentDiv)
 
     //CreateTxtContent function
     const createTxtContent = () => {
+        const txtContentContainer = $('<div>').prop({
+            className: 'row justify-content-center txtContentContainer',
+        })
 
+        const slideBar = $('<div>').prop({
+            className: 'col-1 txtContent_slideBar',
+            innerHTML: `<svg viewBox="0 0 64 200">
+	<rect height="8" width="8" y="14" x="16" />
+	<rect height="8" width="8" y="30" x="16" />
+	<rect height="8" width="8" y="46" x="16" />
+	<rect height="8" width="8" y="62" x="16" />
+	<rect height="8" width="8" y="14" x="32" />
+	<rect height="8" width="8" y="30" x="32" />
+	<rect height="8" width="8" y="46" x="32" />
+	<rect height="8" width="8" y="62" x="32" />
+</svg> `
+        })
+            .hover((e) => {
+                slideBar.css({
+                    'opacity': '1',
+                })
+            }, (e) => {
+                slideBar.css({
+                    'opacity': '0.5',
+                })
+            })
+            .appendTo(txtContentContainer)
+        const txtContent = $('<textarea>').prop({
+            className: 'col-11 txtContent_content'
+        }).appendTo(txtContentContainer)
+
+        contentContainer.append(txtContentContainer)
     }
 
     //CreateCodeContent function
     const createCodeContent = () => {
+        const codeContentContainer = $('<div>').prop({
+            className: 'row justify-content-center codeContentContainer',
+        })
+        const slideBar = $('<div>').prop({
+            className: 'col-1 txtContent_slideBar',
+            innerHTML: `<svg viewBox="0 0 64 200">
+	<rect height="8" width="8" y="14" x="16" />
+	<rect height="8" width="8" y="30" x="16" />
+	<rect height="8" width="8" y="46" x="16" />
+	<rect height="8" width="8" y="62" x="16" />
+	<rect height="8" width="8" y="14" x="32" />
+	<rect height="8" width="8" y="30" x="32" />
+	<rect height="8" width="8" y="46" x="32" />
+	<rect height="8" width="8" y="62" x="32" />
+</svg> `
+        })
+            .hover((e) => {
+                slideBar.css({
+                    'opacity': '1',
+                })
+            }, (e) => {
+                slideBar.css({
+                    'opacity': '0.5',
+                })
+            })
+            .appendTo(codeContentContainer)
 
+        const codeContentId = `codeContent_${$('.CommentContainer').find('.codeContentContainer').length}`
+
+        const codeContentDiv = $('<div>').prop({
+            className:'col-11 codeContent_content'
+        }).appendTo(codeContentContainer)
+
+        $('<textarea>').prop({
+            id: codeContentId,
+        }).appendTo(codeContentDiv)
+
+        contentContainer.append(codeContentContainer)
+        //codeMirror append to codeContent
+        codeMirrorProgram(codeContentId, '//write your comment code here')
+        $(`#${codeContentId}`).data('CodeMirror').setSize(null,200)
     }
 
     loadingPage(false)
@@ -378,8 +440,7 @@ const ProgrammingBox = (programmingKey) => {
         const customCode = $("#custom").data('CodeMirror')
 
         //重整Code Line 以便查詢錯誤位置
-        const EditorName = ['setting', 'config', 'preload', 'create', 'update', 'custom']
-        for (let name of EditorName) {
+        for (let name of ['setting', 'config', 'preload', 'create', 'update', 'custom']) {
             $(`#${name}`)
                 .data('CodeMirror')
                 .setOption('firstLineNumber', swtichEditorNameToStartLineNumber(name));
@@ -507,6 +568,7 @@ const ProgrammingBox = (programmingKey) => {
     //upload flie & click function
     //click
     const uploadFileClick = async () => {
+        //模擬Click隱藏之Input
         return $('.uploadfileInput').click()
     }
     //upload
