@@ -5,9 +5,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Go List</title>
-  <!-- go.js -->
-  <script src="https://cdn.jsdelivr.net/npm/gojs@2.1/release/go.js"></script>
+  <title>首頁</title>
 
   <!-- bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -21,29 +19,11 @@
 
   <!-- axios -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
-  <!-- CodeMirror-->
-  <!-- 必要引入 -->
-  <link href="../codemirror-5.65.9/lib/codemirror.css" rel="stylesheet" />
-  <script src="../codemirror-5.65.9/lib/codemirror.js"></script>
-  <!-- 主題引入 -->
-  <link href="../codemirror-5.65.9/theme/blackboard.css" rel="stylesheet" />
-  <!-- JavaScript高亮 -->
-  <script src="../codemirror-5.65.9/mode/javascript/javascript.js"></script>
-  <!-- 支持代碼折疊 -->
-  <link rel="stylesheet" href="../codemirror-5.65.9/addon/fold/foldgutter.css" />
-  <script src="../codemirror-5.65.9/addon/fold/foldcode.js"></script>
-  <script src="../codemirror-5.65.9/addon/fold/foldgutter.js"></script>
-  <script src="../codemirror-5.65.9/addon/fold/brace-fold.js"></script>
-  <script src="../codemirror-5.65.9/addon/fold/comment-fold.js"></script>
-  <!-- 提供Hint -->
-  <link rel="stylesheet" href="../codemirror-5.65.9/addon/hint/show-hint.css" />
-  <script src="../codemirror-5.65.9/keymap/sublime.js"></script>
-  <script src="../codemirror-5.65.9/addon/hint/show-hint.js"></script>
-  <script src="../codemirror-5.65.9/addon/hint/anyword-hint.js"></script>
-  <script src="../codemirror-5.65.9/addon/hint/javascript-hint.js"></script>
+
 </head>
 
 <body>
+  <!-- loading -->
   <div class="container-fluid loadingContainer">
     <div class="loadingDiv">
       <div class="loader">
@@ -51,78 +31,25 @@
       </div>
     </div>
   </div>
-  <div class="navBarContainer">
-    <!-- open nav -->
-    <div class="row justify-content-start navBarOpen">
-      <div class="col-12 navBarOpen_content" id="content_title">
-        <h3 class="navBarOpen_title">
-          Go List
-        </h3>
+  <div class="container-fluid navContainer">
+    <div class="row justify-content-center align-items-center navBar">
+      <div class="col-4">
+        <img src="../media/img/amumamum.PNG" alt="home" style="width:80px;height: 80px;">
       </div>
-      <div class="col-2 navBarOpen_content" id="studentId">
-        <h5 class="navBarOpen_title">
-          <%= studentId %>
-        </h5>
+      <div class="col-4">
+        <h3>YZUIC Phaser Learning</h3>
       </div>
-      <div class="col-2 navBarOpen_content" id="print">
-        <div class="navBarOpen_text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 512 512">
-            <path
-              d="M96 0H368h13.3l9.4 9.4 48 48 9.4 9.4V80v80H384V93.3L354.7 64H128v96H64V32 0H96zM64 384H0V192H512V384H448v96 32H416 96 64V480 384zm64 0v64H384V384 352H128v16 16zM408 248v48h48V248H408z" />
-          </svg>
-        </div>
-      </div>
-      <div class="col-2 navBarOpen_content" id="save">
-        <div class="navBarOpen_text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 448 512">
-            <path
-              d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 416c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z" />
-          </svg>
-        </div>
-      </div>
-      <div class="col-2 navBarOpen_content" id="restart">
-        <div class="navBarOpen_text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 512 512">
-            <path
-              d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM160 152c0-13.3 10.7-24 24-24h88c44.2 0 80 35.8 80 80c0 28-14.4 52.7-36.3 67l34.1 75.1c5.5 12.1 .1 26.3-11.9 31.8s-26.3 .1-31.8-11.9L268.9 288H208v72c0 13.3-10.7 24-24 24s-24-10.7-24-24V264 152zm48 88h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H208v64z" />
-          </svg>
-        </div>
-      </div>
-      <div class="col-2 offset-md-2 navBarOpen_content" id="logout">
-        <div class="navBarOpen_text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 512 512">
-            <path
-              d="M160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96C43 32 0 75 0 128V384c0 53 43 96 96 96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H96c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32h64zM504.5 273.4c4.8-4.5 7.5-10.8 7.5-17.4s-2.7-12.9-7.5-17.4l-144-136c-7-6.6-17.2-8.4-26-4.6s-14.5 12.5-14.5 22v72H192c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32H320v72c0 9.6 5.7 18.2 14.5 22s19 2 26-4.6l144-136z" />
-          </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Diagram Area -->
-  <div class="paletteContainer">
-    <div class="paletteDiv">
-      <div id="myPaletteDiv">
-        <canvas tabindex="0" width="200" height="1900">
-          This text is displayed if your browser does not support the Canvas HTML element.</canvas>
-      </div>
-      <div id="slideIcon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="100%" viewBox="0 0 256 512">
+      <div class="col-4">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 512 512">
           <path
-            d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z" />
+            d="M160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96C43 32 0 75 0 128V384c0 53 43 96 96 96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H96c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32h64zM504.5 273.4c4.8-4.5 7.5-10.8 7.5-17.4s-2.7-12.9-7.5-17.4l-144-136c-7-6.6-17.2-8.4-26-4.6s-14.5 12.5-14.5 22v72H192c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32H320v72c0 9.6 5.7 18.2 14.5 22s19 2 26-4.6l144-136z" />
         </svg>
       </div>
     </div>
   </div>
-  <div class="diagramContainer container-fluid">
-    <div id="myDiagramDiv">
-      <canvas tabindex="0" width="1900"
-        style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 954px; height: 750px; cursor: auto;">This
-        text is displayed if your browser does not support the Canvas HTML element.</canvas>
-    </div>
-  </div>
 </body>
-<script type="module" src="../js/gogrammingList.js"></script>
-<link rel="stylesheet" href="../css/gogrammingList.css" type="text/css" />
+<script type="module" src="../js/home.js"></script>
+<link rel="stylesheet" href="../css/home/home.css">
 <link rel="stylesheet" href="../global/loader.css">
 
 </html>

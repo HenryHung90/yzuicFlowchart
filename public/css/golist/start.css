@@ -1,0 +1,12 @@
+/* start */
+.startBoxContainer{
+    height: 88%;
+    overflow: auto;
+}
+.codeTutorial_container{
+    height: 100%;
+    overflow:auto;
+}
+.codeTutorial_code{
+    width: 100%;
+}

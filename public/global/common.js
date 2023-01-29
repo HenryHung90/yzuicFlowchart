@@ -9,6 +9,8 @@ const loadingPage = (state) => {
     }
 }
 
+
+//Go.js Function
 //save code sync Icon
 const saveCodeStatus = (state) => {
     if (state) {
@@ -33,9 +35,9 @@ const saveCodeStatus = (state) => {
 }
 
 //calculate maximumSizeInMegaByte
-const maximumSizeInMegaByte = (megaByte) => {
+const maximumSizeInMegaByte = (Byte) => {
     //MB -> KB -> Byte
-    return megaByte * 1024 * 1024
+    return Byte * 1024 * 1024
 }
 
 //show Each Box
@@ -96,7 +98,7 @@ const showContainer = async (s) => {
         'overflow': 'hidden',
     })
     loadingPage(true)
-    
+
     //blocking
     const block = $('<div>').prop({
         className: 'container-fluid block',
@@ -167,7 +169,7 @@ const showContainer = async (s) => {
             StartBox(s).appendTo(contentContainer)
 
             codeMirrorProgram('tutorial', '')
-            $('#tutorial').data('CodeMirror').setSize(null,700)
+            $('#tutorial').data('CodeMirror').setSize(null, 700)
             break;
         case "Comment":
             CommentBox(s).appendTo(contentContainer)

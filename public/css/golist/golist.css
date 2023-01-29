@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+body {
+    margin: 0;
+    overflow: hidden;
+}
+/*common */
+.block {
+    height: 150vh;
+    /* background-color: rgba(0,0,0,0.5); */
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    animation: fadeIn 0.5s steps(100);
+    position: absolute;
+    overflow: hidden;
+}
+
+.paletteContainer {
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: left;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+}
+
+.paletteDiv {
+    display: flex;
+    width: 230px;
+    height: 95%;
+    margin: 2% 0;
+    padding-top: 20px;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: 5px 5px 2px 0 rgba(0, 0, 0, 0.7);
+    pointer-events: all;
+    transition-duration: 0.3s;
+    transform: translateX(-200px);
+}
+
+.paletteDiv:hover {
+    transition-duration: 0.3s;
+    transform: translateX(-20px);
+}
+
+#myPaletteDiv {
+    height: 95%;
+    pointer-events: all;
+}
+
+/* NavBar */
+.navBarContainer {
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding: 24px;
+    z-index: 999;
+}
+
+/* NavBar Open */
+#content_title {
+    height: 40px;
+}
+
+.navBarOpen {
+    pointer-events: all;
+    background-color: white;
+    box-shadow: 3px 3px 2px 0 rgba(0, 0, 0, 0.7);
+    transform: translateY(100px);
+    transition-duration: 0.3s;
+    border-radius: 40px;
+    width: 50%;
+    height: 150px;
+}
+
+.navBarOpen:hover {
+    transition-duration: 0.3s;
+    transform: translateY(30px);
+}
+
+.navBarOpen_content {
+    height: 80px;
+}
+
+.navBarOpen_title {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bold;
+    line-height: 80px;
+    text-align: center;
+    user-select: none;
+    font-weight: bolder;
+}
+#studentId{
+    border-right: 2px solid rgba(0,0,0,0.5);
+}
+
+.navBarOpen_text {
+    line-height: 80px;
+    text-align: center;
+    transition-duration: 0.3s;
+    user-select: none;
+    cursor: pointer;
+}
+
+.navBarOpen_text:hover {
+    transition-duration: 0.3s;
+    color: white;
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.5)
+}
+
+/* diagram */
+.diagramContainer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    height: 100vh;
+}
+
+#myPaletteDiv {
+    width: 200px;
+    margin-right: 2px;
+    background-color: rgb(40, 44, 52);
+    position: relative;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}
+
+#diagramPaletteCaller {
+    width: 20px;
+    height: 100%;
+    background-color: rgb(12, 16, 32);
+}
+
+#myDiagramDiv {
+    flex-grow: 1;
+    background-color: rgb(40, 44, 52);
+    position: relative;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    cursor: auto;
+}
+
+/* content */
+.contentDiv {
+    background-color: transparent;
+    z-index: 1001;
+    animation: fadeIn 0.5s steps(100);
+    position: absolute;
+    padding: 15px;
+}
+
+.contentContainer {
+    height: 85vh;
+    background-color: white;
+    border-radius: 20px;
+    padding: 5px 10px;
+    overflow: hidden;
+}
+
+.content_cancel {
+    height: 40px;
+    text-align: center;
+    transition-duration: 0.5s;
+}
+
+.content_status {
+    display: none;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    opacity: 0.3;
+    user-select: none;
+}
+
+.content_complete {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bolder;
+    color: green;
+    border: 1px solid green;
+    border-radius: 10px;
+    user-select: none;
+}
+
+#content_status_icon {
+    transition-timing-function: ease;
+    animation: sync 1s infinite steps(200);
+}
+
+/* Media Area */
+@media (max-width: 1439px) {
+    .navBarIcon {
+        margin: 20px 60px;
+    }
+
+    .navBarOpen {
+        height: 50vh;
+        width: 80%;
+        transform: translateY(250px);
+    }
+
+    .navBarOpen:hover {
+        transition-duration: 0.3s;
+        transform: translateY(30px);
+    }
+
+    .navBarOpen_content {
+        width: 100%;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes upanddown {
+    from {
+        transform: translateY(-10px);
+    }
+
+    50% {
+        transform: translateY(0px);
+    }
+
+    to {
+        transform: translateY(-10px);
+    }
+}
+@keyframes demoloaded {
+    from{
+        transform: translateY(-95vh);
+    }
+    50%{
+        transform: translateY(-90vh);
+    }
+    to{
+        transform: translateY(-95vh);
+    }
+}
+
+@keyframes sync {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -239,18 +239,18 @@ const goListInit = () => {
 
       //HighLight 線條
       $(go.Shape,  // the highlight shape, normally transparent
-        { isPanelMain: true, strokeWidth: 6, stroke: "transparent", name: "HIGHLIGHT" }),
+        { isPanelMain: true, strokeWidth: 8, stroke: "transparent", name: "HIGHLIGHT" }),
 
       //線條Style
       $(go.Shape,  // the link path shape
-        { isPanelMain: true, stroke: "rgb(255,100,100)", strokeWidth: 4 },
+        { isPanelMain: true, stroke: "rgb(255,100,100)", strokeWidth: 3 },
         //sel => 是否被選中
-        new go.Binding("stroke", "isSelected", sel => sel ? "blue" : "gray").ofObject()),
+        new go.Binding("stroke", "isSelected", sel => sel ? "orange" : "gray").ofObject()),
 
 
       //箭頭指標樣式
       $(go.Shape,  // the arrowhead scale=>大小
-        { toArrow: "standard", scale: 2, strokeWidth: 0, fill: "gray" }),
+        { toArrow: "standard", scale: 2, strokeWidth: 0, fill:'gray'}),
 
       //自定義一個 Panel 在線上
       //自定義樣式 visible 預設看不到 name=>設定LANBEL 在showLinkLabel() function 中

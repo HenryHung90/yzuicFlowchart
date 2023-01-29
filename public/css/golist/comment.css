@@ -1,0 +1,53 @@
+/*Comment*/
+.commentContentDiv {
+    padding: 5px 20px;
+    height: 88%;
+}
+
+.content_BtnDiv {
+    height: 70px;
+    display: flex;
+}
+
+.content_Title {
+    height: 70px;
+}
+
+.content_Btn {
+    height: 50px;
+    width: 50px;
+    margin-left: 10px;
+}
+
+.CommentContainer{
+    min-height: 200px;
+    height: 88%;
+    border:1px solid rgba(0,0,0,0.5);
+    border-radius: 20px;
+    overflow: auto;
+}
+
+.txtContentContainer,
+.codeContentContainer{
+    width: 95%;
+    min-height: 200px;
+    height: auto;
+    margin-top:3px;
+}
+.txtContent_slideBar{
+    transition-duration: 0.3s;
+    max-width: 70px;
+    height:200px;
+    opacity: 0.5;
+}
+.txtContent_content,
+.codeContent_content{
+    height: 200px;
+    max-height: 500px;
+    outline:none;
+    border:none;
+    display: block;
+    font-size: 15px;
+    line-height: 1.5;
+    resize: none;
+}
