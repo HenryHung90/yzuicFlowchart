@@ -1,10 +1,68 @@
 import express from 'express'
+import bcrypt from 'bcryptjs'
 const router = express.Router()
 
 import studentConfig from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 
+const saltRound = 10
 
+//學生修改密碼
+router.post('/changepassword', async (req, res) => {
+    try {
+        let result = false
+        const studentData = await studentConfig.findOne({
+            studentId: req.user.studentId,
+            studentClass: req.user.studentClass,
+            studentAccess: true
+        })
+
+        await bcrypt.compare(req.body.oldPassword, studentData.studentPassword).then(response => {
+            result = response
+        })
+        if (!result) {
+            res.json(
+                {
+                    message: '舊密碼輸入錯誤!',
+                    status: 500,
+                }
+            )
+            return
+        }
+
+        await bcrypt.hash(req.body.newPassword, saltRound).then(hashed => {
+            studentConfig.updateOne({
+                studentId: req.user.studentId,
+                studentClass: req.user.studentClass,
+                studentAccess: true
+            }, {
+                studentPassword: hashed
+            }).then(response => {
+                if (response.acknowledged) {
+                    res.json({
+                        message: '修改成功!',
+                        status: 200,
+                    })
+                } else {
+                    res.json({
+                        message: '修改失敗!請再試一次',
+                        status: 201,
+                    })
+                }
+            })
+        })
+
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '修改失敗，請聯繫管理員 (err)',
+                status: 500
+            }
+        )
+    }
+})
 //學生讀取 goList
 router.post('/readgolist', async (req, res) => {
     try {
@@ -18,6 +76,7 @@ router.post('/readgolist', async (req, res) => {
         })
     }
     catch {
+        console.log(err)
         res.json(
             {
                 message: '讀取存檔失敗，請重新整理',
@@ -222,12 +281,12 @@ router.post('/restartcode', async (req, res) => {
         let standardCodeList = {}
         //尋找 Code
         await standardcontent.findOne({ class: req.user.studentClass, access: true }).then(response => {
-            standardCodeList  = response.standardCodeList || {}
+            standardCodeList = response.standardCodeList || {}
         })
         //更新 Code
         await studentConfig.updateOne(
             { studentId: req.user.studentId, studentAccess: true },
-            { studentCodeList:standardCodeList })
+            { studentCodeList: standardCodeList })
             .then(response => {
                 if (response.acknowledged) {
                     res.json({

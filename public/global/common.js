@@ -8,6 +8,13 @@ const loadingPage = (state) => {
         $('.loadingContainer').fadeOut(200)
     }
 }
+const serverResponseErrorDetect = (response) => {
+    if(response.status === 404){
+        window.alert(response.data.message || 'Error 請重新整理網頁')
+        return false
+    }
+    return true
+}
 
 
 //Go.js Function
@@ -365,4 +372,4 @@ const codeMirrorProgram = (name, content) => {
 
 
 
-export { showContainer, swtichEditorNameToStartLineNumber, codeMirrorProgram, loadingPage, saveCodeStatus, maximumSizeInMegaByte }
+export { showContainer, swtichEditorNameToStartLineNumber, codeMirrorProgram, loadingPage, serverResponseErrorDetect, saveCodeStatus, maximumSizeInMegaByte }
