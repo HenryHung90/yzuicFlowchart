@@ -145,6 +145,16 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
         res.render('./home', { studentId: req.params.studentId })
     }
 })
+app.get('/:missionId/:studentId', passport.authenticate('token', { session: false }), async (req, res) => {
+    if (req.user.studentId != req.params.studentId) {
+        res.redirect('/')
+    } else {
+        res.render('./golist', {
+            studentId: req.params.studentId,
+            missionId: req.params.missionId
+        })
+    }
+})
 //routes
 app.use('/launch', passport.authenticate('token', { session: false }), launchroutes)
 app.use('/admin', passport.authenticate('token', { session: false }), adminroutes)

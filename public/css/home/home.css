@@ -1,0 +1,152 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
+.block {
+    height: 100vh;
+    /* background-color: rgba(0,0,0,0.5); */
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.5s steps(100);
+    position: absolute;
+    overflow: hidden;
+}
+/* navbar */
+.navContainer {
+    height: 100px;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: FadeInAndDown 1s ease-out;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+.navBar {
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+.nav_title {
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 3000;
+}
+.nav_account {
+    display: flex;
+}
+
+/* account */
+.nav_account li {
+    font-family: "Ubuntu", sans-serif;
+    display: flex;
+    user-select: none;
+}
+.nav_studentId {
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 3000;
+    line-height: 60px;
+}
+.nav_setting {
+    border-radius: 10px;
+    margin-left: 20px;
+    padding: 10px;
+    width: 20%;
+    box-shadow: 1px 1px 5px rgba(32, 72, 82, 0.8);
+}
+.nav_setting:hover {
+    transition-duration: 0.3s;
+    background-color: rgba(32, 72, 82, 0.5);
+}
+/* changePassword */
+.changePasswordDiv {
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding: 15vh 30vw;
+    z-index: 1000;
+    animation: fadeIn 0.3s steps(100);
+}
+.CPDesktop {
+    background-color: rgb(32, 72, 82);
+    border-radius: 20px;
+    min-height: 350px;
+    max-height: 600px;
+    height: 100%;
+    z-index: 1001;
+}
+
+.CPContainer {
+    box-shadow: 0 0 5px 2px rgba(0, 233, 233, 0.8);
+    border: 0.5 bold rgba(0, 233, 233, 0.8);
+    height: 85%;
+    width: 50%;
+    margin: 5% auto;
+}
+
+.CP_Title {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 30px auto;
+    padding: 20px 0;
+    text-align: center;
+}
+.CP_Button {
+    margin-top:50px;
+    padding: 30px 30px;
+    border-top: 1px solid rgba(0, 0, 0, 0.8);
+    height: 10%;
+}
+
+@keyframes FadeInAndDown {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(5px);
+        transform: translateY(-100px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: none;
+        transform: translateY(0px);
+    }
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+@media (max-width: 1439px) {
+    .navBar {
+        justify-content: right !important;
+    }
+    .nav_image {
+        display: none;
+        width: 0;
+    }
+    .nav_title {
+        width: 30%;
+    }
+    .nav_account {
+        width: 60%;
+    }
+
+    .changePasswordDiv {
+        padding: 0;
+        align-items: center;
+    }
+
+    .CPDesktop {
+        width: 95%;
+        margin: 0;
+    }
+
+    .CPContainer {
+        margin: 0 auto;
+        width: 90%;
+    }
+    .CP_Button{
+        padding:10px 0;
+    }
+    .CP_Button .btn-outline-info{
+        margin-left: 30%;
+    }
+}
