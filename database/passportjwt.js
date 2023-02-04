@@ -75,7 +75,7 @@ opts.failureMessage = true
 
 passport.use('token', new JWTStrategy(opts,
     (jwtPayload, done) => {
-        console.log('user', jwtPayload.studentId, 'get in at ',new Date())
+        console.log('user', jwtPayload.studentId, 'get in at', new Date())
         studentConfig.findOne({ _id: jwtPayload._id, studentId: jwtPayload.studentId })
             .then(user => {
                 const returnUser = {
@@ -102,6 +102,7 @@ const signIn = (req, res) => {
         // res.setHeader('Authorization',token).redirect(`/home/${req.user.studentId}`)
         res.cookie('token', token, { maxAge: EXPIRE_SECOND }).cookie('studentId', req.user.studentId, { maxAge: EXPIRE_SECOND }).json({
             studentId: req.user.studentId,
+            studentClass: req.user.studentClass,
             token: token,
             status: 200
         })

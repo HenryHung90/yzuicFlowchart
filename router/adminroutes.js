@@ -71,41 +71,18 @@ router.post('/addstudent', async (req, res) => {
 })
 
 //新增Standard
-// router.post('/addstandardcontent', async (req, res) => {
-//     const newStandardcontent = new standardcontent({
-//         class: '108',
-//         access: true,
-//         standardGoList: {
-//             "class": "GraphLinksModel",
-//             "linkFromPortIdProperty": "fromPort",
-//             "linkToPortIdProperty": "toPort",
-//             "nodeDataArray": [
-//                 {
-//                     "category": "Start",
-//                     "text": "任務一:小炸彈",
-//                     "key": "1",
-//                     "loc": "-134 -137"
-//                 },
-//                 {
-//                     "category": "Start",
-//                     "text": "任務二:小飛機",
-//                     "key": "2",
-//                     "loc": "-127 57"
-//                 },
-//                 {
-//                     "category": "Start",
-//                     "text": "任務三:小坦克",
-//                     "key": "3",
-//                     "loc": "-124.35 228.7499999999999"
-//                 }
-//             ],
-//             "linkDataArray": []
-//         },
-//         standardCodeList: {}
-//     })
+router.post('/addstandardcontent', async (req, res) => {
+    const newStandardcontent = new standardcontent({
+        class: req.body.class,
+        access: true,
+        goListTitle: req.body.goListTitle,
+        standardGoList: req.body.standardGoList,
+        standardCodeList: req.body.standardCodeList || {},
+        standardData: req.body.standardGoList || {},
+    })
 
-//     newStandardcontent.save()
-//     res.send('22222')
-// })
+    newStandardcontent.save()
+    res.send('22222')
+})
 
-export default router 
+export default router

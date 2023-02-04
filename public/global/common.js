@@ -1,5 +1,7 @@
 import { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "./gogrammingPage.js"
 
+
+//------------------------------ normal function ------------------------------//
 //loading Page
 const loadingPage = (state) => {
     if (state) {
@@ -8,16 +10,22 @@ const loadingPage = (state) => {
         $('.loadingContainer').fadeOut(200)
     }
 }
+//與 server 聯繫進行偵錯
 const serverResponseErrorDetect = (response) => {
-    if(response.status === 404){
+    if (response.data.status === 404) {
         window.alert(response.data.message || 'Error 請重新整理網頁')
         return false
     }
     return true
 }
+//取得 cookie值
+const getCookie = (name) => {
+    let value = "; " + document.cookie;
+    let parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
 
-
-//Go.js Function
+//------------------------------ Go.js Function -----------------------------------//
 //save code sync Icon
 const saveCodeStatus = (state) => {
     if (state) {
@@ -28,7 +36,7 @@ const saveCodeStatus = (state) => {
             'font-size': '12px',
             'font-weight': "normal",
             'opacity': '0.3',
-        }, 500)
+        }, 200)
     } else {
         $('.content_status').fadeOut(200)
         $('.content_complete').animate({
@@ -37,18 +45,18 @@ const saveCodeStatus = (state) => {
             'font-size': '20px',
             'font-weight': "bolder",
             'opacity': '1',
-        }, 500)
+        }, 200)
     }
 }
-
 //calculate maximumSizeInMegaByte
 const maximumSizeInMegaByte = (Byte) => {
     //MB -> KB -> Byte
     return Byte * 1024 * 1024
 }
-
 //show Each Box
 const showContainer = async (s) => {
+    // 暫停主頁儲存的功能
+    $(document).off('keydown')
     //取得 Iframe 發出之 Error 警訊
     const reciveMessage = (e) => {
         e.preventDefault()
@@ -204,6 +212,7 @@ const showContainer = async (s) => {
                 url: '/student/readcode',
                 data: {
                     keyCode: s.key,
+                    courseId: $.trim($('#courseId').text())
                 }
             }).then(response => {
                 //response.data.data == code內容
@@ -215,14 +224,14 @@ const showContainer = async (s) => {
                 ProgrammingBox(s).appendTo(contentContainer)
                 // create listenEvent
                 listenMessageBind()
-                codeMirrorProgram('setting', response.data.data.setting || '')
-                codeMirrorProgram('config', response.data.data.config || '')
-                codeMirrorProgram('preload', response.data.data.preload || '')
-                codeMirrorProgram('create', response.data.data.create || '')
-                codeMirrorProgram('update', response.data.data.update || '')
-                codeMirrorProgram('custom', response.data.data.custom || '')
-                saveCodeStatus(false)
+                codeMirrorProgram('setting', response.data.code.setting || '')
+                codeMirrorProgram('config', response.data.code.config || '')
+                codeMirrorProgram('preload', response.data.code.preload || '')
+                codeMirrorProgram('create', response.data.code.create || '')
+                codeMirrorProgram('update', response.data.code.update || '')
+                codeMirrorProgram('custom', response.data.code.custom || '')
             })
+            saveCodeStatus(false)
             loadingPage(false)
             break;
         case "Reflection":
@@ -232,7 +241,7 @@ const showContainer = async (s) => {
 }
 
 
-//codeMirror Function
+//------------------------------ codeMirror Function ------------------------------//
 //轉換各組行數
 const swtichEditorNameToStartLineNumber = (EditorName) => {
     switch (EditorName) {
@@ -274,7 +283,6 @@ const swtichEditorNameToStartLineNumber = (EditorName) => {
 
     }
 }
-
 //初始化各個Editor
 const codeMirrorProgram = (name, content) => {
     const textProgram = document.getElementById(name)
@@ -372,4 +380,13 @@ const codeMirrorProgram = (name, content) => {
 
 
 
-export { showContainer, swtichEditorNameToStartLineNumber, codeMirrorProgram, loadingPage, serverResponseErrorDetect, saveCodeStatus, maximumSizeInMegaByte }
+export {
+    showContainer,
+    swtichEditorNameToStartLineNumber,
+    getCookie,
+    codeMirrorProgram,
+    loadingPage,
+    serverResponseErrorDetect,
+    saveCodeStatus,
+    maximumSizeInMegaByte
+}

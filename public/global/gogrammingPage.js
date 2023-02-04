@@ -208,7 +208,7 @@ const CommentBox = (commentKey) => {
         const codeContentId = `codeContent_${$('.CommentContainer').find('.codeContentContainer').length}`
 
         const codeContentDiv = $('<div>').prop({
-            className:'col-11 codeContent_content'
+            className: 'col-11 codeContent_content'
         }).appendTo(codeContentContainer)
 
         $('<textarea>').prop({
@@ -218,7 +218,7 @@ const CommentBox = (commentKey) => {
         contentContainer.append(codeContentContainer)
         //codeMirror append to codeContent
         codeMirrorProgram(codeContentId, '//write your comment code here')
-        $(`#${codeContentId}`).data('CodeMirror').setSize(null,200)
+        $(`#${codeContentId}`).data('CodeMirror').setSize(null, 200)
     }
 
     loadingPage(false)
@@ -314,6 +314,17 @@ const ProgrammingBox = (programmingKey) => {
     }).click((e) => {
         saveCode()
     }).appendTo(content_LaunchDiv)
+    //Save Btn
+    $(document).keydown((e) => {
+        if (e.ctrlKey && e.keyCode == 83) {
+            e.preventDefault()
+            saveCode()
+        }
+        if (e.metaKey && e.keyCode == 83) {
+            e.preventDefault()
+            saveCode()
+        }
+    })
 
     $('<input>').prop({
         className: 'uploadfileInput',
@@ -555,6 +566,7 @@ const ProgrammingBox = (programmingKey) => {
                 update: updateCode.getValue(),
                 custom: customCode.getValue(),
                 keyCode: keyCode,
+                courseId: $.trim($('#courseId').text())
             }
         }).then(response => {
             if (response.data.status != 200) {

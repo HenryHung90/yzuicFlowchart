@@ -1,4 +1,4 @@
-import { showContainer, loadingPage } from "../global/common.js";
+import { showContainer, loadingPage, getCookie } from "../global/common.js";
 
 
 //init Diagram varible
@@ -28,7 +28,7 @@ const goListInit = () => {
     } else {
       if (idx >= 0) document.title = document.title.slice(0, idx);
     }
-    
+
   });
 
 
@@ -250,7 +250,7 @@ const goListInit = () => {
 
       //箭頭指標樣式
       $(go.Shape,  // the arrowhead scale=>大小
-        { toArrow: "standard", scale: 2, strokeWidth: 0, fill:'gray'}),
+        { toArrow: "standard", scale: 2, strokeWidth: 0, fill: 'gray' }),
 
       //自定義一個 Panel 在線上
       //自定義樣式 visible 預設看不到 name=>設定LANBEL 在showLinkLabel() function 中
@@ -328,28 +328,33 @@ const goListInit = () => {
 }
 //nav & click function
 const navInit = () => {
+  //初始化 boostrap Tooltip
+  let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
   //nav
   $('#print').click((e) => {
-    print()
+    navButton.printList()
   })
   $('#save').click((e) => {
-    save()
+    navButton.save()
   })
   $('#restart').click((e) => {
-    restart()
+    navButton.restart()
   })
   $('#logout').click((e) => {
-    logout()
+    navButton.logout()
   })
   //Save Btn
   $(document).keydown((e) => {
     if (e.ctrlKey && e.keyCode == 83) {
       e.preventDefault()
-      save()
+      navButton.save()
     }
     if (e.metaKey && e.keyCode == 83) {
       e.preventDefault()
-      save()
+      navButton.save()
     }
   })
 
@@ -358,30 +363,118 @@ const navInit = () => {
 
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
-//save
-const save = async () => {
-  loadingPage(true)
-  //Json Parse
-  const goData = JSON.parse(myDiagram.model.toJson());
-  //刪除 * 字號
-  let idx = document.title.indexOf("*");
-  document.title = document.title.slice(0, idx);
-  //存入資料庫
-  await axios({
-    method: "post",
-    url: '/student/savegolist',
-    data: {
-      goList: goData
-    }
-  }).then(response => {
-    if (response.data.status == 500) {
-      window.alert(response.data.message)
-      return
-    }
-    loadingPage(false)
-  })
+const navButton = {
+  //save
+  save: async () => {
+    loadingPage(true)
+    //Json Parse
+    const goData = JSON.parse(myDiagram.model.toJson());
+    //刪除 * 字號
+    let idx = document.title.indexOf("*");
+    if (idx !== -1) {
+      document.title = document.title.slice(0, idx);
+      //存入資料庫
+      await axios({
+        method: "post",
+        url: '/student/savegolist',
+        data: {
+          goList: goData,
+          courseId: $.trim($('#courseId').text())
+        }
+      }).then(response => {
+        if (response.data.status == 500) {
+          window.alert(response.data.message)
+          return
+        }
+        loadingPage(false)
+      })
 
-  myDiagram.isModified = false;
+      myDiagram.isModified = false;
+    }
+  },
+  //print
+  printList: () => {
+    let svgWindow = window.open();
+    if (!svgWindow) return;  // failure to open a new Window
+    let printSize = new go.Size(700, 960);
+    let bnds = myDiagram.documentBounds;
+    let x = bnds.x;
+    let y = bnds.y;
+    while (y < bnds.bottom) {
+      while (x < bnds.right) {
+        let svg = myDiagram.makeSvg({ scale: 1.0, position: new go.Point(x, y), size: printSize });
+        svgWindow.document.body.appendChild(svg);
+        x += printSize.width;
+      }
+      x = bnds.x;
+      y += printSize.height;
+    }
+    setTimeout(() => svgWindow.print(), 1);
+  },
+  //restart code & golist
+  restart: async () => {
+    if (window.confirm('確定重整嗎？所有內容將被清除！')) {
+      loadingPage(true)
+
+      //重整 goList
+      await axios({
+        method: 'post',
+        url: '/student/restartgolist',
+        data: {
+          courseId: $.trim($('#courseId').text())
+        }
+      }).then(response => {
+        if (response.data.status != 200) {
+          window.alert(response.data.message)
+          loadingPage(false)
+          return
+        }
+      })
+
+      //重整 code
+      await axios({
+        method: 'post',
+        url: '/student/restartcode'
+      }).then(response => {
+        if (response.data.status != 200) {
+          window.alert(response.data.message)
+          loadingPage(false)
+          return
+        }
+      })
+
+      load()
+      loadingPage(false)
+    }
+  },
+  //download new golist
+  download: async () => {
+    loadingPage(true)
+
+    //更新 goList
+    await axios({
+      method: 'post',
+      url: '/student/downloadgolist',
+      data: {
+        courseId: $.trim($('#courseId').text())
+      }
+    }).then(response => {
+      if (response.data.status != 200) {
+        window.alert(response.data.message)
+        loadingPage(false)
+        return
+      }
+    })
+
+    load()
+    loadingPage(false)
+  },
+  //logout
+  logout: () => {
+    if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
+      window.location.href = `/home/${getCookie('studentId')}`
+    }
+  }
 }
 //load
 const load = async () => {
@@ -389,7 +482,10 @@ const load = async () => {
 
   await axios({
     method: 'post',
-    url: '/student/readgolist'
+    url: '/student/readgolist',
+    data: {
+      courseId: $.trim($('#courseId').text())
+    }
   }).then(response => {
     if (response.data.status == 500) {
       window.alert(response.data.message)
@@ -400,70 +496,6 @@ const load = async () => {
 
   // myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
   myDiagram.model = go.Model.fromJson(goListData)
-}
-//print
-const print = () => {
-  let svgWindow = window.open();
-  if (!svgWindow) return;  // failure to open a new Window
-  let printSize = new go.Size(700, 960);
-  let bnds = myDiagram.documentBounds;
-  let x = bnds.x;
-  let y = bnds.y;
-  while (y < bnds.bottom) {
-    while (x < bnds.right) {
-      let svg = myDiagram.makeSvg({ scale: 1.0, position: new go.Point(x, y), size: printSize });
-      svgWindow.document.body.appendChild(svg);
-      x += printSize.width;
-    }
-    x = bnds.x;
-    y += printSize.height;
-  }
-  setTimeout(() => svgWindow.print(), 1);
-}
-//restart code & golist
-const restart = async () => {
-  if (window.confirm('確定重整嗎？所有內容將被清除！')) {
-    loadingPage(true)
-
-    //重整 goList
-    await axios({
-      method: 'post',
-      url: '/student/restartgolist'
-    }).then(response => {
-      if (response.data.status != 200) {
-        window.alert(response.data.message)
-        loadingPage(false)
-        return
-      }
-    })
-
-    //重整 code
-    await axios({
-      method:'post',
-      url:'/student/restartcode'
-    }).then(response=>{
-      if(response.data.status != 200){
-        window.alert(response.data.message)
-        loadingPage(false)
-        return
-      }
-    })
-
-    load()
-    loadingPage(false)
-  }
-}
-//logout
-const logout = () => {
-  if (window.confirm("確定登出嗎？退出前請記得儲存內容喔!")) {
-    loadingPage(true)
-    axios({
-      method: 'post',
-      url: '/logout'
-    }).then(response => {
-      window.location.href = '/'
-    })
-  }
 }
 //----------------------------------------------------------------------------------------
 //special for deleting node function
@@ -489,6 +521,7 @@ const deleteNode = (part) => {
           url: '/student/deletecode',
           data: {
             keyCode: part.ob.key,
+            courseId: $.trim($('#courseId').text())
           }
         }).then(response => {
           if (response.data.status != 200) {

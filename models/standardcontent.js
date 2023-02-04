@@ -11,6 +11,10 @@ const standardcontent = new mongoose.Schema({
         type: 'boolean',
         required: true,
     },
+    goListTitle: {
+        type: 'string',
+        required: true,
+    },
     // Flowchart 內容
     standardGoList: {
         type: 'object',
@@ -20,7 +24,12 @@ const standardcontent = new mongoose.Schema({
     standardCodeList: {
         type: 'object',
         required: false,
-    }
+    },
+    // 其他內容
+    standardData: {
+        type: 'object',
+        required: false
+    },
 })
 
 export default mongoose.model('standardcontents', standardcontent)

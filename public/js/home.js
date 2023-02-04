@@ -1,10 +1,16 @@
-import { loadingPage, serverResponseErrorDetect } from '../global/common.js'
+import { loadingPage, serverResponseErrorDetect, getCookie } from '../global/common.js'
 loadingPage(true)
 
 const homeInit = async () => {
     axios({
-        method:'POST',
-        url:'/student/getallcourse',
+        method: 'POST',
+        url: '/student/getallcourse',
+    }).then(response => {
+        if (serverResponseErrorDetect(response)) {
+            if (response.data.standardData !== null || response.data.standardData !== undefined) {
+                renderGoList(response.data.standardData)
+            }
+        }
     })
 
     loadingPage(false)
@@ -104,7 +110,7 @@ const changePassword = () => {
         const NP_2 = $('#new_password_2').val()
         const OP = $('#old_password').val()
 
-        if(NP_1.length === 0 || NP_2.length === 0 || OP.length === 0){
+        if (NP_1.length === 0 || NP_2.length === 0 || OP.length === 0) {
             window.alert('不得有欄位為空!')
             return
         }
@@ -115,7 +121,7 @@ const changePassword = () => {
             $('#old_password').val('')
             return
         }
-        if(NP_1 === OP){
+        if (NP_1 === OP) {
             window.alert("新舊密碼不得相同!")
             $('#new_password_1').val('')
             $('#new_password_2').val('')
@@ -132,16 +138,16 @@ const changePassword = () => {
             },
             withCredentials: true
         }).then(async response => {
-            if(serverResponseErrorDetect(response)){
+            if (serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
                 loadingPage(false)
-                if(response.data.status === 200){
+                if (response.data.status === 200) {
                     cancelCP()
                 }
             }
         })
     }
-    const cancelCP = () =>{
+    const cancelCP = () => {
         $(document).off('keydown')
         changePasswordDiv.fadeOut(500)
         setTimeout(e => {
@@ -150,6 +156,32 @@ const changePassword = () => {
     }
 
 
+}
+
+const renderGoList = (standardData) => {
+    standardData.map((value, index) => {
+        const goListContainer = $('<div>').prop({
+            className: 'goListCourse_contentContainer'
+        }).click(e => {
+            enterClass(value._id)
+        }).appendTo($('.goListCourse'))
+
+        //Image Box
+        $('<div>').prop({
+            className: 'goListCourse_contentImageBox',
+            innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:100%;height: 60%">'
+        }).appendTo(goListContainer)
+
+        //Title Detail
+        $('<div>').prop({
+            className: 'goListCourse_contentTitle',
+            innerHTML: value.goListTitle
+        }).appendTo(goListContainer)
+
+        const enterClass = (id) => {
+            window.location.href = `/student/${id}`
+        }
+    })
 }
 
 window.addEventListener('DOMContentLoaded', homeInit)

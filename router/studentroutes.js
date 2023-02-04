@@ -63,19 +63,77 @@ router.post('/changepassword', async (req, res) => {
         )
     }
 })
+//學生取得所有教學資料
+router.post('/getallcourse', async (req, res) => {
+    try {
+        const standardData = await standardcontent.find({ access: true })
+
+        res.json({
+            standardData: standardData,
+            status: 200,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得教材時發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//學生進入教程
+router.get('/:courseId', async (req, res) => {
+    try {
+        const courseData = await standardcontent.findOne({ _id: req.params.courseId })
+        if (courseData === null || courseData === undefined || courseData.length === 0) {
+            res.redirect(`/home/${req.user.studentId}`)
+            return
+        }
+        res.render('./golist', {
+            studentId: req.user.studentId,
+            courseId: req.params.courseId,
+            courseTitle: courseData.goListTitle
+        })
+    }
+    catch (err) {
+        res.json({
+            message: "錯誤開啟，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
 //學生讀取 goList
 router.post('/readgolist', async (req, res) => {
     try {
-        await studentConfig.findOne({ studentId: req.user.studentId, studentAccess: true }).then(response => {
-            res.json(
-                {
-                    message: response.studentGoList,
-                    status: 200
-                }
-            )
+        const studentData = await studentConfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+            studentAccess: true
         })
+
+        if (studentData.studentGoList[req.body.courseId] === null ||
+            studentData.studentGoList[req.body.courseId] === undefined
+        ) {
+            const standardData = await standardcontent.findOne({
+                class: req.user.studentClass,
+                _id: req.body.courseId,
+                access: true
+            })
+            res.json({
+                message: standardData.standardGoList,
+                status: 200
+            })
+            return
+        }
+        res.json(
+            {
+                message: studentData.studentGoList[req.body.courseId],
+                status: 200
+            }
+        )
     }
-    catch {
+    catch (err) {
         console.log(err)
         res.json(
             {
@@ -88,27 +146,42 @@ router.post('/readgolist', async (req, res) => {
 //學生儲存 goList
 router.post('/savegolist', async (req, res) => {
     try {
-        await studentConfig.updateOne(
-            { studentId: req.user.studentId, studentAccess: true },
-            { studentGoList: req.body.goList }
-        ).then(response => {
-            if (response.acknowledged) {
-                res.json(
-                    {
-                        message: 'success',
-                        status: 200
-                    }
-                )
-            } else {
-                res.json(
-                    {
-                        message: '儲存失敗，請再試一次',
-                        status: 500
-                    }
-                )
-            }
+        const studentData = await studentConfig.findOne(
+            {
+                studentClass: req.user.studentClass,
+                studentId: req.user.studentId,
+                studentAccess: true
+            })
 
-        })
+        studentData.studentGoList[req.body.courseId] = req.body.goList
+
+        await studentConfig.updateOne(
+            {
+                studentClass: req.user.studentClass,
+                studentId: req.user.studentId,
+                studentAccess: true
+            },
+            {
+                studentGoList: studentData.studentGoList
+            })
+            .then(response => {
+                if (response.acknowledged) {
+                    res.json(
+                        {
+                            message: 'success',
+                            status: 200
+                        }
+                    )
+                } else {
+                    res.json(
+                        {
+                            message: '儲存失敗，請再試一次',
+                            status: 500
+                        }
+                    )
+                }
+
+            })
     }
     catch (err) {
         console.log(err)
@@ -123,15 +196,33 @@ router.post('/savegolist', async (req, res) => {
 //學生重整 goList
 router.post('/restartgolist', async (req, res) => {
     try {
-        let standardGoList = {}
         //尋找 GoList
-        await standardcontent.findOne({ class: req.user.studentClass, access: true }).then(response => {
-            standardGoList = response.standardGoList
+        const standardData = await standardcontent.findOne({
+            class: req.user.studentClass,
+            _id: req.body.courseId,
+            access: true
         })
-        //更新 GoList
+        //尋找學生資料
+        const studentData = await studentConfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+            studentAccess: true
+        })
+        // GoList
+        if (studentData.studentGoList[req.body.courseId] !== undefined) {
+            studentData.studentGoList[req.body.courseId] = standardData.standardGoList[req.body.courseId]
+        }
+        // CodeList
+        if (studentData.studentCodeList[req.body.courseId] !== undefined) {
+            studentData.studentCodeList[req.body.courseId] = standardData.standardCodeList[req.body.courseId]
+        }
+        //重整 GoList
         await studentConfig.updateOne(
-            { studentId: req.user.studentId, studentAccess: true },
-            { studentGoList: standardGoList })
+            { studentClass: req.user.studentClass, studentId: req.user.studentId, studentAccess: true },
+            {
+                studentGoList: studentData.studentGoList,
+                studentCodeList: studentData.studentCodeList
+            })
             .then(response => {
                 if (response.acknowledged) {
                     res.json({
@@ -144,7 +235,53 @@ router.post('/restartgolist', async (req, res) => {
                         status: 500
                     })
                 }
-
+            })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: '重整 golist 失敗，請聯繫管理員 (err)',
+            status: 500
+        })
+    }
+})
+//學生更新 goList
+router.post('/downloadgolist', async (req, res) => {
+    try {
+        //尋找 GoList
+        const standardData = await standardcontent.findOne({
+            class: req.user.studentClass,
+            _id: req.body.courseId,
+            access: true
+        })
+        //尋找學生資料
+        const studentData = await studentConfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+            studentAccess: true
+        })
+        // GoList
+        if (studentData.studentGoList[req.body.courseId] !== undefined) {
+            studentData.studentGoList[req.body.courseId] = standardData.standardGoList[req.body.courseId]
+        }
+        //更新 GoList
+        await studentConfig.updateOne(
+            { studentClass: req.user.studentClass, studentId: req.user.studentId, studentAccess: true },
+            {
+                studentGoList: studentData.studentGoList,
+            })
+            .then(response => {
+                if (response.acknowledged) {
+                    res.json({
+                        message: 'success',
+                        status: 200
+                    })
+                } else {
+                    res.json({
+                        message: '更新 GoList 失敗，請重新整理網頁！',
+                        status: 500
+                    })
+                }
             })
     }
     catch (err) {
@@ -159,10 +296,23 @@ router.post('/restartgolist', async (req, res) => {
 //學生讀取 code
 router.post('/readcode', async (req, res) => {
     try {
-        await studentConfig.findOne({ studentId: req.user.studentId, studentAccess: true }).then(response => {
+        await studentConfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+            studentAccess: true
+        }).then(response => {
+            if (response.studentCodeList[req.body.courseId] === undefined) {
+                res.json(
+                    {
+                        code: '',
+                        status: 200
+                    }
+                )
+                return
+            }
             res.json(
                 {
-                    data: response.studentCodeList[req.body.keyCode] || '',
+                    code: response.studentCodeList[req.body.courseId][req.body.keyCode],
                     status: 200
                 }
             )
@@ -181,47 +331,62 @@ router.post('/readcode', async (req, res) => {
 //學生儲存 code
 router.post('/savecode', async (req, res) => {
     try {
-        // console.log(req.body)
-        //取得目前檔案
-        let studentUpdateData = {}
-        //儲存狀態
-        let saveStatus = false
-
-        await studentConfig.findOne({ studentId: req.user.studentId, studentAccess: true }).then(response => {
-            studentUpdateData = response.studentCodeList
+        const studentData = await studentConfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+            studentAccess: true
         })
 
-        //更新 or 新增 coding 檔案
-        studentUpdateData[req.body.keyCode] = {
-            setting: req.body.setting,
-            config: req.body.config,
-            preload: req.body.preload,
-            create: req.body.create,
-            update: req.body.update,
-            custom: req.body.custom,
+        if (studentData.studentCodeList[req.body.courseId] === undefined) {
+            // 初始化載入
+            studentData.studentCodeList[req.body.courseId] = {
+                [req.body.keyCode]: {
+                    setting: req.body.setting,
+                    config: req.body.config,
+                    preload: req.body.preload,
+                    create: req.body.create,
+                    update: req.body.update,
+                    custom: req.body.custom,
+                }
+            }
+        } else {
+            // 後續新增
+            studentData.studentCodeList[req.body.courseId][req.body.keyCode] = {
+                setting: req.body.setting,
+                config: req.body.config,
+                preload: req.body.preload,
+                create: req.body.create,
+                update: req.body.update,
+                custom: req.body.custom
+            }
         }
 
         //存入 coding 檔案
         await studentConfig.updateOne(
-            { studentId: req.user.studentId, studentAccess: true },
-            { studentCodeList: studentUpdateData }).then(response => {
-                saveStatus = response.acknowledged
-            })
-        if (saveStatus) {
-            res.json(
-                {
-                    message: 'success',
-                    status: 200
-                }
-            )
-        } else {
-            res.json(
-                {
-                    message: '儲存 code 失敗，請記下您當前的 code 並重新整理頁面',
-                    status: 500
-                }
-            )
-        }
+            {
+                studentClass: req.user.studentClass,
+                studentId: req.user.studentId,
+                studentAccess: true
+            },
+            { studentCodeList: studentData.studentCodeList }
+        ).then(response => {
+            if (response.acknowledged) {
+                res.json(
+                    {
+                        message: 'success',
+                        status: 200
+                    }
+                )
+            } else {
+                res.json(
+                    {
+                        message: '儲存 code 失敗，請記下您當前的 code 並重新整理頁面',
+                        status: 500
+                    }
+                )
+            }
+        })
+
     }
     catch (err) {
         console.log(err)
@@ -236,16 +401,13 @@ router.post('/savecode', async (req, res) => {
 //學生刪除 code
 router.post('/deletecode', async (req, res) => {
     try {
-        //取得目前檔案
-        let studentUpdateData = {}
-        //刪除狀態
-        let deleteStatus = false
-
-        await studentConfig.findOne({ studentId: req.user.studentId, studentAccess: true }).then(response => {
-            studentUpdateData = response.studentCodeList
+        const studentData = await studentConfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+            studentAccess: true
         })
 
-        delete studentUpdateData[req.body.keyCode]
+        delete studentData.studentCodeList[req.body.courseId]
 
         await studentConfig.updateOne(
             { studentId: req.user.studentId, studentAccess: true },
