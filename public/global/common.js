@@ -1,4 +1,4 @@
-import { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "./gogrammingPage.js"
+import { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "../js/golist/gogrammingPage.js"
 
 
 //------------------------------ normal function ------------------------------//
@@ -23,6 +23,32 @@ const getCookie = (name) => {
     let value = "; " + document.cookie;
     let parts = value.split("; " + name + "=");
     if (parts.length == 2) return parts.pop().split(";").shift();
+}
+//取得 當前時間
+const getNowTime = (Type) => {
+    const date = new Date()
+
+    switch (Type) {
+        case "SimpleTime":
+            let hour = date.getHours()
+            let minute = date.getMinutes()
+
+            if (hour.toString().length == 1) {
+                hour = "0" + hour
+            }
+            if (minute.toString().length == 1) {
+                minute = "0" + minute
+            }
+
+            return hour + ":" + minute
+            break
+        case "FullTime":
+            return date.getYear() + "/" +
+                date.getMonth() - 1 +
+                date.getDay() + " " +
+                date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+            break;
+    }
 }
 
 //------------------------------ Go.js Function -----------------------------------//
@@ -384,6 +410,7 @@ export {
     showContainer,
     swtichEditorNameToStartLineNumber,
     getCookie,
+    getNowTime,
     codeMirrorProgram,
     loadingPage,
     serverResponseErrorDetect,

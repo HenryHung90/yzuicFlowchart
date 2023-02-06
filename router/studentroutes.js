@@ -112,8 +112,8 @@ router.post('/readgolist', async (req, res) => {
             studentAccess: true
         })
 
-        if (studentData.studentGoList[req.body.courseId] === null ||
-            studentData.studentGoList[req.body.courseId] === undefined
+        if (studentData.studentGoList === null ||
+            studentData.studentGoList === undefined
         ) {
             const standardData = await standardcontent.findOne({
                 class: req.user.studentClass,
@@ -209,11 +209,11 @@ router.post('/restartgolist', async (req, res) => {
             studentAccess: true
         })
         // GoList
-        if (studentData.studentGoList[req.body.courseId] !== undefined) {
+        if (studentData.studentGoList !== undefined) {
             studentData.studentGoList[req.body.courseId] = standardData.standardGoList[req.body.courseId]
         }
         // CodeList
-        if (studentData.studentCodeList[req.body.courseId] !== undefined) {
+        if (studentData.studentCodeList !== undefined) {
             studentData.studentCodeList[req.body.courseId] = standardData.standardCodeList[req.body.courseId]
         }
         //重整 GoList

@@ -21,12 +21,14 @@ import './database/mongodb.js'
 import helmet from 'helmet'
 //passport
 import { passport, signIn } from './database/passportjwt.js'
+//socket.io
+import socketServer from './socketServer.js'
+import { Server } from 'socket.io'
+import http from 'http'
 
 //dlxvhg4vwiWYjjjU
 
 const app = express()
-const host = '127.0.0.1'
-const port = '3000'
 
 //.env config
 dotenv.config()
@@ -72,6 +74,7 @@ app.use(
                         "https://code.jquery.com",
                         "https://cdn.jsdelivr.net",
                         'https://cdnjs.cloudflare.com',
+                        'https://cdn.socket.io/',
                         'http://localhost:3000',
                     ],
                     frameAncestors: [
@@ -114,6 +117,7 @@ app.use(express.static('public'))
 
 app.use(express.static(path.join(__dirname, 'public')))
 
+
 app.get('/', async (req, res) => {
     if (req.cookies['token'] == undefined) {
         res.render('./index')
@@ -132,6 +136,7 @@ app.post('/logout', async (req, res) => {
 // })
 app.post('/login', passport.authenticate('login', { session: false }), signIn)
 
+// app.use('/admin', adminroutes)
 app.use((req, res, next) => {
     if (req.cookies['token'] == undefined) {
         res.redirect('/')
@@ -162,4 +167,11 @@ app.use((err, req, res, next) => {
 })
 
 
-app.listen(port, () => { console.log("Server is runing at " + host + " : " + port) })
+const httpServer = http.createServer(app)
+const io = new Server(httpServer)
+//socket server management
+socketServer(io)
+
+
+
+httpServer.listen(process.env.PORT, () => { console.log("Server is runing at " + process.env.HOST + " : " + process.env.PORT) })

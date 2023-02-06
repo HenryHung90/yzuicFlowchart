@@ -1,4 +1,4 @@
-import { codeMirrorProgram, loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximumSizeInMegaByte } from "./common.js"
+import { codeMirrorProgram, loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximumSizeInMegaByte } from "../../global/common.js"
 //Start
 //Comment
 //Understanding
@@ -757,6 +757,11 @@ const ReflectionBox = () => {
 }
 
 
-
-
-export { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox }
+export {
+    StartBox,
+    CommentBox,
+    UnderstandingBox,
+    FormulatingBox,
+    ProgrammingBox,
+    ReflectionBox
+}

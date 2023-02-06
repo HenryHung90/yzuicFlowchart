@@ -1,8 +1,11 @@
-import { showContainer, loadingPage, getCookie } from "../global/common.js";
+import { showContainer, loadingPage, getCookie } from "../../global/common.js";
+import { chatBoxInit } from "./chatbox.js";
+
 
 
 //init Diagram varible
 let myDiagram
+
 
 loadingPage(true)
 
@@ -361,6 +364,7 @@ const navInit = () => {
   loadingPage(false)
 }
 
+
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
@@ -382,6 +386,7 @@ const navButton = {
           courseId: $.trim($('#courseId').text())
         }
       }).then(response => {
+        console.log(response.data)
         if (response.data.status == 500) {
           window.alert(response.data.message)
           return
@@ -390,6 +395,8 @@ const navButton = {
       })
 
       myDiagram.isModified = false;
+    }else{
+      loadingPage(false)
     }
   },
   //print
@@ -549,3 +556,4 @@ const deleteNode = (part) => {
 
 window.addEventListener('DOMContentLoaded', goListInit);
 window.addEventListener('DOMContentLoaded', navInit);
+chatBoxInit()

@@ -47,22 +47,20 @@ router.post('/addstudent', async (req, res) => {
                         studentCodeList: {}
                     })
                     newStudent.save()
-                    return 'success'
+                    res.json({
+                        message: 'success',
+                        status: 200
+                    })
                 })
-            }
-        }).then(response => {
-            if (response == 'success') {
-                res.status(200).json({
-                    message: 'success',
-                    status: 200
-                })
+            }else{
+                throw 'student is exist'
             }
         })
 
     }
     catch (err) {
         console.log(err)
-        res.status(500).json({
+        res.json({
             message: err,
             status: 500
         })
