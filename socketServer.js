@@ -1,11 +1,6 @@
 const socketServer = (io) => {
-
     io.on('connection', (socket) => {
         console.log("user connected")
-
-        socket.on('disconnection', () => {
-            console.log("user disconnected")
-        })
 
         socket.on('enterRoom', (message) => {
             io.emit('re-enterRoom', message)

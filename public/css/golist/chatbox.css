@@ -1,0 +1,145 @@
+/* chatBox */
+.chatBoxContainer {
+    overflow: hidden;
+    display: flex;
+    pointer-events: none;
+    align-items: flex-end;
+    justify-content: right;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding: 10px 50px;
+    z-index: 1003;
+}
+.chatBox {
+    width: 70px;
+    height: 70px;
+    border-radius: 35px;
+    text-align: center;
+    pointer-events: all;
+    background-color: rgb(128, 128, 128);
+    transition-duration: 0.5s;
+}
+.chatBox:hover {
+    transition-duration: 0.5s;
+    box-shadow: 0 0 5px 1px wheat;
+}
+
+.chatBox_MessageContainer {
+    pointer-events: all;
+    width: 400px;
+    height: 80%;
+    margin-bottom: 80px;
+    overflow: auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 5px 1px black;
+    transform: translateX(70px);
+    display: none;
+    opacity: 0;
+}
+.chatBox_MessageTitle {
+    height: 7%;
+    width: 100%;
+    padding: 10px 20px;
+    color: white;
+    position: sticky;
+    font-weight: bolder;
+    background-color: rgb(40, 44, 52);
+}
+.chatBox_MessageBox {
+    overflow: hidden;
+    height: 93%;
+}
+.chatBox_MessageContent {
+    height: 93%;
+    overflow-y: auto;
+}
+
+.chatBox_MessageEnterBox {
+    height: 7%;
+    position: sticky;
+    align-self: flex-end;
+}
+
+.chatBox_enterMessage {
+    font-family: "Ubuntu", sans-serif;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 10px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+/* send Message Box setting */
+.chatBox_sendMessageBox {
+    padding: 3px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    text-align: right;
+    justify-content: right;
+    animation: fadeInAndUp 0.2s steps(100);
+}
+.chatBox_sendMessageBox_studentId {
+    font-family: "Ubuntu", sans-serif;
+    font-size: 8px;
+    font-weight: bolder;
+    width: 100%;
+}
+.chatBox_sendMessage_messageBox {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 15px;
+    word-break: break-all;
+    text-align: left;
+    max-width: 60%;
+    border-radius: 5px;
+    background-color: rgb(13, 90, 255);
+    color: white;
+}
+.chatBox_sendMessage_sendTime {
+    width: 100%;
+    font-size: 6px;
+}
+/* receive Message Box setting */
+.chatBox_receiveMessageBox {
+    padding: 3px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    text-align: left;
+    justify-content: left;
+    animation: fadeInAndUp 0.2s steps(100);
+}
+.chatBox_receiveMessageBox_studentId {
+    font-family: "Ubuntu", sans-serif;
+    font-size: 8px;
+    font-weight: bolder;
+    width: 100%;
+}
+.chatBox_receiveMessage_messageBox {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 15px;
+    word-break: break-all;
+    text-align: left;
+    max-width: 60%;
+    border-radius: 5px;
+    background-color: rgb(189, 189, 189);
+    color: black;
+}
+.chatBox_receiveMessage_sendTime {
+    width: 100%;
+    font-size: 6px;
+}
+
+@keyframes fadeInAndUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

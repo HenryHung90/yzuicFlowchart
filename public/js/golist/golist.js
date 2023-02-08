@@ -364,7 +364,6 @@ const navInit = () => {
   loadingPage(false)
 }
 
-
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
