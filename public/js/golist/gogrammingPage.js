@@ -1,4 +1,8 @@
-import { codeMirrorProgram, loadingPage, swtichEditorNameToStartLineNumber, saveCodeStatus, maximumSizeInMegaByte } from "../../global/common.js"
+import {
+    NormalizeFunc,
+    CodeMirrorFunc,
+    GoListFunc
+} from "../../global/common.js"
 //Start
 //Comment
 //Understanding
@@ -42,7 +46,7 @@ const StartBox = (startKey) => {
         'border': '1px solid black'
     }).appendTo(content_demoContainer)
 
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
     return startBoxContainer
 }
 //CommentBox return function
@@ -217,20 +221,20 @@ const CommentBox = (commentKey) => {
 
         contentContainer.append(codeContentContainer)
         //codeMirror append to codeContent
-        codeMirrorProgram(codeContentId, '//write your comment code here')
+        CodeMirrorFunc.codeMirrorProgram(codeContentId, '//write your comment code here')
         $(`#${codeContentId}`).data('CodeMirror').setSize(null, 200)
     }
 
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
     return contentDiv
 }
 //UnderstandingBox return function
 const UnderstandingBox = (understandKey) => {
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
 }
 //FormulatingBox return function
 const FormulatingBox = (FormulatingKey) => {
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
 }
 //Programming return function
 const ProgrammingBox = (programmingKey) => {
@@ -441,7 +445,7 @@ const ProgrammingBox = (programmingKey) => {
     //--------------------------------------------------------------
     //Launch demo function
     const launchDemo = async () => {
-        loadingPage(true)
+        NormalizeFunc.loadingPage(true)
         //取得各階段程式碼
         const settingCode = $("#setting").data('CodeMirror')
         const configCode = $('#config').data('CodeMirror')
@@ -454,7 +458,7 @@ const ProgrammingBox = (programmingKey) => {
         for (let name of ['setting', 'config', 'preload', 'create', 'update', 'custom']) {
             $(`#${name}`)
                 .data('CodeMirror')
-                .setOption('firstLineNumber', swtichEditorNameToStartLineNumber(name));
+                .setOption('firstLineNumber', CodeMirrorFunc.swtichEditorNameToStartLineNumber(name));
         }
 
         await axios({
@@ -469,17 +473,13 @@ const ProgrammingBox = (programmingKey) => {
                 custom: customCode.getValue()
             }
         }).then(response => {
+            NormalizeFunc.serverResponseErrorDetect(response)
             //成功執行並將access隨機碼載入
             if (response.data.status == 200) {
                 return response.data.message
             }
-            //失敗則告知失敗位置
-            if (response.data.status == 500) {
-                window.alert(response.data.message)
-                return 'fail'
-            }
         }).then(async response => {
-            if (response == 'fail') {
+            if (!response) {
                 return
             }
 
@@ -518,7 +518,7 @@ const ProgrammingBox = (programmingKey) => {
 
                 demoIframeInfo.on('load', (e) => {
                     e.preventDefault()
-                    loadingPage(false)
+                    NormalizeFunc.loadingPage(false)
                     $('.demoContent').addClass('demoFinish')
                     setTimeout((e) => {
                         $('.demoContent').removeClass('demoFinish')
@@ -533,7 +533,7 @@ const ProgrammingBox = (programmingKey) => {
                 $('#demoIframe').attr('src', `../access/${document.cookie.split("; ")[1].split("=")[1]}/${response}/${response}.html`)
                 $('#demoIframe').on('load', (e) => {
                     e.preventDefault()
-                    loadingPage(false)
+                    NormalizeFunc.loadingPage(false)
                     $('.demoContent').addClass('demoFinish')
                     setTimeout((e) => {
                         $('.demoContent').removeClass('demoFinish')
@@ -545,7 +545,7 @@ const ProgrammingBox = (programmingKey) => {
 
     //save code function
     const saveCode = async () => {
-        saveCodeStatus(true)
+        GoListFunc.saveCodeStatus(true)
         //取得各階段程式碼
         const settingCode = $("#setting").data('CodeMirror')
         const configCode = $('#config').data('CodeMirror')
@@ -566,14 +566,14 @@ const ProgrammingBox = (programmingKey) => {
                 update: updateCode.getValue(),
                 custom: customCode.getValue(),
                 keyCode: keyCode,
-                courseId: $.trim($('#courseId').text())
+                courseId: NormalizeFunc.getFrontEndCode('courseId')
             }
         }).then(response => {
             if (response.data.status != 200) {
                 window.alert(response.data.message)
                 return
             }
-            saveCodeStatus(false)
+            GoListFunc.saveCodeStatus(false)
         })
     }
 
@@ -585,16 +585,16 @@ const ProgrammingBox = (programmingKey) => {
     }
     //upload
     const uploadFile = async (files) => {
-        loadingPage(true)
+        NormalizeFunc.loadingPage(true)
         let uploadFile = new FormData()
 
         for (let file of files) {
             const extension = file.name.substring(file.name.lastIndexOf('.'), file.name.length).toLowerCase();
 
             //檢查檔案大小
-            if (file.size >= maximumSizeInMegaByte(20)) {
+            if (file.size >= NormalizeFunc.maximumSizeInMegaByte(20)) {
                 window.alert("上傳檔案禁止超過 20 MB")
-                loadingPage(false)
+                NormalizeFunc.loadingPage(false)
                 return
             }
             //檢查檔案副檔名結構
@@ -602,7 +602,7 @@ const ProgrammingBox = (programmingKey) => {
                 uploadFile.append('image', file)
             } else {
                 window.alert("上傳檔案僅限 png jpg jpeg")
-                loadingPage(false)
+                NormalizeFunc.loadingPage(false)
                 return
             }
         }
@@ -615,7 +615,7 @@ const ProgrammingBox = (programmingKey) => {
                 window.alert(response.data.message)
                 return
             }
-            loadingPage(false)
+            NormalizeFunc.loadingPage(false)
         })
 
     }
@@ -748,12 +748,12 @@ const ProgrammingBox = (programmingKey) => {
         }
     }
 
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
     return contentRowDiv
 }
 //Reflection return function
 const ReflectionBox = () => {
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
 }
 
 

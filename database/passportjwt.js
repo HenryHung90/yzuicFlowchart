@@ -52,6 +52,7 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                         studentClass: user.studentClass,
                         studentId: user.studentId,
                         studentName: user.studentName,
+                        studentChatRoomId: user.studentChatRoomId,
                     }
                     done(null, returnUser)
                 }
@@ -66,11 +67,12 @@ let cookieExtractor = function (req) {
     if (req && req.cookies) token = req.cookies['token'];
     return token;
 };
-let opts = {}
-opts.jwtFromRequest = cookieExtractor
-opts.secretOrKey = secret_key
-opts.failureRedirect = '/'
-opts.failureMessage = true
+let opts = {
+    jwtFromRequest: cookieExtractor,
+    secretOrKey: secret_key,
+    failureRedirect: '/',
+    failureMessage: true
+}
 
 
 passport.use('token', new JWTStrategy(opts,
@@ -83,6 +85,7 @@ passport.use('token', new JWTStrategy(opts,
                     studentClass: user.studentClass,
                     studentId: user.studentId,
                     studentName: user.studentName,
+                    studentChatRoomId: user.studentChatRoomId,
                 }
                 done(null, returnUser)
             })

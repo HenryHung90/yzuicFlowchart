@@ -1,5 +1,5 @@
-import { socketConnect } from '../../global/socketConnect.js'
-
+import { socketConnect, MessageType } from '../../global/socketConnect.js'
+import { NormalizeFunc } from '../../global/common.js'
 
 const chatBoxInit = () => {
     // 傳送進入房間訊息
@@ -25,14 +25,14 @@ const chatBoxInit = () => {
         className: 'chatBox_MessageBox'
     }).appendTo(chatBoxMessageContainer)
     //Content
-    $('<div>').prop({
+    const MessageContent = $('<div>').prop({
         className: 'chatBox_MessageContent',
     }).appendTo(MessageBox)
     //EnterBox
     const EnterBox = $('<div>').prop({
         className: 'input-group chatBox_MessageEnterBox',
         innerHTML:
-            '<input id="Message" type="text" class="form-control" placeholder="輸入訊息" aria-label="輸入訊息" aria-describedby="button-addon2">'
+            '<textarea id="Message"  class="form-control" placeholder="輸入訊息" aria-label="輸入訊息" aria-describedby="button-addon2">'
     }).appendTo(MessageBox)
 
     $('<button>').prop({
@@ -65,8 +65,14 @@ const chatBoxInit = () => {
             'opacity': '1'
         }, 300)
 
-        $(document).keydown((e) => {
-            if (e.keyCode === 13) {
+
+        $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
+
+        $('#Message').keydown((e) => {
+            if (e.shiftKey && e.keyCode === 13) {
+                $('#Message').val($('#Message').val() + '\n')
+            }
+            else if (e.keyCode === 13) {
                 e.preventDefault()
                 sendMessage()
             }
@@ -77,12 +83,12 @@ const chatBoxInit = () => {
         $('.chatBox_MessageContainer').animate({
             'opacity': '0'
         }, 300)
+        $('#Message').off('keydown')
         setTimeout((e) => {
             $('.chatBox_MessageContainer').css({
                 'display': 'none'
             })
         }, 300)
-        $(document).off('keydown')
     }
 
     // send message
@@ -92,6 +98,40 @@ const chatBoxInit = () => {
             $('#Message').val('')
         }
     }
+
+
+
+    //重新整理次數記錄
+    let freshCount = 2
+    $(MessageContent).on('scroll', () => {
+        if ($(MessageContent).scrollTop() === 0) {
+            axios({
+                method: 'POST',
+                url: '/student/getmessagehistory',
+                data: {
+                    freshCount: freshCount,
+                    chatRoomId: NormalizeFunc.getFrontEndCode('studentChatRoomId')
+                }
+            }).then(response => {
+                NormalizeFunc.serverResponseErrorDetect(response)
+                if (response.data.status === 200) {
+                    const reverseMessage = response.data.message.reverse()
+                    const OffsetScrollTop = $('.chatBox_MessageContent')[0].scrollHeight
+
+                    for (let messageHistory of reverseMessage) {
+                        if (messageHistory.studentId === NormalizeFunc.getCookie("studentId")) {
+                            MessageType.sendMessage_History(messageHistory)
+                        } else {
+                            //別人傳則使用別人傳的模型
+                            MessageType.receiveMessage_History(messageHistory)
+                        }
+                    }
+                    $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight - OffsetScrollTop - 100)
+                    freshCount++
+                }
+            })
+        }
+    })
 }
 
 

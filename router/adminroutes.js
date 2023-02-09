@@ -1,12 +1,16 @@
 import express from 'express'
 import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid';
 const router = express.Router()
 
 import studentConifg from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import studentconfig from '../models/studentconfig.js'
+import chatroomconfig from '../models/chatroomconfig.js'
 
 const saltRound = 10
+
+
 
 //新增學生
 router.post('/addstudent', async (req, res) => {
@@ -52,7 +56,7 @@ router.post('/addstudent', async (req, res) => {
                         status: 200
                     })
                 })
-            }else{
+            } else {
                 throw 'student is exist'
             }
         })
@@ -68,19 +72,102 @@ router.post('/addstudent', async (req, res) => {
 
 })
 
-//新增Standard
+//新增 Standard
 router.post('/addstandardcontent', async (req, res) => {
-    const newStandardcontent = new standardcontent({
-        class: req.body.class,
-        access: true,
-        goListTitle: req.body.goListTitle,
-        standardGoList: req.body.standardGoList,
-        standardCodeList: req.body.standardCodeList || {},
-        standardData: req.body.standardGoList || {},
-    })
+    try {
+        const newStandardcontent = new standardcontent({
+            class: req.body.class,
+            access: true,
+            goListTitle: req.body.goListTitle,
+            standardGoList: req.body.standardGoList,
+            standardCodeList: req.body.standardCodeList || {},
+            standardData: req.body.standardGoList || {},
+        })
 
-    newStandardcontent.save()
-    res.send('22222')
+        newStandardcontent.save()
+        res.json({
+            message: "success",
+            status: 200,
+        })
+
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "新增go list失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+
+})
+
+//新增 chatroom (加入 studentId)
+router.post('/addchatroom', async (req, res) => {
+    try {
+        const chatRoomId = uuidv4()
+
+        if (req.body.chatRoomId === '') {
+            const newChatRoom = new chatroomconfig({
+                class: req.body.class,
+                access: true,
+                chatRoomId: chatRoomId,
+                studentGroup: req.body.studentGroup,
+                messageHistory: []
+            })
+
+            newChatRoom.save()
+
+            for (let studentId of req.body.studentGroup) {
+                studentConifg.updateOne(
+                    { studentAccess: true, studentClass: req.body.class, studentId: studentId },
+                    { studentChatRoomId: chatRoomId }
+                ).then(response => {
+                    if (!response.acknowledged) {
+                        res.json({
+                            message: studentId + "加入房間失敗",
+                            status: 500
+                        })
+                        return
+                    }
+                })
+            }
+            res.json({
+                message: `創建成功!\n房間ID:${chatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
+                status: 200,
+            })
+        } else {
+            await chatroomconfig.updateOne(
+                { class: req.body.class, chatRoomId: req.body.chatRoomId },
+                { studentGroupId: req.body.studentGroupId }
+            )
+            for (let studentId of req.body.studentGroup) {
+                studentConifg.updateOne(
+                    { studentAccess: true, studentClass: req.body.class, studentId: studentId },
+                    { studentChatRoomId: req.body.chatRoomId }
+                ).then(response => {
+                    if (!response.acknowledged) {
+                        res.json({
+                            message: studentId + "加入房間失敗",
+                            status: 500
+                        })
+                        return
+                    }
+                })
+            }
+            res.json({
+                message: `加入成功!\n房間ID:${chatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
+                status: 200,
+            })
+        }
+
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "新增聊天室失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
 })
 
 export default router

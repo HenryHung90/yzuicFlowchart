@@ -116,7 +116,6 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-
 /* diagram */
 .diagramContainer {
     display: flex;
@@ -194,6 +193,11 @@ body {
 #content_status_icon {
     transition-timing-function: ease;
     animation: sync 1s infinite steps(200);
+}
+
+#courseId,
+#studentChatRoomId {
+    display: none;
 }
 
 /* Media Area */

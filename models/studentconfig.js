@@ -26,6 +26,11 @@ const studentsConfig = new mongoose.Schema({
         type: 'boolean',
         required: true,
     },
+    // 學生使用的聊天室
+    studentChatRoomId: {
+        type: 'string',
+        required: false,
+    },
     // 學生的 Flowchart
     studentGoList: {
         type: 'object',
@@ -33,8 +38,8 @@ const studentsConfig = new mongoose.Schema({
     },
     // 學生的 Code
     studentCodeList: {
-        type:'object',
-        required:false,
+        type: 'object',
+        required: false,
     }
 })
 
