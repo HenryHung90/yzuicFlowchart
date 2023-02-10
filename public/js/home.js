@@ -1,19 +1,19 @@
-import { loadingPage, serverResponseErrorDetect, getCookie } from '../global/common.js'
-loadingPage(true)
+import { NormalizeFunc } from '../global/common.js'
+NormalizeFunc.loadingPage(true)
 
 const homeInit = async () => {
     axios({
         method: 'POST',
         url: '/student/getallcourse',
     }).then(response => {
-        if (serverResponseErrorDetect(response)) {
+        if (NormalizeFunc.serverResponseErrorDetect(response)) {
             if (response.data.standardData !== null || response.data.standardData !== undefined) {
                 renderGoList(response.data.standardData)
             }
         }
     })
 
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
 }
 
 
@@ -24,7 +24,7 @@ $('#changePassword').click(e => changePassword())
 
 const logout = () => {
     if (window.confirm("確定登出嗎？退出前請記得儲存內容喔!")) {
-        loadingPage(true)
+        NormalizeFunc.loadingPage(true)
         axios({
             method: 'post',
             url: '/logout'
@@ -128,7 +128,7 @@ const changePassword = () => {
             $('#old_password').val('')
             return
         }
-        loadingPage(true)
+        NormalizeFunc.loadingPage(true)
         axios({
             method: 'POST',
             url: '/student/changepassword',
@@ -138,9 +138,9 @@ const changePassword = () => {
             },
             withCredentials: true
         }).then(async response => {
-            if (serverResponseErrorDetect(response)) {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
-                loadingPage(false)
+                NormalizeFunc.loadingPage(false)
                 if (response.data.status === 200) {
                     cancelCP()
                 }

@@ -1,4 +1,4 @@
-import { showContainer, loadingPage, getCookie } from "../../global/common.js";
+import { GoListFunc,  NormalizeFunc } from "../../global/common.js";
 import { chatBoxInit } from "./chatbox.js";
 
 
@@ -7,7 +7,7 @@ import { chatBoxInit } from "./chatbox.js";
 let myDiagram
 
 
-loadingPage(true)
+NormalizeFunc.loadingPage(true)
 
 const goListInit = () => {
   // Since 2.2 you can also author concise templates with method chaining instead of GraphObject.make
@@ -38,7 +38,7 @@ const goListInit = () => {
   //event function
   myDiagram.addDiagramListener("ObjectDoubleClicked", e => {
     const part = e.subject.part;
-    if (!(part instanceof go.Link)) showContainer(part.ob);
+    if (!(part instanceof go.Link)) GoListFunc.showContainer(part.ob);
   });
   myDiagram.addDiagramListener('SelectionDeleting', function (e) {
     // the DiagramEvent.subject is the collection of Parts about to be deleted
@@ -361,16 +361,15 @@ const navInit = () => {
     }
   })
 
-  loadingPage(false)
+  NormalizeFunc.loadingPage(false)
 }
-
 
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
   //save
   save: async () => {
-    loadingPage(true)
+    NormalizeFunc.loadingPage(true)
     //Json Parse
     const goData = JSON.parse(myDiagram.model.toJson());
     //刪除 * 字號
@@ -383,7 +382,7 @@ const navButton = {
         url: '/student/savegolist',
         data: {
           goList: goData,
-          courseId: $.trim($('#courseId').text())
+          courseId: NormalizeFunc.getFrontEndCode('courseId')
         }
       }).then(response => {
         console.log(response.data)
@@ -391,12 +390,12 @@ const navButton = {
           window.alert(response.data.message)
           return
         }
-        loadingPage(false)
+        NormalizeFunc.loadingPage(false)
       })
 
       myDiagram.isModified = false;
-    }else{
-      loadingPage(false)
+    } else {
+      NormalizeFunc.loadingPage(false)
     }
   },
   //print
@@ -421,19 +420,19 @@ const navButton = {
   //restart code & golist
   restart: async () => {
     if (window.confirm('確定重整嗎？所有內容將被清除！')) {
-      loadingPage(true)
+      NormalizeFunc.loadingPage(true)
 
       //重整 goList
       await axios({
         method: 'post',
         url: '/student/restartgolist',
         data: {
-          courseId: $.trim($('#courseId').text())
+          courseId: NormalizeFunc.getFrontEndCode('courseId')
         }
       }).then(response => {
         if (response.data.status != 200) {
           window.alert(response.data.message)
-          loadingPage(false)
+          NormalizeFunc.loadingPage(false)
           return
         }
       })
@@ -445,41 +444,41 @@ const navButton = {
       }).then(response => {
         if (response.data.status != 200) {
           window.alert(response.data.message)
-          loadingPage(false)
+          NormalizeFunc.loadingPage(false)
           return
         }
       })
 
       load()
-      loadingPage(false)
+      NormalizeFunc.loadingPage(false)
     }
   },
   //download new golist
   download: async () => {
-    loadingPage(true)
+    NormalizeFunc.loadingPage(true)
 
     //更新 goList
     await axios({
       method: 'post',
       url: '/student/downloadgolist',
       data: {
-        courseId: $.trim($('#courseId').text())
+        courseId: NormalizeFunc.getFrontEndCode('courseId')
       }
     }).then(response => {
       if (response.data.status != 200) {
         window.alert(response.data.message)
-        loadingPage(false)
+        NormalizeFunc.loadingPage(false)
         return
       }
     })
 
     load()
-    loadingPage(false)
+    NormalizeFunc.loadingPage(false)
   },
   //logout
   logout: () => {
     if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
-      window.location.href = `/home/${getCookie('studentId')}`
+      window.location.href = `/home/${NormalizeFunc.getCookie('studentId')}`
     }
   }
 }
@@ -491,7 +490,7 @@ const load = async () => {
     method: 'post',
     url: '/student/readgolist',
     data: {
-      courseId: $.trim($('#courseId').text())
+      courseId: NormalizeFunc.getFrontEndCode('courseId')
     }
   }).then(response => {
     if (response.data.status == 500) {
@@ -528,7 +527,7 @@ const deleteNode = (part) => {
           url: '/student/deletecode',
           data: {
             keyCode: part.ob.key,
-            courseId: $.trim($('#courseId').text())
+            courseId: NormalizeFunc.getFrontEndCode('courseId')
           }
         }).then(response => {
           if (response.data.status != 200) {

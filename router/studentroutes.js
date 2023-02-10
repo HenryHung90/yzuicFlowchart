@@ -4,6 +4,7 @@ const router = express.Router()
 
 import studentConfig from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
+import chatroomconfig from '../models/chatroomconfig.js'
 
 const saltRound = 10
 
@@ -92,7 +93,8 @@ router.get('/:courseId', async (req, res) => {
         res.render('./golist', {
             studentId: req.user.studentId,
             courseId: req.params.courseId,
-            courseTitle: courseData.goListTitle
+            courseTitle: courseData.goListTitle,
+            studentChatRoomId: req.user.studentChatRoomId,
         })
     }
     catch (err) {
@@ -469,6 +471,47 @@ router.post('/restartcode', async (req, res) => {
         console.log(err)
         res.json({
             message: '重整 Code 失敗，請聯繫管理員 (err)',
+            status: 500
+        })
+    }
+})
+
+router.post('/getmessagehistory', async (req, res) => {
+    try {
+        const messageData = await chatroomconfig.findOne({ chatRoomId: req.body.chatRoomId, access: true })
+
+        let sliceStart = messageData.messageHistory.length - (11 + (11 * req.body.freshCount))
+        let sliceEnd = messageData.messageHistory.length - (1 + (11 * req.body.freshCount))
+        let isTop = false
+
+        if (sliceEnd < 0) {
+            res.json({
+                message: 'no more',
+                status: 501,
+            })
+            return
+        }
+
+        while (sliceStart < 0) {
+            sliceStart++
+            isTop = true
+        }
+
+        if(sliceStart === 0 && sliceEnd === 0){
+            sliceEnd = 1
+        }
+
+        const messageSlice = messageData.messageHistory.slice(sliceStart, sliceEnd)
+
+        res.json({
+            message: messageSlice,
+            status: 200,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: '取得歷史訊息失敗，請聯繫管理員 (err)',
             status: 500
         })
     }
