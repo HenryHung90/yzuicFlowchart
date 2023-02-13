@@ -25,11 +25,18 @@ const standardcontent = new mongoose.Schema({
         type: 'object',
         required: false,
     },
-    // 其他內容
-    standardData: {
+    // 探索理解 內容
+    // 目標 操作 限制（問號內塞流程圖）
+    standardUnderstanding: {
         type: 'object',
         required: false
     },
+    // 表徵制定 內容
+    // 語法 => 動畫 互動 監聽 （問號內塞程式碼）
+    standardFormulating: {
+        type:'object',
+        required:false,
+    }
 })
 
 export default mongoose.model('standardcontents', standardcontent)

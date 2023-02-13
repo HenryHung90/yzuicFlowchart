@@ -72,7 +72,7 @@ router.post('/addstudent', async (req, res) => {
 
 })
 
-//新增 Standard
+//新增 Standard 各項內容
 router.post('/addstandardcontent', async (req, res) => {
     try {
         const newStandardcontent = new standardcontent({
@@ -81,7 +81,8 @@ router.post('/addstandardcontent', async (req, res) => {
             goListTitle: req.body.goListTitle,
             standardGoList: req.body.standardGoList,
             standardCodeList: req.body.standardCodeList || {},
-            standardData: req.body.standardGoList || {},
+            standardUnderstanding: req.body.standardUnderstanding || {},
+            standardFormulating: req.body.standardFormulating || {}
         })
 
         newStandardcontent.save()
@@ -89,7 +90,6 @@ router.post('/addstandardcontent', async (req, res) => {
             message: "success",
             status: 200,
         })
-
     }
     catch (err) {
         console.log(err)
@@ -99,6 +99,57 @@ router.post('/addstandardcontent', async (req, res) => {
         })
     }
 
+})
+
+//修改 Standard 各項內容
+router.post('/updatestandardcontent', async (req, res) => {
+    try {
+        const standardData = await standardcontent.findOne({
+            class: req.body.class,
+            goListTitle: req.body.goListTitle
+        })
+
+        if (!isEmpty(req.body.standardGoList)) {
+            standardData.standardGoList = req.body.standardGoList
+        }
+        if (!isEmpty(req.body.standardCodeList)) {
+            standardData.standardCodeList = req.body.standardCodeList
+        }
+        if (!isEmpty(req.body.standardUnderstanding)) {
+            standardData.standardUnderstanding = req.body.standardUnderstanding
+        }
+        if (!isEmpty(req.body.standardFormulating)) {
+            standardData.standardFormulating = req.body.standardFormulating
+        }
+
+        await standardcontent.updateOne({
+            class: req.body.class,
+            goListTitle: req.body.goListTitle,
+        }, {
+            standardGoList: standardData.standardGoList,
+            standardCodeList: standardData.standardCodeList,
+            standardUnderstanding: standardData.standardUnderstanding,
+            standardFormulating: standardData.standardFormulating
+        })
+
+        res.json({
+            message: "success",
+            status: 200,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "編輯go list失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+
+    function isEmpty(body) {
+        if (body === undefined || body === null || body === '' || body === {}) {
+            return true
+        }
+        return false
+    }
 })
 
 //新增 chatroom (加入 studentId)
@@ -169,5 +220,6 @@ router.post('/addchatroom', async (req, res) => {
         })
     }
 })
+
 
 export default router

@@ -201,7 +201,7 @@ body {
 }
 
 /* Media Area */
-@media (max-width: 1439px) {
+@media (max-width: 1400px) {
     .navBarIcon {
         margin: 20px 60px;
     }
