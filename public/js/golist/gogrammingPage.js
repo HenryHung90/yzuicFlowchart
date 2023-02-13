@@ -59,7 +59,7 @@ const CommentBox = (commentKey) => {
     })
 
     //contentTitle
-    const contentTitle = $('<div>').prop({
+    $('<div>').prop({
         className: 'form-floating content_Title',
         innerHTML: '<input type="text" class="form-control" id="contentTitle" placeholder="輸入你的標題">' +
             '<label for="floatingInput">筆記標題</label>'
@@ -225,16 +225,29 @@ const CommentBox = (commentKey) => {
         $(`#${codeContentId}`).data('CodeMirror').setSize(null, 200)
     }
 
-    NormalizeFunc.loadingPage(false)
     return contentDiv
 }
 //UnderstandingBox return function
 const UnderstandingBox = (understandKey) => {
-    NormalizeFunc.loadingPage(false)
+    // 把 Sync 字樣刪除
+    $('.content_complete').remove()
+    //Content Div-------------------------------------------------
+    const contentDiv = $('<div>').prop({
+        className: 'justify-content-center UnderstandingContentDiv'
+    })
+
+    return contentDiv
 }
 //FormulatingBox return function
 const FormulatingBox = (FormulatingKey) => {
-    NormalizeFunc.loadingPage(false)
+    // 把 Sync 字樣刪除
+    $('.content_complete').remove()
+    //Content Div-------------------------------------------------
+    const contentDiv = $('<div>').prop({
+        className: 'justify-content-center FormulatingContentDiv'
+    })
+
+    return contentDiv
 }
 //Programming return function
 const ProgrammingBox = (programmingKey) => {
@@ -319,7 +332,7 @@ const ProgrammingBox = (programmingKey) => {
         saveCode()
     }).appendTo(content_LaunchDiv)
     //Save Btn
-    $(document).keydown((e) => {
+    $('.contentDiv').keydown((e) => {
         if (e.ctrlKey && e.keyCode == 83) {
             e.preventDefault()
             saveCode()
@@ -748,12 +761,18 @@ const ProgrammingBox = (programmingKey) => {
         }
     }
 
-    NormalizeFunc.loadingPage(false)
     return contentRowDiv
 }
 //Reflection return function
 const ReflectionBox = () => {
-    NormalizeFunc.loadingPage(false)
+    // 把 Sync 字樣刪除
+    $('.content_complete').remove()
+    //Content Div-------------------------------------------------
+    const contentDiv = $('<div>').prop({
+        className: 'justify-content-center ReflectionContentDiv'
+    })
+
+    return contentDiv
 }
 
 

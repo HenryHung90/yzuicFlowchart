@@ -1,4 +1,4 @@
-import { GoListFunc,  NormalizeFunc } from "../../global/common.js";
+import { GoListFunc, NormalizeFunc } from "../../global/common.js";
 import { chatBoxInit } from "./chatbox.js";
 
 
@@ -20,6 +20,7 @@ const goListInit = () => {
         // "initialContentAlignment": go.Spot.Center, 
         "LinkDrawn": showLinkLabel,  // this DiagramEvent listener is defined below
         "LinkRelinked": showLinkLabel,
+        "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
         "undoManager.isEnabled": true  // enable undo & redo
       });
 
@@ -48,20 +49,6 @@ const goListInit = () => {
     });
   });
 
-  // helper definitions for node templates
-  function nodeStyle() {
-    return [
-      // The Node.location comes from the "loc" property of the node data,
-      // converted by the Point.parse static method.
-      // If the Node.location is changed, it updates the "loc" property of the node data,
-      // converting back using the Point.stringify static method.
-      new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-      {
-        // the Node.location is at the center of each node
-        locationSpot: go.Spot.Center
-      }
-    ];
-  }
 
   // Define a function for creating a "port" that is normally transparent.
   // The "name" is used as the GraphObject.portId,
@@ -100,34 +87,49 @@ const goListInit = () => {
       stroke: "#F8F8F8"
     }
   }
+  // helper definitions for node templates
+  function nodeStyle() {
+    return [
+      // The Node.location comes from the "loc" property of the node data,
+      // converted by the Point.parse static method.
+      // If the Node.location is changed, it updates the "loc" property of the node data,
+      // converting back using the Point.stringify static method.
+      new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+      {
+        // the Node.location is at the center of each node
+        locationSpot: go.Spot.Center
+      }
+    ];
+  }
 
   // define the Node templates for regular nodes
-  let standardSetting = $(go.Node, "Table", nodeStyle(), { deletable: false },
-    // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
-    $(go.Panel, "Auto",
-      $(go.Shape, "RoundedRectangle",
-        { fill: "#282c34", stroke: "#00A9C9", strokeWidth: 3.5 },
-        new go.Binding("figure", "figure")
-      ),
-      $(go.TextBlock, textStyle(),
-        {
-          margin: 15,
-          maxSize: new go.Size(160, NaN),
-          wrap: go.TextBlock.WrapFit,
-          editable: false,
-          textAlign: 'center',
-        },
-        //攜結text 呼叫時會使用建立之node 名稱作為內部text
-        //綁定TextBlock.text 屬性爲Node.data.name的值，Model對象可以通過Node.data.name獲取和設置TextBlock.text
-        new go.Binding("text").makeTwoWay()
-      ),
-      // four named ports, one on each side:
-      makePort("T", go.Spot.Top, go.Spot.TopSide, false, true),
-      makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true),
-      makePort("R", go.Spot.Right, go.Spot.RightSide, true, true),
-      makePort("B", go.Spot.Bottom, go.Spot.BottomSide, true, false)
+  let standardSetting =
+    $(go.Node, "Table", nodeStyle(), { deletable: false },
+      // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+      $(go.Panel, "Auto",
+        $(go.Shape, "RoundedRectangle",
+          { fill: "#282c34", stroke: "#00A9C9", strokeWidth: 3.5 },
+          new go.Binding("figure", "figure")
+        ),
+        $(go.TextBlock, textStyle(),
+          {
+            margin: 15,
+            maxSize: new go.Size(160, 160),
+            wrap: go.TextBlock.WrapFit,
+            editable: false,
+            textAlign: 'center',
+          },
+          //攜結text 呼叫時會使用建立之node 名稱作為內部text
+          //綁定TextBlock.text 屬性爲Node.data.name的值，Model對象可以通過Node.data.name獲取和設置TextBlock.text
+          new go.Binding("text").makeTwoWay()
+        ),
+        // four named ports, one on each side:
+        makePort("T", go.Spot.Top, go.Spot.TopSide, false, true),
+        makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true),
+        makePort("R", go.Spot.Right, go.Spot.RightSide, true, true),
+        makePort("B", go.Spot.Bottom, go.Spot.BottomSide, true, false)
+      )
     )
-  )
 
   myDiagram.nodeTemplateMap.add("Understanding", standardSetting)
   myDiagram.nodeTemplateMap.add("Formulating", standardSetting)
@@ -161,7 +163,7 @@ const goListInit = () => {
     $(go.Node, "Table", nodeStyle(), { deletable: false },
       $(go.Panel, "Spot",
         $(go.Shape, "Circle",
-          { desiredSize: new go.Size(70, 70), fill: "#282c34", stroke: "#09d3ac", strokeWidth: 3.5 }),
+          { desiredSize: new go.Size(100, 100), fill: "#282c34", stroke: "#09d3ac", strokeWidth: 3.5 }),
         $(go.TextBlock, "Start", textStyle(),
           new go.Binding("text"))
       ),
@@ -226,8 +228,9 @@ const goListInit = () => {
     $(go.Link,  // the whole link panel
       {
         routing: go.Link.AvoidsNodes,
-        curve: go.Link.JumpOver,
-        corner: 5, toShortLength: 4,
+        corner: 10, 
+        curve: go.Link.JumpGap,
+        toShortLength: 10,
         relinkableFrom: true,
         relinkableTo: true,
         reshapable: true,
@@ -320,12 +323,6 @@ const goListInit = () => {
     animation.add(diagram, 'opacity', 0, 1);
     animation.start();
   }
-  // // Show the diagram's model in JSON format that the user may edit
-  // const printButton = document.getElementById("PrintButton")
-  // // print the diagram by opening a new window holding SVG images of the diagram contents for each page
-  // printButton.addEventListener("click", (e) => {
-  //   printDiagram()
-  // })
 
   load();  // load an initial diagram from some JSON text
 }
@@ -333,9 +330,10 @@ const goListInit = () => {
 const navInit = () => {
   //初始化 boostrap Tooltip
   let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
+
   //nav
   $('#print').click((e) => {
     navButton.printList()
@@ -350,7 +348,7 @@ const navInit = () => {
     navButton.logout()
   })
   //Save Btn
-  $(document).keydown((e) => {
+  $('#myDiagramDiv').keydown((e) => {
     if (e.ctrlKey && e.keyCode == 83) {
       e.preventDefault()
       navButton.save()

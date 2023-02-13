@@ -217,21 +217,26 @@ const GoListFunc = {
         //Programming 計畫執行
         //Reflection 監控反思
         //利用 Key 值紀錄內容
+        console.log(s)
         switch (s.category) {
             case "Start":
                 StartBox(s).appendTo(contentContainer)
-
-                codeMirrorProgram('tutorial', '')
+                CodeMirrorFunc.codeMirrorProgram('tutorial', '')
                 $('#tutorial').data('CodeMirror').setSize(null, 700)
+
+                NormalizeFunc.loadingPage(false)
                 break;
             case "Comment":
                 CommentBox(s).appendTo(contentContainer)
+                NormalizeFunc.loadingPage(false)
                 break;
-            case "Undestanding":
+            case "Understanding":
                 UnderstandingBox(s).appendTo(contentContainer)
+                NormalizeFunc.loadingPage(false)
                 break;
             case "Formulating":
                 FormulatingBox(s).appendTo(contentContainer)
+                NormalizeFunc.loadingPage(false)
                 break;
             case "Programming":
                 //確認userId資料夾是否建立
@@ -239,6 +244,7 @@ const GoListFunc = {
                     method: 'post',
                     url: '/launch/createdemo'
                 }).then(response => {
+                    NormalizeFunc.serverResponseErrorDetect(response)
                     if (response.data.status != 200) {
                         window.alert(response.data.message)
                         return
@@ -253,27 +259,31 @@ const GoListFunc = {
                         courseId: NormalizeFunc.getFrontEndCode('courseId')
                     }
                 }).then(response => {
+                    NormalizeFunc.serverResponseErrorDetect(response)
                     //response.data.data == code內容
                     if (response.data.status != 200) {
                         window.alert(response.data.message)
                         return
                     }
-                    // console.log(response.data)
                     ProgrammingBox(s).appendTo(contentContainer)
                     // create listenEvent
                     listenMessageBind()
-                    CodeMirrorFunc.codeMirrorProgram('setting', response.data.code.setting || '')
-                    CodeMirrorFunc.codeMirrorProgram('config', response.data.code.config || '')
-                    CodeMirrorFunc.codeMirrorProgram('preload', response.data.code.preload || '')
-                    CodeMirrorFunc.codeMirrorProgram('create', response.data.code.create || '')
-                    CodeMirrorFunc.codeMirrorProgram('update', response.data.code.update || '')
-                    CodeMirrorFunc.codeMirrorProgram('custom', response.data.code.custom || '')
+                    if (response.data.code !== undefined) {
+                        CodeMirrorFunc.codeMirrorProgram('setting', response.data.code.setting || '')
+                        CodeMirrorFunc.codeMirrorProgram('config', response.data.code.config || '')
+                        CodeMirrorFunc.codeMirrorProgram('preload', response.data.code.preload || '')
+                        CodeMirrorFunc.codeMirrorProgram('create', response.data.code.create || '')
+                        CodeMirrorFunc.codeMirrorProgram('update', response.data.code.update || '')
+                        CodeMirrorFunc.codeMirrorProgram('custom', response.data.code.custom || '')
+                    }
+
                 })
                 GoListFunc.saveCodeStatus(false)
                 NormalizeFunc.loadingPage(false)
                 break;
             case "Reflection":
                 ReflectionBox(s).appendTo(contentContainer)
+                NormalizeFunc.loadingPage(false)
                 break;
         }
     }
