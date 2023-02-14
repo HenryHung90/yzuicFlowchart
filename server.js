@@ -59,6 +59,8 @@ mongoDbStatus.once('open', (db) => console.log('Connection to mongodb'))
 app.use(helmet({ dnsPrefetchControl: { allow: true } }))
 //阻止瀏覽器對 Content-Type 不明的內容進行探查，以防止惡意程式碼的注入
 app.use(helmet.noSniff());
+//阻止基本的 XSS 攻擊
+app.use(helmet.xssFilter());
 //CSP
 app.use(
     helmet(
@@ -67,7 +69,7 @@ app.use(
                 directives: {
                     defaultSrc: [
                         "'self'",
-                        'http://localhost:3000'
+                        'http://localhost:3000',
                     ],
                     scriptSrc: [
                         "'self'",

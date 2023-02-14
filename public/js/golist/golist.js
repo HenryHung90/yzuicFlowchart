@@ -160,32 +160,60 @@ const goListInit = () => {
     ));
 
   myDiagram.nodeTemplateMap.add("Start",
-    $(go.Node, "Table", nodeStyle(), { deletable: false },
+    $(go.Node, "Table", nodeStyle(),
       $(go.Panel, "Spot",
         $(go.Shape, "Circle",
           { desiredSize: new go.Size(100, 100), fill: "#282c34", stroke: "#09d3ac", strokeWidth: 3.5 }),
         $(go.TextBlock, "Start", textStyle(),
-          new go.Binding("text"))
+          // {
+          //   editable: true
+          // },
+          new go.Binding("text").makeTwoWay())
       ),
       // three named ports, one on each side except the top, all output only:
+      makePort("T", go.Spot.Top, go.Spot.Top, false, true),
       makePort("L", go.Spot.Left, go.Spot.Left, true, false),
       makePort("R", go.Spot.Right, go.Spot.Right, true, false),
       makePort("B", go.Spot.Bottom, go.Spot.Bottom, true, false)
     ));
 
-  myDiagram.nodeTemplateMap.add("End",
+  go.Shape.defineFigureGenerator("ExternalOrganization", function (shape, w, h) {
+    var geo = new go.Geometry();
+    var param1 = shape ? shape.parameter1 : NaN;
+    if (isNaN(param1) || param1 < .2) param1 = .2; // Minimum
+    var fig = new go.PathFigure(0, 0, true);
+    geo.add(fig);
+
+    // Body
+    fig.add(new go.PathSegment(go.PathSegment.Line, w, 0));
+    fig.add(new go.PathSegment(go.PathSegment.Line, w, h));
+    fig.add(new go.PathSegment(go.PathSegment.Line, 0, h).close());
+    var fig2 = new go.PathFigure(param1 * w, 0, false);
+    geo.add(fig2);
+    // Top left triangle
+    fig2.add(new go.PathSegment(go.PathSegment.Line, 0, param1 * h));
+    // Top right triangle
+    fig2.add(new go.PathSegment(go.PathSegment.Move, w, param1 * h));
+    fig2.add(new go.PathSegment(go.PathSegment.Line, (1 - param1) * w, 0));
+    // Bottom left triangle
+    fig2.add(new go.PathSegment(go.PathSegment.Move, 0, (1 - param1) * h));
+    fig2.add(new go.PathSegment(go.PathSegment.Line, param1 * w, h));
+    // Bottom right triangle
+    fig2.add(new go.PathSegment(go.PathSegment.Move, (1 - param1) * w, h));
+    fig2.add(new go.PathSegment(go.PathSegment.Line, w, (1 - param1) * h));
+    //??? geo.spot1 = new go.Spot(param1 / 2, param1 / 2);
+    //??? geo.spot2 = new go.Spot(1 - param1 / 2, 1 - param1 / 2);
+    return geo;
+  });
+
+  myDiagram.nodeTemplateMap.add("Target",
     $(go.Node, "Table", nodeStyle(),
       $(go.Panel, "Spot",
-        $(go.Shape, "Circle",
-          { desiredSize: new go.Size(60, 60), fill: "#282c34", stroke: "#DC3C00", strokeWidth: 3.5 }),
-        $(go.TextBlock, "End", textStyle(),
-          new go.Binding("text"))
+        $(go.Shape, "ExternalOrganization", { desiredSize: new go.Size(150, 150), fill: "#282c34", stroke: "#ffd3ac", strokeWidth: 4.5 }),
+        $(go.TextBlock, "Target", textStyle(), new go.Binding("text"))
       ),
-      // three named ports, one on each side except the bottom, all input only:
-      makePort("T", go.Spot.Top, go.Spot.Top, false, true),
-      makePort("L", go.Spot.Left, go.Spot.Left, false, true),
-      makePort("R", go.Spot.Right, go.Spot.Right, false, true)
-    ));
+      makePort("B", go.Spot.Bottom, go.Spot.Bottom, true, false)
+    ))
 
   // taken from ../extensions/Figures.js:
   go.Shape.defineFigureGenerator("File", (shape, w, h) => {
@@ -205,6 +233,7 @@ const goListInit = () => {
     geo.spot2 = go.Spot.BottomRight;
     return geo;
   });
+
 
   myDiagram.nodeTemplateMap.add("Comment",
     $(go.Node, "Auto", nodeStyle(),
@@ -228,7 +257,7 @@ const goListInit = () => {
     $(go.Link,  // the whole link panel
       {
         routing: go.Link.AvoidsNodes,
-        corner: 10, 
+        corner: 10,
         curve: go.Link.JumpGap,
         toShortLength: 10,
         relinkableFrom: true,
@@ -302,12 +331,13 @@ const goListInit = () => {
 
         nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Understanding", text: "探索與理解" },
-          { category: "Formulating", text: "表徵與制定" },
-          { category: "Programming", text: "計畫與執行" },
-          { category: "Reflection", text: "監控與反思" },
+          { category: "Understanding", text: "探索理解" },
+          { category: "Formulating", text: "表徵制定" },
+          { category: "Programming", text: "計畫執行" },
+          { category: "Reflection", text: "監控反思" },
           { category: "Conditional", text: "自定義" },
           { category: "Comment", text: "筆記" },
+          { category: "Target", text: "成品展示" }
         ])
       });
 

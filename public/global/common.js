@@ -1,4 +1,4 @@
-import { StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "../js/golist/gogrammingPage.js"
+import { TargetBox, StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "../js/golist/gogrammingPage.js"
 
 
 //------------------------------ normal function ------------------------------//]
@@ -93,8 +93,6 @@ const GoListFunc = {
     },
     //show Each Box
     showContainer: async (s) => {
-        // 暫停主頁儲存的功能
-        $(document).off('keydown')
         //取得 Iframe 發出之 Error 警訊
         const reciveMessage = (e) => {
             e.preventDefault()
@@ -173,6 +171,11 @@ const GoListFunc = {
             className: 'container-md contentContainer'
         }).appendTo(contentDiv)
 
+
+        $(block).on('keydown', e => {
+            console.log(e.keyCode)
+        })
+
         //------------------------------------------------
         //contentContainer Btn Area
         const content_iconContainer = $('<div>').prop({
@@ -219,10 +222,61 @@ const GoListFunc = {
         //利用 Key 值紀錄內容
         console.log(s)
         switch (s.category) {
+            case "Target":
+                TargetBox().appendTo(contentContainer)
+
+                await axios({
+                    method: 'post',
+                    url: '/student/getmaterial',
+                    data: {
+                        courseId: NormalizeFunc.getFrontEndCode('courseId')
+                    }
+                }).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (response.data.status === 200) {
+                            $('.targetIframe').attr('src', `../Material/${response.data.message}/full/index.html`)
+                        }
+                    }
+                })
+                NormalizeFunc.loadingPage(false)
+                break
             case "Start":
-                StartBox(s).appendTo(contentContainer)
-                CodeMirrorFunc.codeMirrorProgram('tutorial', '')
-                $('#tutorial').data('CodeMirror').setSize(null, 700)
+                StartBox().appendTo(contentContainer)
+
+                await axios({
+                    method: 'post',
+                    url: '/student/getstarting',
+                    data: {
+                        courseId: NormalizeFunc.getFrontEndCode('courseId'),
+                        key: s.key
+                    }
+                }).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (response.data.status === 200) {
+                            console.log(response.data.message)
+                            if(response.data.message === undefined){
+                                CodeMirrorFunc.codeMirrorProgram('tutorial', '')
+                                $('#startDescription').html(`<h3>Task undefined</h3>`)
+                                return
+                            }
+                            CodeMirrorFunc.codeMirrorProgram('tutorial', response.data.message.code)
+                            //設定 CodeMirror 大小
+                            $('#tutorial').data('CodeMirror').setSize(null, 600)
+                            //設定 Iframe 跑的　demo
+                            $('#startIframe').attr('src', `../Material${response.data.message.material}`)
+                            //設定 Target 字樣
+                            $('#startDescription').html(`<h3>Task ${s.key} : ${response.data.message.target}</h3>`)
+                            //設定 button click 事件
+                            $('#start_launchbtn').click((e) => {
+                                $('#startIframe').attr('src', `../Material${response.data.message.material}`)
+                                $('#demoContent').addClass('startDemoFinish')
+                                setTimeout(e => {
+                                    $('#demoContent').removeClass('startDemoFinish')
+                                },800)
+                            })
+                        }
+                    }
+                })
 
                 NormalizeFunc.loadingPage(false)
                 break;
@@ -275,6 +329,13 @@ const GoListFunc = {
                         CodeMirrorFunc.codeMirrorProgram('create', response.data.code.create || '')
                         CodeMirrorFunc.codeMirrorProgram('update', response.data.code.update || '')
                         CodeMirrorFunc.codeMirrorProgram('custom', response.data.code.custom || '')
+                    } else {
+                        CodeMirrorFunc.codeMirrorProgram('setting', '')
+                        CodeMirrorFunc.codeMirrorProgram('config', '')
+                        CodeMirrorFunc.codeMirrorProgram('preload', '')
+                        CodeMirrorFunc.codeMirrorProgram('create', '')
+                        CodeMirrorFunc.codeMirrorProgram('update', '')
+                        CodeMirrorFunc.codeMirrorProgram('custom', '')
                     }
 
                 })

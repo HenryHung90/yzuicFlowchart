@@ -98,12 +98,73 @@ router.get('/:courseId', async (req, res) => {
         })
     }
     catch (err) {
+        console.log(err)
         res.json({
             message: "錯誤開啟，請聯繫管理員(err)",
             status: 500,
         })
     }
 })
+
+//學生取得demo位置
+router.post('/getmaterial', async (req, res) => {
+    try {
+        const materialData = await standardcontent.findOne({
+            _id:req.body.courseId
+        })
+
+        if (materialData.standardMaterial === undefined ||
+            materialData.standardMaterial === null) {
+            res.json({
+                message: "查無此demo，請稍後再試",
+                status: 500,
+            })
+            return
+        }
+        res.json({
+            message: materialData.standardMaterial,
+            status: 200
+        })
+
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得 demo 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//學生取得start內容
+router.post('/getstarting',async (req,res)=>{
+    try {
+        const materialData = await standardcontent.findOne({
+            _id: req.body.courseId
+        })
+
+        if (materialData.standardStarting === undefined ||
+            materialData.standardStarting === null) {
+            res.json({
+                message: "查無此demo，請稍後再試",
+                status: 500,
+            })
+            return
+        }
+        res.json({
+            message: materialData.standardStarting[req.body.key],
+            status: 200
+        })
+
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得 starting 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
 
 //學生讀取 goList
 router.post('/readgolist', async (req, res) => {
@@ -476,6 +537,7 @@ router.post('/restartcode', async (req, res) => {
     }
 })
 
+//學生取得訊息紀錄
 router.post('/getmessagehistory', async (req, res) => {
     try {
         const messageData = await chatroomconfig.findOne({ chatRoomId: req.body.chatRoomId, access: true })
@@ -497,7 +559,7 @@ router.post('/getmessagehistory', async (req, res) => {
             isTop = true
         }
 
-        if(sliceStart === 0 && sliceEnd === 0){
+        if (sliceStart === 0 && sliceEnd === 0) {
             sliceEnd = 1
         }
 

@@ -150,6 +150,7 @@ body {
 .contentDiv {
     background-color: transparent;
     z-index: 1001;
+    pointer-events: none;
     animation: fadeIn 0.5s steps(100);
     position: absolute;
     padding: 15px;
@@ -161,6 +162,7 @@ body {
     border-radius: 20px;
     padding: 5px 10px;
     overflow: hidden;
+    pointer-events: all;
 }
 
 .content_cancel {

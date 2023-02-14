@@ -3,6 +3,23 @@ import {
     CodeMirrorFunc,
     GoListFunc
 } from "../../global/common.js"
+//Target 顯示最終成品的Block
+const TargetBox = () => {
+    // 把 Sync 字樣刪除
+    $('.content_complete').remove()
+    //Content Div-------------------------------------------------
+    const contentDiv = $('<div>').prop({
+        className: 'justify-content-center TargetContentDiv'
+    })
+
+    $('<iframe>').prop({
+        className: 'container-fluid targetIframe',
+    }).appendTo(contentDiv)
+
+
+    return contentDiv
+}
+
 //Start
 //Comment
 //Understanding
@@ -14,7 +31,7 @@ import {
 //using in common.js => to show messageBox
 
 //StartBox return function
-const StartBox = (startKey) => {
+const StartBox = () => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
 
@@ -22,13 +39,31 @@ const StartBox = (startKey) => {
         className: 'row justify-content-start startBoxContainer'
     })
 
+
+    //start description
+    const startDescriptionContainer = $('<div>').prop({
+        className: 'row startDescription_container',
+    }).appendTo($('.contentContainer'))
+
+    //descriptions
+    $('<div>').prop({
+        className: 'col-10 startDescription_description',
+        id: 'startDescription'
+    }).appendTo(startDescriptionContainer)
+
+    //play button
+    //launch
+    $('<button>').prop({
+        className: 'col-2 btn btn-success content_launchbtn',
+        id: 'start_launchbtn',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>'
+    }).appendTo(startDescriptionContainer)
+
     //container
     const content_codingContainer = $('<div>').prop({
-        className: 'col-5 codeTutorial_container'
+        className: 'col-12 codeTutorial_container'
     }).appendTo(startBoxContainer)
-    const content_demoContainer = $('<div>').prop({
-        className: 'col-7 codeDemo_container'
-    }).appendTo(startBoxContainer)
+
 
     //content
     $('<textarea>').prop({
@@ -36,15 +71,41 @@ const StartBox = (startKey) => {
         id: 'tutorial'
     }).appendTo(content_codingContainer)
 
-    $('<iframe>').prop({
-        src: ''
-    }).css({
-        'width': '100%',
-        'height': '70%',
-        'margin-top': '10%',
-        'border-radius': '20px',
-        'border': '1px solid black'
-    }).appendTo(content_demoContainer)
+
+    const demoDiv = $('<div>').prop({
+        className: 'container-fluid DemoDiv',
+    }).prependTo($('body'))
+
+    const demoIframe = $('<div>').prop({
+        className: 'row justify-content-start iframeContainer'
+    }).appendTo(demoDiv)
+
+    const demoContent = $('<div>').prop({
+        className: 'col-12 demoContent',
+        id: 'demoContent',
+    }).appendTo(demoIframe)
+
+    $('<iframe>')
+        .prop({
+            className: 'col-12',
+            id: 'startIframe',
+        })
+        .css({
+            'width': '100%',
+            'height': '95%',
+            'margin': '0 auto',
+            'margin-top': '5px',
+            'border': '1px dashed black',
+            'border-radius': '20px'
+        })
+        .appendTo(demoContent)
+
+    //DownIcon
+    $('<div>').prop({
+        className: 'col-1 offset-md-5 downIcon',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+    }).appendTo(demoContent)
+
 
     NormalizeFunc.loadingPage(false)
     return startBoxContainer
@@ -777,6 +838,7 @@ const ReflectionBox = () => {
 
 
 export {
+    TargetBox,
     StartBox,
     CommentBox,
     UnderstandingBox,
