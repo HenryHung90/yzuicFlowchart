@@ -1,4 +1,3 @@
-
 // 階段四:隨機挑選一張圖片消失並且點擊四周圖片使其移動到空位
 // => JS Random 使用、Phaser Interactive、程式邏輯
 let game = new Phaser.Game({

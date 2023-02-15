@@ -68,6 +68,79 @@ const NormalizeFunc = {
         return Byte * 1024 * 1024
     },
 }
+//------------------------------ category Box Function -----------------------------------//
+const categoryBox = {
+    Target: (data) => {
+        $('.targetIframe').attr('src', `../Material/${data.message}/full/index.html`)
+    },
+    Start: (data, key) => {
+        if (data.message === undefined) {
+            CodeMirrorFunc.codeMirrorProgram('tutorial', '')
+            $('#startDescription').html(`<h3>Task undefined</h3>`)
+            return
+        }
+        CodeMirrorFunc.codeMirrorProgram('tutorial', data.message.code)
+        //設定 CodeMirror 大小
+        $('#tutorial').data('CodeMirror').setSize(null, 600)
+        //設定 Iframe 跑的　demo
+        $('#startIframe').attr('src', `../Material${data.message.material}`)
+        //設定 Target 字樣
+        $('#startDescription').html(`<h3>Task ${key} : ${data.message.target}</h3>`)
+        //設定 button click 事件
+        $('#start_launchbtn').click((e) => {
+            $('#startIframe').attr('src', `../Material${data.message.material}`)
+            $('#demoContent').addClass('startDemoFinish')
+            setTimeout(e => {
+                $('#demoContent').removeClass('startDemoFinish')
+            }, 800)
+        })
+        return
+    },
+    Understanding: (data) => {
+        if (data.message === undefined) {
+            $('#understandingDescription').html(`<h3>任務目標 -</h3><h3> -- </h3>`)
+            return
+        }
+        $('#understandingDescription').html(`<h3>任務目標 -</h3><h3>⭐${data.message.target}⭐</h3>`)
+
+        data.message.operation.split('\n').forEach(operation => {
+            $('<p>').prop({
+                className: 'understandingDescription_operationText',
+                innerHTML: '🕹 ' + operation
+            }).appendTo($('#understandingOperation'))
+        })
+
+        data.message.limit.split('\n').forEach(limit => {
+            $('<p>').prop({
+                className: 'understandingDescription_limitText',
+                innerHTML: '⚠ ' + limit
+            }).appendTo($('#understandingLimit'))
+        })
+    },
+    Formulating: (data) => {
+
+    },
+    Programming: (data) => {
+        if (data.code !== undefined) {
+            CodeMirrorFunc.codeMirrorProgram('setting', data.code.setting || '')
+            CodeMirrorFunc.codeMirrorProgram('config', data.code.config || '')
+            CodeMirrorFunc.codeMirrorProgram('preload', data.code.preload || '')
+            CodeMirrorFunc.codeMirrorProgram('create', data.code.create || '')
+            CodeMirrorFunc.codeMirrorProgram('update', data.code.update || '')
+            CodeMirrorFunc.codeMirrorProgram('custom', data.code.custom || '')
+        } else {
+            CodeMirrorFunc.codeMirrorProgram('setting', '')
+            CodeMirrorFunc.codeMirrorProgram('config', '')
+            CodeMirrorFunc.codeMirrorProgram('preload', '')
+            CodeMirrorFunc.codeMirrorProgram('create', '')
+            CodeMirrorFunc.codeMirrorProgram('update', '')
+            CodeMirrorFunc.codeMirrorProgram('custom', '')
+        }
+    },
+    Reflection: (data) => {
+
+    }
+}
 //------------------------------ Go.js Function -----------------------------------//
 const GoListFunc = {
     saveCodeStatus: (state) => {
@@ -116,7 +189,6 @@ const GoListFunc = {
         const listenMessageUnbind = () => {
             window.removeEventListener('message', reciveMessage, false)
         }
-
         //click close function
         const closePage = () => {
             block.fadeOut(200)
@@ -128,6 +200,7 @@ const GoListFunc = {
             //unbind listenEvent
             listenMessageUnbind()
             setTimeout(() => {
+                console.log('remove')
                 $('body').css({
                     'overflow': 'auto',
                 })
@@ -137,6 +210,8 @@ const GoListFunc = {
                 $('.DemoDiv').remove()
                 $('.content_consoleErrorArea').remove()
                 $('.content_dataVisualizationArea').remove()
+                //understanding modal
+                $('.modal').remove()
             }, 200)
         }
 
@@ -171,10 +246,6 @@ const GoListFunc = {
             className: 'container-md contentContainer'
         }).appendTo(contentDiv)
 
-
-        $(block).on('keydown', e => {
-            console.log(e.keyCode)
-        })
 
         //------------------------------------------------
         //contentContainer Btn Area
@@ -221,6 +292,9 @@ const GoListFunc = {
         //Reflection 監控反思
         //利用 Key 值紀錄內容
         console.log(s)
+
+        const courseId = NormalizeFunc.getFrontEndCode('courseId')
+
         switch (s.category) {
             case "Target":
                 TargetBox().appendTo(contentContainer)
@@ -229,12 +303,12 @@ const GoListFunc = {
                     method: 'post',
                     url: '/student/getmaterial',
                     data: {
-                        courseId: NormalizeFunc.getFrontEndCode('courseId')
+                        courseId: courseId
                     }
                 }).then(response => {
                     if (NormalizeFunc.serverResponseErrorDetect(response)) {
                         if (response.data.status === 200) {
-                            $('.targetIframe').attr('src', `../Material/${response.data.message}/full/index.html`)
+                            categoryBox.Target(response.data)
                         }
                     }
                 })
@@ -247,34 +321,15 @@ const GoListFunc = {
                     method: 'post',
                     url: '/student/getstarting',
                     data: {
-                        courseId: NormalizeFunc.getFrontEndCode('courseId'),
+                        courseId: courseId,
                         key: s.key
                     }
                 }).then(response => {
                     if (NormalizeFunc.serverResponseErrorDetect(response)) {
                         if (response.data.status === 200) {
-                            console.log(response.data.message)
-                            if(response.data.message === undefined){
-                                CodeMirrorFunc.codeMirrorProgram('tutorial', '')
-                                $('#startDescription').html(`<h3>Task undefined</h3>`)
-                                return
-                            }
-                            CodeMirrorFunc.codeMirrorProgram('tutorial', response.data.message.code)
-                            //設定 CodeMirror 大小
-                            $('#tutorial').data('CodeMirror').setSize(null, 600)
-                            //設定 Iframe 跑的　demo
-                            $('#startIframe').attr('src', `../Material${response.data.message.material}`)
-                            //設定 Target 字樣
-                            $('#startDescription').html(`<h3>Task ${s.key} : ${response.data.message.target}</h3>`)
-                            //設定 button click 事件
-                            $('#start_launchbtn').click((e) => {
-                                $('#startIframe').attr('src', `../Material${response.data.message.material}`)
-                                $('#demoContent').addClass('startDemoFinish')
-                                setTimeout(e => {
-                                    $('#demoContent').removeClass('startDemoFinish')
-                                },800)
-                            })
+                            categoryBox.Start(response.data, s.key)
                         }
+                        window.alert(response.data.message)
                     }
                 })
 
@@ -282,10 +337,30 @@ const GoListFunc = {
                 break;
             case "Comment":
                 CommentBox(s).appendTo(contentContainer)
+
                 NormalizeFunc.loadingPage(false)
                 break;
             case "Understanding":
-                UnderstandingBox(s).appendTo(contentContainer)
+                UnderstandingBox().appendTo(contentContainer)
+
+                await axios({
+                    method: "post",
+                    url: '/student/getunderstanding',
+                    data: {
+                        courseId: courseId,
+                        key: s.key
+                    }
+                }).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (response.data.status === 200) {
+                            categoryBox.Understanding(response.data)
+                            return
+                        }
+                        window.alert(response.data.message)
+                    }
+                })
+
+
                 NormalizeFunc.loadingPage(false)
                 break;
             case "Formulating":
@@ -293,15 +368,18 @@ const GoListFunc = {
                 NormalizeFunc.loadingPage(false)
                 break;
             case "Programming":
+                ProgrammingBox(s).appendTo(contentContainer)
+
                 //確認userId資料夾是否建立
                 await axios({
                     method: 'post',
                     url: '/launch/createdemo'
                 }).then(response => {
-                    NormalizeFunc.serverResponseErrorDetect(response)
-                    if (response.data.status != 200) {
-                        window.alert(response.data.message)
-                        return
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (response.data.status != 200) {
+                            window.alert(response.data.message)
+                            return
+                        }
                     }
                 })
                 //讀取該key值的Code內容
@@ -313,31 +391,16 @@ const GoListFunc = {
                         courseId: NormalizeFunc.getFrontEndCode('courseId')
                     }
                 }).then(response => {
-                    NormalizeFunc.serverResponseErrorDetect(response)
-                    //response.data.data == code內容
-                    if (response.data.status != 200) {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        //response.data.data == code內容
+                        if (response.data.status === 200) {
+                            // create listenEvent
+                            listenMessageBind()
+                            categoryBox.Programming(response.data)
+                            return
+                        }
                         window.alert(response.data.message)
-                        return
                     }
-                    ProgrammingBox(s).appendTo(contentContainer)
-                    // create listenEvent
-                    listenMessageBind()
-                    if (response.data.code !== undefined) {
-                        CodeMirrorFunc.codeMirrorProgram('setting', response.data.code.setting || '')
-                        CodeMirrorFunc.codeMirrorProgram('config', response.data.code.config || '')
-                        CodeMirrorFunc.codeMirrorProgram('preload', response.data.code.preload || '')
-                        CodeMirrorFunc.codeMirrorProgram('create', response.data.code.create || '')
-                        CodeMirrorFunc.codeMirrorProgram('update', response.data.code.update || '')
-                        CodeMirrorFunc.codeMirrorProgram('custom', response.data.code.custom || '')
-                    } else {
-                        CodeMirrorFunc.codeMirrorProgram('setting', '')
-                        CodeMirrorFunc.codeMirrorProgram('config', '')
-                        CodeMirrorFunc.codeMirrorProgram('preload', '')
-                        CodeMirrorFunc.codeMirrorProgram('create', '')
-                        CodeMirrorFunc.codeMirrorProgram('update', '')
-                        CodeMirrorFunc.codeMirrorProgram('custom', '')
-                    }
-
                 })
                 GoListFunc.saveCodeStatus(false)
                 NormalizeFunc.loadingPage(false)
@@ -486,6 +549,7 @@ const CodeMirrorFunc = {
         $(`#${name}`).data('CodeMirror', Editor)
     }
 }
+
 
 export {
     NormalizeFunc,

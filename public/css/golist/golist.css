@@ -161,7 +161,8 @@ body {
     background-color: white;
     border-radius: 20px;
     padding: 5px 10px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     pointer-events: all;
 }
 

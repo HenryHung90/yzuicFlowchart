@@ -1,7 +1,6 @@
 /* start */
 .startBoxContainer{
     height: 80%;
-    overflow: auto;
     pointer-events: all;
 }
 .startDescription_container{

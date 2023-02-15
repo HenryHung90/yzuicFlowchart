@@ -106,11 +106,11 @@ router.get('/:courseId', async (req, res) => {
     }
 })
 
-//學生取得demo位置
+// 學生取得 demo 位置
 router.post('/getmaterial', async (req, res) => {
     try {
         const materialData = await standardcontent.findOne({
-            _id:req.body.courseId
+            _id: req.body.courseId
         })
 
         if (materialData.standardMaterial === undefined ||
@@ -135,8 +135,8 @@ router.post('/getmaterial', async (req, res) => {
         })
     }
 })
-//學生取得start內容
-router.post('/getstarting',async (req,res)=>{
+// 學生取得 start 內容
+router.post('/getstarting', async (req, res) => {
     try {
         const materialData = await standardcontent.findOne({
             _id: req.body.courseId
@@ -159,12 +159,39 @@ router.post('/getstarting',async (req,res)=>{
     } catch (err) {
         console.log(err)
         res.json({
-            message: "取得 starting 失敗，請聯繫管理員(err)",
+            message: "取得 start task 失敗，請聯繫管理員(err)",
             status: 500,
         })
     }
 })
+// 學生取得 understanding 內容
+router.post('/getunderstanding', async (req, res) => {
+    try{
+        const understandingData = await standardcontent.findOne({
+            _id:req.body.courseId
+        })
 
+        if (understandingData.standardUnderstanding === undefined ||
+            understandingData.standardUnderstanding === null) {
+            res.json({
+                message: "查無 探索理解，請稍後再試",
+                status: 500,
+            })
+            return
+        }
+        res.json({
+            message: understandingData.standardUnderstanding[req.body.key],
+            status: 200
+        })
+
+    }catch(err){
+        console.log(err)
+        res.json({
+            message: "取得 探索理解 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
 
 //學生讀取 goList
 router.post('/readgolist', async (req, res) => {

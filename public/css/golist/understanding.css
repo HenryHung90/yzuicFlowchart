@@ -1,0 +1,29 @@
+.understandingDescription_container {
+    padding: 10px 24px;
+}
+
+.understandingDescription_target h3 {
+    font-weight: bolder;
+    font-size: 40px;
+}
+
+.understandingDescription_operation,
+.understandingDescription_limit {
+    margin: 15px auto;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 5px 2px rgba(94, 94, 94, 0.8);
+}
+
+.understandingDescription_operation h4,
+.understandingDescription_limit h4 {
+    font-weight: bolder;
+    margin-bottom: 10px;
+    font-size: 30px;
+}
+.understandingDescription_operation p,
+.understandingDescription_limit p {
+    margin: 15px;
+    font-size: 20px;
+}

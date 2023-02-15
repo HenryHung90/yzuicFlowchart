@@ -5,7 +5,6 @@ const router = express.Router()
 
 import studentConifg from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
-import studentconfig from '../models/studentconfig.js'
 import chatroomconfig from '../models/chatroomconfig.js'
 
 const saltRound = 10

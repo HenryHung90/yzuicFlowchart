@@ -128,9 +128,11 @@ function puzzleClicking(puzzle, clickId) {
         movePuzzle(puzzle, clickId, puzzlePosition, moveIndex)
     }
 
-    if (detectFinish(puzzleInformation.invisiblePuzzle)) {
+    if (detectFinish([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
         puzzleInformation.isFinish = true
         window.alert("完成")
+
+        console.log(puzzleInformation.invisiblePuzzle)
 
         puzzleInformation.crop.getChildren()[puzzleInformation.invisiblePuzzle]
             .setPosition(puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].x, puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].y)
