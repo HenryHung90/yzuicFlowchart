@@ -128,10 +128,13 @@ function puzzleClicking(puzzle, clickId) {
         movePuzzle(puzzle, clickId, puzzlePosition, moveIndex)
     }
 
-    if (detectFinish(puzzleInformation.invisiblePuzzle)) {
+
+    if (detectFinish(puzzleInformation.motionPosition)) {
+        // 若發現已完成 就將 isFinish 改為 true
         puzzleInformation.isFinish = true
         window.alert("完成")
 
+        // 將被消失的那張卡牌顯現出來，並擺在正確位置上
         puzzleInformation.crop.getChildren()[puzzleInformation.invisiblePuzzle]
             .setPosition(puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].x, puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].y)
             .setVisible(true)

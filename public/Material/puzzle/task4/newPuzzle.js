@@ -63,6 +63,13 @@ function create() {
 
         // 若選到的是要去掉的那塊，則跳過他
         else if (randomPick == puzzleInformation.invisiblePuzzle) {
+            // 創建隱藏的 puzzle ，並將其設置看不到
+            puzzleInformation.crop.create(
+                puzzleInformation.standardPosition[i].x,
+                puzzleInformation.standardPosition[i].y,
+                'puzzle',
+                randomPick
+            ).setVisible(false).setScale(puzzleInformation.cropScale)
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
         }
