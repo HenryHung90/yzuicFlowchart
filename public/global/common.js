@@ -254,7 +254,7 @@ const GoListFunc = {
                     if (NormalizeFunc.serverResponseErrorDetect(response)) {
                         if (response.data.status === 200) {
                             console.log(response.data.message)
-                            if(response.data.message === undefined){
+                            if (response.data.message === undefined) {
                                 CodeMirrorFunc.codeMirrorProgram('tutorial', '')
                                 $('#startDescription').html(`<h3>Task undefined</h3>`)
                                 return
@@ -269,10 +269,12 @@ const GoListFunc = {
                             //設定 button click 事件
                             $('#start_launchbtn').click((e) => {
                                 $('#startIframe').attr('src', `../Material${response.data.message.material}`)
-                                $('#demoContent').addClass('startDemoFinish')
-                                setTimeout(e => {
-                                    $('#demoContent').removeClass('startDemoFinish')
-                                },800)
+                                $('#startIframe').on('load', () => {
+                                    $('#demoContent').addClass('startDemoFinish')
+                                    setTimeout(e => {
+                                        $('#demoContent').removeClass('startDemoFinish')
+                                    }, 800)
+                                })
                             })
                         }
                     }

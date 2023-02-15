@@ -1,5 +1,5 @@
-// 階段四:隨機挑選一張圖片消失並且點擊四周圖片使其移動到空位
-// => JS Random 使用、Phaser Interactive、程式邏輯
+// 階段五:程式能夠判斷是否完成遊戲
+// => 程式規劃、程式邏輯
 let game = new Phaser.Game({
     type: Phaser.AUTO,
     width: 800,
@@ -36,6 +36,8 @@ const puzzleInformation = {
     motionPosition: [],
     // 用於儲存要抹去的 puzzle 編號
     invisiblePuzzle: null,
+    // 用於儲存是否獲勝
+    isFinish: false,
 }
 
 
@@ -100,7 +102,9 @@ function create() {
             puzzle.setInteractive()
             // 設定 Puzzle 在 pointerup 的監聽事件
             puzzle.on('pointerup', (e) => {
-                puzzleClicking(puzzle, randomPick)
+                if (!puzzleInformation.isFinish) {
+                    puzzleClicking(puzzle, randomPick)
+                }
             })
         }
     }
@@ -122,6 +126,18 @@ function puzzleClicking(puzzle, clickId) {
 
         // 讓被點擊的 puzzle 與 被去除的那塊 puzzle 位置交換
         movePuzzle(puzzle, clickId, puzzlePosition, moveIndex)
+    }
+
+    if (detectFinish(puzzleInformation.motionPosition)) {
+        // 若發現已完成 就將 isFinish 改為 true
+        puzzleInformation.isFinish = true
+        window.alert("完成")
+
+        // 將被消失的那張卡牌顯現出來，並擺在正確位置上
+        puzzleInformation.crop.getChildren()[puzzleInformation.invisiblePuzzle]
+            .setPosition(puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].x, puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].y)
+            .setVisible(true)
+            .setDepth(10)
     }
 }
 
@@ -221,6 +237,19 @@ function movePuzzle(puzzle, clickId, puzzlePosition, moveIndex) {
 
         alert('過關!')
     }
+}
+
+// 是否獲勝
+function detectFinish(motionPosition) {
+    // 從第一個跑到最後一個比對陣列是否為升冪排列
+    // 若為升冪則能確定已經完成排列
+    for (let puzzle = 0; puzzle < puzzleInformation.amount; puzzle++) {
+        if (motionPosition[puzzle + 1] - motionPosition[puzzle] !== 1) {
+            // 只要有位置不正確 就代表尚未獲勝
+            return false
+        }
+    }
+    return true
 }
 
 
