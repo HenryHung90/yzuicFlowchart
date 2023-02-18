@@ -335,11 +335,6 @@ const GoListFunc = {
 
                 NormalizeFunc.loadingPage(false)
                 break;
-            case "Comment":
-                CommentBox(s).appendTo(contentContainer)
-
-                NormalizeFunc.loadingPage(false)
-                break;
             case "Understanding":
                 UnderstandingBox().appendTo(contentContainer)
 
@@ -407,6 +402,11 @@ const GoListFunc = {
                 break;
             case "Reflection":
                 ReflectionBox(s).appendTo(contentContainer)
+                NormalizeFunc.loadingPage(false)
+                break;
+            case "Comment":
+                CommentBox(s).appendTo(contentContainer)
+
                 NormalizeFunc.loadingPage(false)
                 break;
         }
