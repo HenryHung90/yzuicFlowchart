@@ -166,9 +166,9 @@ router.post('/getstarting', async (req, res) => {
 })
 // 學生取得 understanding 內容
 router.post('/getunderstanding', async (req, res) => {
-    try{
+    try {
         const understandingData = await standardcontent.findOne({
-            _id:req.body.courseId
+            _id: req.body.courseId
         })
 
         if (understandingData.standardUnderstanding === undefined ||
@@ -184,10 +184,38 @@ router.post('/getunderstanding', async (req, res) => {
             status: 200
         })
 
-    }catch(err){
+    } catch (err) {
         console.log(err)
         res.json({
             message: "取得 探索理解 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//學生取得 formulating 內容
+router.post('/getformulating', async (req, res) => {
+    try {
+        const understandingData = await standardcontent.findOne({
+            _id: req.body.courseId
+        })
+
+        if (understandingData.standardFormulating === undefined ||
+            understandingData.standardFormulating === null) {
+            res.json({
+                message: "查無 表徵制定，請稍後再試",
+                status: 500,
+            })
+            return
+        }
+        res.json({
+            message: understandingData.standardFormulating[req.body.key],
+            status: 200
+        })
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得 表徵制定 失敗，請聯繫管理員(err)",
             status: 500,
         })
     }
@@ -245,6 +273,12 @@ router.post('/savegolist', async (req, res) => {
 
         studentData.studentGoList[req.body.courseId] = req.body.goList
 
+        if (studentData.studentCodeList[req.body.courseId] === undefined) {
+            studentData.studentCodeList[req.body.courseId] = { 0: "-100" }
+        }
+
+        console.log(studentData.studentCodeList)
+
         await studentConfig.updateOne(
             {
                 studentClass: req.user.studentClass,
@@ -252,7 +286,8 @@ router.post('/savegolist', async (req, res) => {
                 studentAccess: true
             },
             {
-                studentGoList: studentData.studentGoList
+                studentGoList: studentData.studentGoList,
+                studentCodeList: studentData.studentCodeList
             })
             .then(response => {
                 if (response.acknowledged) {
@@ -300,11 +335,11 @@ router.post('/restartgolist', async (req, res) => {
         })
         // GoList
         if (studentData.studentGoList !== undefined) {
-            studentData.studentGoList[req.body.courseId] = standardData.standardGoList[req.body.courseId]
+            studentData.studentGoList[req.body.courseId] = standardData.standardGoList
         }
         // CodeList
         if (studentData.studentCodeList !== undefined) {
-            studentData.studentCodeList[req.body.courseId] = standardData.standardCodeList[req.body.courseId]
+            studentData.studentCodeList[req.body.courseId] = standardData.standardCodeList
         }
         //重整 GoList
         await studentConfig.updateOne(
@@ -501,21 +536,20 @@ router.post('/deletecode', async (req, res) => {
 
         await studentConfig.updateOne(
             { studentId: req.user.studentId, studentAccess: true },
-            { studentCodeList: studentUpdateData }
+            { studentCodeList: studentData.studentCodeList }
         ).then(response => {
-            deleteStatus = response.acknowledged
-        })
-        if (deleteStatus) {
-            res.json({
-                message: 'success',
-                status: 200
-            })
-        } else {
+            if (response.acknowledged) {
+                res.json({
+                    message: 'success',
+                    status: 200
+                })
+                return
+            }
             res.json({
                 message: '刪除該 node code 失敗，請重新整理網頁！',
                 status: 500
             })
-        }
+        })
     }
     catch (err) {
         console.log(err)

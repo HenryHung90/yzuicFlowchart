@@ -38,12 +38,14 @@ const standardcontent = new mongoose.Schema({
     },
     // 探索理解 內容
     // 目標 操作 限制（問號內塞流程圖）
+    // 內容應包含 key = {target, operation, limit, hint}
     standardUnderstanding: {
         type: 'object',
         required: false
     },
     // 表徵制定 內容
     // 語法 => 動畫 互動 監聽 （問號內塞程式碼）
+    // 內容應包含 key = {content[{title, code, description}], hint}
     standardFormulating: {
         type: 'object',
         required: false,

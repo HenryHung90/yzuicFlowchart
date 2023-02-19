@@ -101,34 +101,16 @@ router.post('/addstandardcontent', async (req, res) => {
 })
 
 //修改 Standard 各項內容
-router.post('/updatestandardcontent', async (req, res) => {
+router.post('/updatestandardgolist', async (req, res) => {
     try {
         const standardData = await standardcontent.findOne({
-            class: req.body.class,
-            goListTitle: req.body.goListTitle
+            _id: req.body._id
         })
 
-        if (!isEmpty(req.body.standardGoList)) {
-            standardData.standardGoList = req.body.standardGoList
-        }
-        if (!isEmpty(req.body.standardCodeList)) {
-            standardData.standardCodeList = req.body.standardCodeList
-        }
-        if (!isEmpty(req.body.standardUnderstanding)) {
-            standardData.standardUnderstanding = req.body.standardUnderstanding
-        }
-        if (!isEmpty(req.body.standardFormulating)) {
-            standardData.standardFormulating = req.body.standardFormulating
-        }
-
         await standardcontent.updateOne({
-            class: req.body.class,
-            goListTitle: req.body.goListTitle,
+            _id: req.body._id
         }, {
-            standardGoList: standardData.standardGoList,
-            standardCodeList: standardData.standardCodeList,
-            standardUnderstanding: standardData.standardUnderstanding,
-            standardFormulating: standardData.standardFormulating
+            standardGoList: req.body.standardGoList,
         })
 
         res.json({
@@ -143,11 +125,64 @@ router.post('/updatestandardcontent', async (req, res) => {
         })
     }
 
-    function isEmpty(body) {
-        if (body === undefined || body === null || body === '' || body === {}) {
-            return true
-        }
-        return false
+})
+
+//修改 goList understanding 內容
+router.post('/updatestandardunderstanding', async (req, res) => {
+    try {
+        const understandingData = await standardcontent.findOne({
+            _id: req.body._id
+        })
+
+        understandingData.standardUnderstanding[req.body.key] = req.body.standardUnderstanding
+
+
+        await standardcontent.updateOne({
+            _id: req.body._id
+        }, {
+            standardUnderstanding: understandingData.standardUnderstanding
+        })
+
+        res.json({
+            message: "success",
+            status: 200,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "編輯 understanding 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
+//修改 goList formulating 內容
+router.post('/updatestandardformulating', async (req, res) => {
+    try {
+        const understandingData = await standardcontent.findOne({
+            _id: req.body._id
+        })
+
+        understandingData.standardFormulating[req.body.key] = req.body.standardFormulating
+
+        await standardcontent.updateOne({
+            _id: req.body._id
+        }, {
+            standardFormulating: understandingData.standardFormulating
+        })
+
+        res.json({
+            message: "success",
+            status: 200,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "編輯 formulating 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
     }
 })
 

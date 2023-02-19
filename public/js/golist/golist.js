@@ -160,7 +160,7 @@ const goListInit = () => {
     ));
 
   myDiagram.nodeTemplateMap.add("Start",
-    $(go.Node, "Table", nodeStyle(),
+    $(go.Node, "Table", nodeStyle(), { deletable: false },
       $(go.Panel, "Spot",
         $(go.Shape, "Circle",
           { desiredSize: new go.Size(100, 100), fill: "#282c34", stroke: "#09d3ac", strokeWidth: 3.5 }),
@@ -207,7 +207,7 @@ const goListInit = () => {
   });
 
   myDiagram.nodeTemplateMap.add("Target",
-    $(go.Node, "Table", nodeStyle(),
+    $(go.Node, "Table", nodeStyle(), { deletable: false },
       $(go.Panel, "Spot",
         $(go.Shape, "ExternalOrganization", { desiredSize: new go.Size(150, 150), fill: "#282c34", stroke: "#ffd3ac", strokeWidth: 4.5 }),
         $(go.TextBlock, "Target", textStyle(), new go.Binding("text"))
@@ -545,9 +545,18 @@ const deleteNode = (part) => {
   }
 
   switch (part.ob.category) {
+    case 'Target':
+      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請自重!`)
+      break
     case 'Start':
       window.alert('此為必須結構，禁止刪除！')
-      return
+      break
+    case 'Understanding':
+      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請住手!`)
+      break
+    case 'Formulating':
+      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐我要報警囉!`)
+      break
     case 'Programming':
       if (window.confirm('確定是否刪除 計畫與執行？\n這將導致該內容全部遭到刪除')) {
         axios({
@@ -567,7 +576,7 @@ const deleteNode = (part) => {
           save()
         })
       }
-      return
+      break
     case 'Comment':
       if (window.confirm('確定是否刪除該筆記？\n這將導致該內容全部遭到刪除')) {
         myDiagram.remove(part)
@@ -575,9 +584,6 @@ const deleteNode = (part) => {
         save()
       }
       break
-    default:
-      myDiagram.remove(part)
-      animateDeletion(part)
   }
 }
 

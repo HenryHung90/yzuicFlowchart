@@ -128,7 +128,7 @@ function puzzleClicking(puzzle, clickId) {
         movePuzzle(puzzle, clickId, puzzlePosition, moveIndex)
     }
 
-    if (detectFinish([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+    if (detectFinish(puzzleInformation.motionPosition)) {
         puzzleInformation.isFinish = true
         window.alert("完成")
 

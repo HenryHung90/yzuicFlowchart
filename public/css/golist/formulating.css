@@ -1,0 +1,33 @@
+.formulatingDescription_container {
+    padding: 10px 24px;
+}
+
+.formulatingDescription_target h3 {
+    font-weight: bolder;
+    font-size: 40px;
+}
+
+.formulatingDescription_contentBox {
+    margin: 15px auto;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 5px 2px rgba(94, 94, 94, 0.8);
+}
+
+.formulatingDescription_contentTitle h4 {
+    font-weight: bolder;
+    margin-bottom: 20px;
+    font-size: 30px;
+}
+
+.formulatingDescription_contentDescription p {
+    font-family: "Ubuntu", sans-serif;
+    margin: 15px;
+    font-size: 20px;
+}
+
+.formulatingDescription_contentCode,
+.formulatingDescription_contentDescription {
+    padding: 5px 20px;
+}

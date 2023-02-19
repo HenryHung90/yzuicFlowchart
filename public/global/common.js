@@ -103,22 +103,80 @@ const categoryBox = {
         }
         $('#understandingDescription').html(`<h3>任務目標 -</h3><h3>⭐${data.message.target}⭐</h3>`)
 
-        data.message.operation.split('\n').forEach(operation => {
-            $('<p>').prop({
-                className: 'understandingDescription_operationText',
-                innerHTML: '🕹 ' + operation
-            }).appendTo($('#understandingOperation'))
-        })
+        //operation
+        if (data.message.operation !== undefined) {
+            data.message.operation.split('\n').forEach(operation => {
+                $('<p>').prop({
+                    className: 'understandingDescription_operationText',
+                    innerHTML: '🕹 ' + operation
+                }).appendTo($('#understandingOperation'))
+            })
+        }
 
-        data.message.limit.split('\n').forEach(limit => {
-            $('<p>').prop({
-                className: 'understandingDescription_limitText',
-                innerHTML: '⚠ ' + limit
-            }).appendTo($('#understandingLimit'))
-        })
+        //limit
+        if (data.message.limit !== undefined) {
+            data.message.limit.split('\n').forEach(limit => {
+                $('<p>').prop({
+                    className: 'understandingDescription_limitText',
+                    innerHTML: '⚠ ' + limit
+                }).appendTo($('#understandingLimit'))
+            })
+        }
+
+        //hint
+        if (data.message.hint !== undefined) {
+            data.message.hint.split('\n').forEach((hint, index) => {
+                if (index !== 0) {
+                    $('<div>').prop({
+                        className: 'understandingDescription_hintArrow',
+                        innerHTML: '<img src="../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg)"></img>'
+                    }).appendTo($('#understandingHint'))
+                }
+
+                $('<div>').prop({
+                    className: 'understandingDescription_hintText',
+                    innerHTML: `<p>👊step ${index + 1}</p>` + hint
+                }).appendTo($('#understandingHint'))
+            })
+        }
     },
     Formulating: (data) => {
+        if (data.message === undefined) {
+            return
+        }
+        if (data.message.content !== undefined) {
+            let index = 0
+            for (const { title, code, description } of data.message.content) {
+                // ContentBox
+                const contentBox = $('<div>').prop({
+                    className: 'formulatingDescription_contentBox',
+                }).appendTo($('#formulatingContent'))
 
+                //Title
+                $('<div>').prop({
+                    className: 'formulatingDescription_contentTitle',
+                    innerHTML: `<h4>⌨ ${title}</h4>`
+                }).appendTo(contentBox)
+
+                //Code
+                $('<textarea>').prop({
+                    className: 'formulatingDescription_contentCode',
+                    id: `code_${index}`,
+                    innerHTML: code
+                }).appendTo(contentBox)
+
+                CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code)
+                $(`#code_${index}`).data('CodeMirror').setSize('auto', 'auto')
+                $(`#code_${index}`).data('CodeMirror').setOption('readOnly', true)
+                index++
+
+                //Description
+                $('<div>').prop({
+                    className: 'formulatingDescription_contentDescription',
+                    innerHTML: `<p>${description}</p>`
+                }).appendTo(contentBox)
+            }
+        }
     },
     Programming: (data) => {
         if (data.code !== undefined) {
@@ -309,7 +367,9 @@ const GoListFunc = {
                     if (NormalizeFunc.serverResponseErrorDetect(response)) {
                         if (response.data.status === 200) {
                             categoryBox.Target(response.data)
+                            return
                         }
+                        window.alert(response.data.message)
                     }
                 })
                 NormalizeFunc.loadingPage(false)
@@ -328,6 +388,7 @@ const GoListFunc = {
                     if (NormalizeFunc.serverResponseErrorDetect(response)) {
                         if (response.data.status === 200) {
                             categoryBox.Start(response.data, s.key)
+                            return
                         }
                         window.alert(response.data.message)
                     }
@@ -360,6 +421,24 @@ const GoListFunc = {
                 break;
             case "Formulating":
                 FormulatingBox(s).appendTo(contentContainer)
+
+                await axios({
+                    method: "post",
+                    url: '/student/getformulating',
+                    data: {
+                        courseId: courseId,
+                        key: s.key
+                    }
+                }).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (response.data.status === 200) {
+                            categoryBox.Formulating(response.data)
+                            return
+                        }
+                        window.alert(response.data.message)
+                    }
+                })
+
                 NormalizeFunc.loadingPage(false)
                 break;
             case "Programming":
