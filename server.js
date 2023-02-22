@@ -29,6 +29,7 @@ import http from 'http'
 //dlxvhg4vwiWYjjjU
 
 const app = express()
+const admin = express()
 
 //.env config
 dotenv.config()
@@ -44,9 +45,14 @@ app.use(morgan('user', {
 
 //用於解析json row txt URL-encoded格式
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
-app.use(bodyParser.json());
-app.use(urlencodedParser);
+//
+app.use(bodyParser.json())
+app.use(urlencodedParser)
 app.use(cookieParser())
+//admin
+admin.use(bodyParser.json())
+admin.use(urlencodedParser)
+admin.use(cookieParser())
 
 
 //mongodb
@@ -106,6 +112,8 @@ app.use(
 
 //設定view ejs
 app.set("view engine", "ejs")
+//admin
+admin.set("view engine", "ejs")
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -116,8 +124,11 @@ const __dirname = path.dirname(__filename);
 //靜態物件取得從public
 app.use(express.json())
 app.use(express.static('public'))
-
 app.use(express.static(path.join(__dirname, 'public')))
+//admin
+admin.use(express.json())
+admin.use(express.static('public'))
+admin.use(express.static(path.join(__dirname, 'public')))
 
 
 app.get('/', async (req, res) => {
@@ -175,5 +186,18 @@ const io = new Server(httpServer)
 socketServer(io)
 
 
+//admin routes
 
-httpServer.listen(process.env.PORT, () => { console.log("Server is runing at " + process.env.HOST + " : " + process.env.PORT) })
+//404
+admin.use((req, res, next) => {
+    res.status(404).render('./404page')
+})
+admin.use((err, req, res, next) => {
+    console.log(err.stack)
+    res.status(500).render('./500error')
+})
+
+
+
+httpServer.listen(process.env.PORT, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT) })
+admin.listen(process.env.ADMIN_PORT, () => { console.log("admin is running at " + process.env.HOST + ":" + process.env.ADMIN_PORT) })

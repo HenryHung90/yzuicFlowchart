@@ -79,14 +79,11 @@ const categoryBox = {
             $('#startDescription').html(`<h3>Task undefined</h3>`)
             return
         }
-        CodeMirrorFunc.codeMirrorProgram('tutorial', data.message.code)
-        //設定 CodeMirror 大小
-        $('#tutorial').data('CodeMirror').setSize(null, 600)
-        //設定 Iframe 跑的　demo
+        // 設定 Iframe 跑的　demo
         $('#startIframe').attr('src', `../Material${data.message.material}`)
-        //設定 Target 字樣
+        // 設定 Target 字樣
         $('#startDescription').html(`<h3>Task ${key} : ${data.message.target}</h3>`)
-        //設定 button click 事件
+        // 設定 button click 事件
         $('#start_launchbtn').click((e) => {
             $('#startIframe').attr('src', `../Material${data.message.material}`)
             $('#demoContent').addClass('startDemoFinish')

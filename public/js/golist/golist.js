@@ -335,7 +335,7 @@ const goListInit = () => {
           { category: "Formulating", text: "表徵制定" },
           { category: "Programming", text: "計畫執行" },
           { category: "Reflection", text: "監控反思" },
-          { category: "Conditional", text: "自定義" },
+          // { category: "Conditional", text: "自定義" },
           { category: "Comment", text: "筆記" },
           { category: "Target", text: "成品展示" }
         ])

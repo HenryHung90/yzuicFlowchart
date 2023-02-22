@@ -10,6 +10,10 @@ let game = new Phaser.Game({
         create: create,
         update: update
     },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     parent: "container",
 });
 
@@ -53,6 +57,47 @@ function create() {
     //將 crop 設為 Phaser 的群組
     puzzleInformation.crop = this.add.group()
 
+    // for (let i = 0; i < puzzleInformation.amount; i++) {
+    //     if (i == puzzleInformation.invisiblePuzzle) {
+    //         puzzleInformation.crop.create(
+    //             puzzleInformation.standardPosition[i].x,
+    //             puzzleInformation.standardPosition[i].y,
+    //             'puzzle',
+    //             i
+    //         ).setVisible(false).setScale(puzzleInformation.cropScale)
+    //         // 在renderedPuzzle 中加入該 puzzle
+    //         puzzleInformation.motionPosition.push(i)
+    //     } else {
+    //         let puzzle = puzzleInformation.crop.create(
+    //             puzzleInformation.standardPosition[i].x,
+    //             puzzleInformation.standardPosition[i].y,
+    //             'puzzle',
+    //             i
+    //         )
+    //             //將其大小初始設置為 0
+    //             .setScale(0)
+
+    //         // 製作一個簡單的小動畫使其放大
+    //         this.tweens.add({
+    //             targets: puzzle,
+    //             delay: 500,
+    //             duration: 800,
+    //             ease: 'Power3',
+    //             scale: puzzleInformation.cropScale,
+    //         })
+
+    //         // 在renderedPuzzle 中加入該 puzzle
+    //         puzzleInformation.motionPosition.push(i)
+    //         // 使 puzzle 能夠互動
+    //         puzzle.setInteractive()
+    //         // 設定 Puzzle 在 pointerup 的監聽事件
+    //         puzzle.on('pointerup', (e) => {
+    //             if (!puzzleInformation.isFinish) {
+    //                 puzzleClicking(puzzle, i)
+    //             }
+    //         })
+    //     }
+    // }
 
     for (let i = 0; i < puzzleInformation.amount; i++) {
         // 隨機從 0 ~ 8 選擇一塊生成
