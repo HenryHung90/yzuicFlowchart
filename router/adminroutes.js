@@ -6,10 +6,37 @@ const router = express.Router()
 import studentConifg from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
+import adminConfig from '../models/adminconfig.js'
 
 const saltRound = 10
 
 
+// router.post('/addadmin', async (req, res) => {
+//     try {
+//         bcrypt.hash(req.body.adminPassword, saltRound, async (err, hashedPassword) => {
+//             if (err) throw 'bad hash'
+
+//             const newAdmin = new adminConfig({
+//                 adminId: req.body.adminId,
+//                 adminPassword: hashedPassword,
+//                 adminName: req.body.adminName
+//             })
+//             newAdmin.save()
+
+//             res.json({
+//                 message: 'success',
+//                 status: 200
+//             })
+//         })
+
+//     } catch (err) {
+//         console.log(err)
+//         res.json({
+//             message: '新增管理員錯誤，請聯繫管理員(err)',
+//             status: 500,
+//         })
+//     }
+// })
 
 //新增學生
 router.post('/addstudent', async (req, res) => {

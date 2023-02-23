@@ -7,6 +7,7 @@ import passportJWT from 'passport-jwt'
 import localStrategy from 'passport-local'
 
 import studentConfig from '../models/studentconfig.js'
+import adminConfig from '../models/adminconfig.js'
 
 const LocalStrategy = localStrategy.Strategy
 const JWTStrategy = passportJWT.Strategy
@@ -53,6 +54,38 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                         studentId: user.studentId,
                         studentName: user.studentName,
                         studentChatRoomId: user.studentChatRoomId,
+                    }
+                    done(null, returnUser)
+                }
+            }
+
+        })
+}))
+
+passport.use('admin-login', new LocalStrategy({ usernameField: 'adminId', passwordField: 'adminPassword' }, (username, password, done) => {
+    adminConfig.findOne({ adminId: username })
+        .then(async (user) => {
+            if (user == null) {
+                console.log('user error')
+                done(null, { message: '無此用戶' })
+            } else {
+                let compareResult = false
+
+                await checkPassword(user, password).then(response => {
+                    if (response) {
+                        compareResult = user
+                    }
+                })
+
+                if (compareResult == false) {
+                    console.log('password error')
+                    done(null, { message: '帳號或密碼錯誤' })
+                } else {
+                    console.log('success')
+                    const returnUser = {
+                        _id: user._id,
+                        adminId: user.adminId,
+                        adminName: user.adminName,
                     }
                     done(null, returnUser)
                 }

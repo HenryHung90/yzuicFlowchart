@@ -98,6 +98,7 @@ app.use(
                         "http://localhost:3000",
                     ],
                     imgSrc: [
+                        "'self'",
                         'https://media.giphy.com',
                         'http://localhost:3000',
                         'data:',
@@ -188,6 +189,27 @@ socketServer(io)
 
 //admin routes
 
+
+admin.get('/', async (req, res) => {
+    if (req.cookies['token'] == undefined) {
+        res.render('./admin/index')
+    }
+})
+
+admin.post('/login', passport.authenticate('admin-login', { session: false }), signIn)
+
+
+admin.post('/logout', async (req, res) => {
+    res.clearCookie('token')
+    res.send('/')
+})
+admin.use((req, res, next) => {
+    if (req.cookies['token'] == undefined) {
+        res.redirect('/')
+        return
+    }
+    next()
+})
 //404
 admin.use((req, res, next) => {
     res.status(404).render('./404page')
