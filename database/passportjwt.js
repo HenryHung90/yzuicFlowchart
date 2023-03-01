@@ -28,6 +28,15 @@ const checkPassword = async (user, inputPassword) => {
     return compareResult
 }
 
+const checkPasswordAdmin = async (user, inputPassword) => {
+    let compareResult = false
+    await bcrypt.compare(inputPassword, user.adminPassword)
+        .then(result => {
+            compareResult = result
+        })
+    return compareResult
+}
+
 passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordField: 'studentPassword' }, (username, password, done) => {
     studentConfig.findOne({ studentId: username, studentAccess: true })
         .then(async (user) => {
@@ -71,7 +80,7 @@ passport.use('admin-login', new LocalStrategy({ usernameField: 'adminId', passwo
             } else {
                 let compareResult = false
 
-                await checkPassword(user, password).then(response => {
+                await checkPasswordAdmin(user, password).then(response => {
                     if (response) {
                         compareResult = user
                     }
@@ -126,6 +135,23 @@ passport.use('token', new JWTStrategy(opts,
                 done(err)
             })
     }))
+passport.use('admin-token', new JWTStrategy(opts,
+    (jwtPayload, done) => {
+        console.log('admin', jwtPayload.adminId, 'get in at', new Date())
+        adminConfig.findOne({ _id: jwtPayload._id, adminId: jwtPayload.adminId })
+            .then(user => {
+                const returnUser = {
+                    _id: user._id,
+                    adminId: user.adminId,
+                    adminName: user.adminName,
+
+                }
+                done(null, returnUser)
+            })
+            .catch(err => {
+                done(err)
+            })
+    }))
 
 const signIn = (req, res) => {
     if (req.user._id == undefined) {
@@ -139,11 +165,26 @@ const signIn = (req, res) => {
         res.cookie('token', token, { maxAge: EXPIRE_SECOND }).cookie('studentId', req.user.studentId, { maxAge: EXPIRE_SECOND }).json({
             studentId: req.user.studentId,
             studentClass: req.user.studentClass,
-            token: token,
             status: 200
         })
         // res.setHeader('token', token).redirect(`/home/${req.user.studentId}`)
     }
 }
 
-export { signIn, passport } 
+const signInAdmin = (req, res) => {
+    if (req.user._id == undefined) {
+        res.json({
+            message: req.user.message,
+            status: 401,
+        })
+    } else {
+        const token = jwt.sign({ _id: req.user._id.toString(), adminId: req.user.adminId.toString() }, secret_key, { expiresIn: EXPIRE_TIME })
+        // res.setHeader('Authorization',token).redirect(`/home/${req.user.studentId}`)
+        res.cookie('token', token, { maxAge: EXPIRE_SECOND }).cookie('adminId', req.user.adminId, { maxAge: EXPIRE_SECOND }).json({
+            adminId: req.user.adminId,
+            status: 200
+        })
+    }
+}
+
+export { signIn, signInAdmin, passport } 

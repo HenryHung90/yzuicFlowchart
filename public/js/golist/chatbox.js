@@ -1,5 +1,6 @@
 import { socketConnect, MessageType } from '../../global/socketConnect.js'
 import { NormalizeFunc } from '../../global/common.js'
+import { studentClientConnect } from '../../global/axiosconnect.js'
 
 const chatBoxInit = () => {
     // 傳送進入房間訊息
@@ -105,16 +106,10 @@ const chatBoxInit = () => {
     let freshCount = 2
     $(MessageContent).on('scroll', () => {
         if ($(MessageContent).scrollTop() === 0) {
-            axios({
-                method: 'POST',
-                url: '/student/getmessagehistory',
-                data: {
-                    freshCount: freshCount,
-                    chatRoomId: NormalizeFunc.getFrontEndCode('studentChatRoomId')
-                }
-            }).then(response => {
-                NormalizeFunc.serverResponseErrorDetect(response)
-                if (response.data.status === 200) {
+            studentClientConnect.getMessageHistory(
+                freshCount, NormalizeFunc.getFrontEndCode('studentChatRoomId')
+            ).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
                     const reverseMessage = response.data.message.reverse()
                     const OffsetScrollTop = $('.chatBox_MessageContent')[0].scrollHeight
 
@@ -129,6 +124,7 @@ const chatBoxInit = () => {
                     $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight - OffsetScrollTop - 100)
                     freshCount++
                 }
+
             })
         }
     })

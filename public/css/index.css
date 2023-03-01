@@ -1,5 +1,17 @@
-.loginContainer{
-    padding:20vh 0;
+body {
+    overflow: hidden;
+}
+#background {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    background-image: url("../media/img/indexBg.png");
+    height: 100vh;
+    animation: flow 1.5s ease;
+    transform: scale(1.2);
+}
+.loginContainer {
+    padding: 20vh 0;
 }
 
 .loginDiv {
@@ -8,6 +20,9 @@
     border: 3px solid black;
     border-radius: 15px;
     padding: 5px 15px;
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.5);
 }
 
 .formTitle {
@@ -47,6 +62,19 @@
         display: inherit;
     }
     .loginInput {
-       width: auto;
+        width: auto;
+    }
+}
+
+@keyframes flow {
+    from {
+        opacity: 0;
+        transform: scale(1);
+        filter: blur(5px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1.2);
+        filter: blur(0px);
     }
 }

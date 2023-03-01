@@ -1,9 +1,11 @@
-import { NormalizeFunc } from '../global/common.js'
-import { studentClientConnect } from '../global/axiosconnect.js'
+import { NormalizeFunc } from '../../global/common.js'
 NormalizeFunc.loadingPage(true)
 
 const homeInit = async () => {
-    studentClientConnect.getAllCourse().then(response => {
+    axios({
+        method: 'POST',
+        url: '/admin/getallcourse',
+    }).then(response => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
             if (response.data.standardData !== null || response.data.standardData !== undefined) {
                 renderGoList(response.data.standardData)
@@ -13,20 +15,19 @@ const homeInit = async () => {
 
     NormalizeFunc.loadingPage(false)
 }
-
-
 //----click function----//
 $('#logout').click(e => logout())
 $('#changePassword').click(e => changePassword())
 
 
 const logout = () => {
-    if (window.confirm("確定登出嗎？退出前請記得儲存內容喔!")) {
-        NormalizeFunc.loadingPage(true)
-        studentClientConnect.logout().then(response => {
-            window.location.href = '/'
-        })
-    }
+    NormalizeFunc.loadingPage(true)
+    axios({
+        method: 'post',
+        url: '/logout'
+    }).then(response => {
+        window.location.href = '/'
+    })
 }
 
 const changePassword = () => {
@@ -124,11 +125,21 @@ const changePassword = () => {
             return
         }
         NormalizeFunc.loadingPage(true)
-        studentClientConnect.changePassword(OP, NP_2).then(async response => {
+        axios({
+            method: 'POST',
+            url: '/student/changepassword',
+            data: {
+                oldPassword: OP,
+                newPassword: NP_2,
+            },
+            withCredentials: true
+        }).then(async response => {
             if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
                 NormalizeFunc.loadingPage(false)
-                cancelCP()
+                if (response.data.status === 200) {
+                    cancelCP()
+                }
             }
         })
     }
@@ -164,7 +175,7 @@ const renderGoList = (standardData) => {
         }).appendTo(goListContainer)
 
         const enterClass = (id) => {
-            window.location.href = `/student/${id}`
+            window.location.href = `/admin/${id}`
         }
     })
 }

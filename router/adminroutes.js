@@ -98,7 +98,7 @@ router.post('/addstudent', async (req, res) => {
 
 })
 
-//新增 Standard 各項內容
+//新增 goList Standard 各項內容
 router.post('/addstandardcontent', async (req, res) => {
     try {
         const newStandardcontent = new standardcontent({
@@ -126,8 +126,7 @@ router.post('/addstandardcontent', async (req, res) => {
     }
 
 })
-
-//修改 Standard 各項內容
+//修改 goList Standard 各項內容
 router.post('/updatestandardgolist', async (req, res) => {
     try {
         const standardData = await standardcontent.findOne({
@@ -153,7 +152,6 @@ router.post('/updatestandardgolist', async (req, res) => {
     }
 
 })
-
 //修改 goList understanding 內容
 router.post('/updatestandardunderstanding', async (req, res) => {
     try {
@@ -183,7 +181,6 @@ router.post('/updatestandardunderstanding', async (req, res) => {
         })
     }
 })
-
 //修改 goList formulating 內容
 router.post('/updatestandardformulating', async (req, res) => {
     try {
@@ -279,6 +276,163 @@ router.post('/addchatroom', async (req, res) => {
             message: "新增聊天室失敗，請聯繫管理員(err)",
             status: 500,
         })
+    }
+})
+//取得目前所有 chatroom
+router.post('/getchatroom', async (req, res) => {
+    try {
+        const chatRoomData = await chatroomconfig.find({})
+
+        if (chatRoomData === null) {
+            res.json({
+                message: 'empty',
+                status: 501
+            })
+            return
+        }
+        res.json({
+            message: { chatRoomId: chatRoomData.chatRoomId, studentGroup: chatRoomData.studentGroup },
+            status: 200
+        })
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得聊天室失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+
+
+})
+
+//Admin 取得所有課程
+router.post('/getallcourse', async (req, res) => {
+    try {
+        const standardData = await standardcontent.find({})
+
+        res.json({
+            standardData: standardData,
+            status: 200,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得教材時發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//Admin 進入課程
+router.get('/:courseId', async (req, res) => {
+    try {
+        const courseData = await standardcontent.findOne({ _id: req.params.courseId })
+        if (courseData === null || courseData === undefined || courseData.length === 0) {
+            res.redirect(`/home/${req.user.adminId}`)
+            return
+        }
+        res.render('./admin/golist', {
+            courseId: req.params.courseId,
+            courseTitle: courseData.goListTitle,
+            adminId: req.user.adminId,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "錯誤開啟，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
+//Admin 讀取 Standard
+router.post('/readstandard', async (req, res) => {
+    try {
+        const standardData = await standardcontent.findOne({ _id: req.body.courseId })
+
+        res.json(
+            {
+                message: standardData.standardGoList,
+                status: 200
+            }
+        )
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '讀取存檔失敗，請重新整理',
+                status: 500,
+            }
+        )
+    }
+})
+//Admin 儲存 Standard
+router.post('/savestandard', async (req, res) => {
+    try {
+        await standardcontent.updateOne({ _id: req.body.courseId, }, { standardGoList: req.body.goList })
+            .then(response => {
+                if (response.acknowledged) {
+                    res.json(
+                        {
+                            message: 'success',
+                            status: 200
+                        }
+                    )
+                } else {
+                    res.json(
+                        {
+                            message: '儲存失敗，請再試一次',
+                            status: 500
+                        }
+                    )
+                }
+
+            })
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '儲存失敗，請聯繫管理員(err)',
+                status: 500,
+            }
+        )
+    }
+})
+//Admin 重整 Standard
+router.post('/restartstandard', async (req, res) => {
+    try {
+        await standardcontent.updateOne({ _id: req.body.courseId, }, { standardGoList: {}, standardCodeList: {} })
+            .then(response => {
+                if (response.acknowledged) {
+                    res.json(
+                        {
+                            message: 'success',
+                            status: 200
+                        }
+                    )
+                } else {
+                    res.json(
+                        {
+                            message: '重整失敗，請再試一次',
+                            status: 500
+                        }
+                    )
+                }
+
+            })
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '重整失敗，請聯繫管理員(err)',
+                status: 500,
+            }
+        )
     }
 })
 

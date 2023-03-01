@@ -231,10 +231,10 @@ router.post('/readgolist', async (req, res) => {
         })
 
         if (studentData.studentGoList === null ||
-            studentData.studentGoList === undefined
+            studentData.studentGoList === undefined ||
+            studentData.studentGoList[req.body.courseId] === null
         ) {
             const standardData = await standardcontent.findOne({
-                class: req.user.studentClass,
                 _id: req.body.courseId,
                 access: true
             })
@@ -271,13 +271,15 @@ router.post('/savegolist', async (req, res) => {
                 studentAccess: true
             })
 
-        studentData.studentGoList[req.body.courseId] = req.body.goList
 
-        if (studentData.studentCodeList[req.body.courseId] === undefined) {
-            studentData.studentCodeList[req.body.courseId] = { 0: "-100" }
+
+        if (studentData.studentGoList === undefined || studentData.studentGoList === {}) {
+            studentData.studentGoList = {
+                [req.body.courseId]: req.body.goList
+            }
+        } else {
+            studentData.studentGoList[req.body.courseId] = req.body.goList
         }
-
-        console.log(studentData.studentCodeList)
 
         await studentConfig.updateOne(
             {
@@ -323,9 +325,7 @@ router.post('/restartgolist', async (req, res) => {
     try {
         //尋找 GoList
         const standardData = await standardcontent.findOne({
-            class: req.user.studentClass,
             _id: req.body.courseId,
-            access: true
         })
         //尋找學生資料
         const studentData = await studentConfig.findOne({
@@ -559,42 +559,6 @@ router.post('/deletecode', async (req, res) => {
                 status: 500
             }
         )
-    }
-})
-//學生重整 code
-router.post('/restartcode', async (req, res) => {
-    try {
-        let standardCodeList = {}
-        //尋找 Code
-        await standardcontent.findOne({ class: req.user.studentClass, access: true }).then(response => {
-            standardCodeList = response.standardCodeList || {}
-        })
-        //更新 Code
-        await studentConfig.updateOne(
-            { studentId: req.user.studentId, studentAccess: true },
-            { studentCodeList: standardCodeList })
-            .then(response => {
-                if (response.acknowledged) {
-                    res.json({
-                        message: 'success',
-                        status: 200
-                    })
-                } else {
-                    res.json({
-                        message: '重整 Code 失敗，請重新整理網頁！',
-                        status: 500
-                    })
-                }
-
-            })
-
-    }
-    catch (err) {
-        console.log(err)
-        res.json({
-            message: '重整 Code 失敗，請聯繫管理員 (err)',
-            status: 500
-        })
     }
 })
 

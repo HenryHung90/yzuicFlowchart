@@ -20,7 +20,7 @@ import './database/mongodb.js'
 //helmet
 import helmet from 'helmet'
 //passport
-import { passport, signIn } from './database/passportjwt.js'
+import { passport, signIn, signInAdmin } from './database/passportjwt.js'
 //socket.io
 import socketServer from './socketServer.js'
 import { Server } from 'socket.io'
@@ -49,10 +49,6 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.use(bodyParser.json())
 app.use(urlencodedParser)
 app.use(cookieParser())
-//admin
-admin.use(bodyParser.json())
-admin.use(urlencodedParser)
-admin.use(cookieParser())
 
 
 //mongodb
@@ -113,8 +109,6 @@ app.use(
 
 //設定view ejs
 app.set("view engine", "ejs")
-//admin
-admin.set("view engine", "ejs")
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -126,11 +120,6 @@ const __dirname = path.dirname(__filename);
 app.use(express.json())
 app.use(express.static('public'))
 app.use(express.static(path.join(__dirname, 'public')))
-//admin
-admin.use(express.json())
-admin.use(express.static('public'))
-admin.use(express.static(path.join(__dirname, 'public')))
-
 
 app.get('/', async (req, res) => {
     if (req.cookies['token'] == undefined) {
@@ -168,7 +157,6 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
 
 //routes
 app.use('/launch', passport.authenticate('token', { session: false }), launchroutes)
-app.use('/admin', passport.authenticate('token', { session: false }), adminroutes)
 app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
 
 //404
@@ -189,20 +177,36 @@ socketServer(io)
 
 //admin routes
 
+admin.use(bodyParser.json())
+admin.use(urlencodedParser)
+admin.use(cookieParser())
+
+admin.set("view engine", "ejs")
+
+admin.use(express.json())
+admin.use(express.static('public'))
+admin.use(express.static(path.join(__dirname, 'public')))
 
 admin.get('/', async (req, res) => {
     if (req.cookies['token'] == undefined) {
         res.render('./admin/index')
+    } else {
+        res.redirect(`./home/${req.cookies.adminId}`)
+    }
+})
+admin.post('/login', passport.authenticate('admin-login', { session: false }), signInAdmin)
+admin.post('/logout', async (req, res) => {
+    res.clearCookie('token')
+    res.redirect('/')
+})
+admin.get('/home/:adminId', async (req, res) => {
+    if (req.cookies.adminId != req.params.adminId) {
+        res.redirect('/')
+    } else {
+        res.render('./admin/home', { adminId: req.cookies.adminId })
     }
 })
 
-admin.post('/login', passport.authenticate('admin-login', { session: false }), signIn)
-
-
-admin.post('/logout', async (req, res) => {
-    res.clearCookie('token')
-    res.send('/')
-})
 admin.use((req, res, next) => {
     if (req.cookies['token'] == undefined) {
         res.redirect('/')
@@ -210,16 +214,28 @@ admin.use((req, res, next) => {
     }
     next()
 })
+
+admin.use('/admin', passport.authenticate('admin-token', { session: false }), adminroutes)
+admin.use('/student', passport.authenticate('admin-token', { session: false }), studentroutes)
+
+
 //404
 admin.use((req, res, next) => {
     res.status(404).render('./404page')
 })
+//500
 admin.use((err, req, res, next) => {
     console.log(err.stack)
     res.status(500).render('./500error')
 })
 
 
-
 httpServer.listen(process.env.PORT, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT) })
 admin.listen(process.env.ADMIN_PORT, () => { console.log("admin is running at " + process.env.HOST + ":" + process.env.ADMIN_PORT) })
+
+
+// status sign meaning
+// status 200 => success
+// status 500 => server error
+// status 501 => empty 
+// status 404 => error

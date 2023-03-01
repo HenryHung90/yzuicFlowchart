@@ -1,5 +1,6 @@
 import { TargetBox, StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "../js/golist/gogrammingPage.js"
-
+import { adminTargetBox, adminStartBox, adminUnderstandingBox, adminFormulatingBox, adminProgrammingBox, adminReflectionBox } from '../js/admin/golist/gogrammingPage.js'
+import { adminClientConnect, studentClientConnect } from "./axiosconnect.js"
 
 //------------------------------ normal function ------------------------------//]
 const NormalizeFunc = {
@@ -13,15 +14,30 @@ const NormalizeFunc = {
     },
     //與 server 聯繫進行偵錯
     serverResponseErrorDetect: (response) => {
-        if (response.data.status === 404) {
-            window.alert(response.data.message || 'Error 請重新整理網頁')
-            return false
+        // status sign meaning
+        // status 200 => success
+        // status 500 => server error
+        // status 501 => empty
+        // status 404 => error
+        // status 401 => account error
+        switch (response.data.status) {
+            case 200:
+                return true
+            case 500:
+                window.alert(response.data.message)
+                return false
+            case 501:
+                if (response.data.message) window.alert(response.data.message)
+                return true
+            case 404:
+                window.alert(response.data.message || 'Error 請重新整理網頁')
+                return false
+            case 401:
+                window.alert(response.data.message)
+                NormalizeFunc.loadingPage(false)
+                return false
+
         }
-        // 不須做任何事
-        if (response.data.status === 501) {
-            return false
-        }
-        return true
     },
     //取得 cookie值
     getCookie: (name) => {
@@ -220,7 +236,7 @@ const GoListFunc = {
         }
     },
     //show Each Box
-    showContainer: async (s) => {
+    showContainer: async (s, id) => {
         //取得 Iframe 發出之 Error 警訊
         const reciveMessage = (e) => {
             e.preventDefault()
@@ -350,143 +366,91 @@ const GoListFunc = {
 
         const courseId = NormalizeFunc.getFrontEndCode('courseId')
 
-        switch (s.category) {
-            case "Target":
-                TargetBox().appendTo(contentContainer)
+        if (id === 'admin') {
+            switch (s.category) {
 
-                await axios({
-                    method: 'post',
-                    url: '/student/getmaterial',
-                    data: {
-                        courseId: courseId
-                    }
-                }).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        if (response.data.status === 200) {
+            }
+        } else {
+            switch (s.category) {
+                case "Target":
+                    TargetBox().appendTo(contentContainer)
+
+                    await studentClientConnect.getMaterial(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
                             categoryBox.Target(response.data)
-                            return
+                            NormalizeFunc.loadingPage(false)
                         }
-                        window.alert(response.data.message)
-                    }
-                })
-                NormalizeFunc.loadingPage(false)
-                break
-            case "Start":
-                StartBox().appendTo(contentContainer)
+                    })
+                    break
 
-                await axios({
-                    method: 'post',
-                    url: '/student/getstarting',
-                    data: {
-                        courseId: courseId,
-                        key: s.key
-                    }
-                }).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        if (response.data.status === 200) {
+                case "Start":
+                    StartBox().appendTo(contentContainer)
+
+                    await studentClientConnect.getStarting(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
                             categoryBox.Start(response.data, s.key)
-                            return
+                            NormalizeFunc.loadingPage(false)
                         }
-                        window.alert(response.data.message)
-                    }
-                })
+                    })
+                    break;
 
-                NormalizeFunc.loadingPage(false)
-                break;
-            case "Understanding":
-                UnderstandingBox().appendTo(contentContainer)
+                case "Understanding":
+                    UnderstandingBox().appendTo(contentContainer)
 
-                await axios({
-                    method: "post",
-                    url: '/student/getunderstanding',
-                    data: {
-                        courseId: courseId,
-                        key: s.key
-                    }
-                }).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        if (response.data.status === 200) {
+                    await studentClientConnect.getUnderstanding(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
                             categoryBox.Understanding(response.data)
-                            return
+                            NormalizeFunc.loadingPage(false)
                         }
-                        window.alert(response.data.message)
-                    }
-                })
+                    })
+                    break;
 
+                case "Formulating":
+                    FormulatingBox(s).appendTo(contentContainer)
 
-                NormalizeFunc.loadingPage(false)
-                break;
-            case "Formulating":
-                FormulatingBox(s).appendTo(contentContainer)
-
-                await axios({
-                    method: "post",
-                    url: '/student/getformulating',
-                    data: {
-                        courseId: courseId,
-                        key: s.key
-                    }
-                }).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        if (response.data.status === 200) {
+                    await studentClientConnect.getFormulating(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
                             categoryBox.Formulating(response.data)
-                            return
+                            NormalizeFunc.loadingPage(false)
                         }
-                        window.alert(response.data.message)
-                    }
-                })
+                    })
+                    break;
 
-                NormalizeFunc.loadingPage(false)
-                break;
-            case "Programming":
-                ProgrammingBox(s).appendTo(contentContainer)
+                case "Programming":
+                    ProgrammingBox(s).appendTo(contentContainer)
 
-                //確認userId資料夾是否建立
-                await axios({
-                    method: 'post',
-                    url: '/launch/createdemo'
-                }).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        if (response.data.status != 200) {
-                            window.alert(response.data.message)
-                            return
+                    //確認userId資料夾是否建立
+                    await studentClientConnect.createDemo().then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                            //讀取該key值的Code內容
+                            studentClientConnect.readCode(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
+                                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                                    listenMessageBind()
+                                    categoryBox.Programming(response.data)
+                                    GoListFunc.saveCodeStatus(false)
+                                    NormalizeFunc.loadingPage(false)
+                                }
+                            })
                         }
-                    }
-                })
-                //讀取該key值的Code內容
-                await axios({
-                    method: 'post',
-                    url: '/student/readcode',
-                    data: {
-                        keyCode: s.key,
-                        courseId: NormalizeFunc.getFrontEndCode('courseId')
-                    }
-                }).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        //response.data.data == code內容
-                        if (response.data.status === 200) {
-                            // create listenEvent
-                            listenMessageBind()
-                            categoryBox.Programming(response.data)
-                            return
-                        }
-                        window.alert(response.data.message)
-                    }
-                })
-                GoListFunc.saveCodeStatus(false)
-                NormalizeFunc.loadingPage(false)
-                break;
-            case "Reflection":
-                ReflectionBox(s).appendTo(contentContainer)
-                NormalizeFunc.loadingPage(false)
-                break;
-            case "Comment":
-                CommentBox(s).appendTo(contentContainer)
+                    })
 
-                NormalizeFunc.loadingPage(false)
-                break;
+                    break;
+
+                case "Reflection":
+                    ReflectionBox(s).appendTo(contentContainer)
+                    NormalizeFunc.loadingPage(false)
+                    break;
+
+                case "Comment":
+                    CommentBox(s).appendTo(contentContainer)
+                    NormalizeFunc.loadingPage(false)
+                    break;
+            }
         }
-    }
+
+
+
+    },
 }
 //------------------------------ codeMirror Function ------------------------------//
 const CodeMirrorFunc = {
