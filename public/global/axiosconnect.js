@@ -119,7 +119,7 @@ const studentClientConnect = {
         (setting, config, preload, create, update, custom, keyCode) => {
             return (
                 axios({
-                    url: '/student/savedemo',
+                    url: '/student/savecode',
                     method: 'post',
                     data: {
                         setting: setting,
