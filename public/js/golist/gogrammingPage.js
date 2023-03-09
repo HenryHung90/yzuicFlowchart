@@ -3,6 +3,7 @@ import {
     CodeMirrorFunc,
     GoListFunc
 } from "../../global/common.js"
+import { studentClientConnect } from "../../global/axiosconnect.js"
 //Target 顯示最終成品的Block
 const TargetBox = () => {
     // 把 Sync 字樣刪除
@@ -19,17 +20,6 @@ const TargetBox = () => {
 
     return contentDiv
 }
-
-//Start
-//Comment
-//Understanding
-//Formulating
-//Programming
-//Reflection
-
-
-//using in common.js => to show messageBox
-
 //StartBox return function
 const StartBox = () => {
     // 把 Sync 字樣刪除
@@ -63,27 +53,6 @@ const StartBox = () => {
         className: 'col-12 codeTutorial_container'
     }).appendTo(startBoxContainer)
 
-
-    //content
-    $('<textarea>').prop({
-        className: 'codeTutorial_code',
-        id: 'tutorial'
-    }).appendTo(content_codingContainer)
-
-
-    const demoDiv = $('<div>').prop({
-        className: 'container-fluid DemoDiv',
-    }).prependTo($('body'))
-
-    const demoIframe = $('<div>').prop({
-        className: 'row justify-content-start iframeContainer'
-    }).appendTo(demoDiv)
-
-    const demoContent = $('<div>').prop({
-        className: 'col-12 demoContent',
-        id: 'demoContent',
-    }).appendTo(demoIframe)
-
     $('<iframe>')
         .prop({
             className: 'col-12',
@@ -95,15 +64,9 @@ const StartBox = () => {
             'margin': '0 auto',
             'margin-top': '5px',
             'border': '1px dashed black',
-            'border-radius': '20px'
+            'border-radius': '20px',
         })
-        .appendTo(demoContent)
-
-    //DownIcon
-    $('<div>').prop({
-        className: 'col-1 offset-md-5 downIcon',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
-    }).appendTo(demoContent)
+        .appendTo(content_codingContainer)
 
 
     NormalizeFunc.loadingPage(false)
@@ -421,7 +384,7 @@ const FormulatingBox = () => {
     $('<div>').prop({
         className: 'col-10 formulatingDescription_target',
         id: 'formulatingDescription',
-        innerHTML:'<h3>語法的使用與制定</h3>'
+        innerHTML: '<h3>語法的使用與制定</h3>'
     }).appendTo(formulatingDescriptionContainer)
 
 
@@ -434,8 +397,8 @@ const FormulatingBox = () => {
 
 
     $('<div>').prop({
-        className:'col-12 formulatingDescription_content',
-        id:'formulatingContent'
+        className: 'col-12 formulatingDescription_content',
+        id: 'formulatingContent'
     }).appendTo(formulatingDescriptionContainer)
 
     return contentDiv
@@ -665,28 +628,21 @@ const ProgrammingBox = (programmingKey) => {
                 .setOption('firstLineNumber', CodeMirrorFunc.swtichEditorNameToStartLineNumber(name));
         }
 
-        await axios({
-            url: '/launch/launchdemo',
-            method: 'post',
-            data: {
-                setting: settingCode.getValue(),
-                config: configCode.getValue(),
-                preload: preloadCode.getValue(),
-                create: createCode.getValue(),
-                update: updateCode.getValue(),
-                custom: customCode.getValue()
-            }
-        }).then(response => {
-            NormalizeFunc.serverResponseErrorDetect(response)
-            //成功執行並將access隨機碼載入
-            if (response.data.status == 200) {
+        await studentClientConnect.launchDemo(
+            settingCode.getValue(),
+            configCode.getValue(),
+            preloadCode.getValue(),
+            createCode.getValue(),
+            updateCode.getValue(),
+            customCode.getValue()
+        ).then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 return response.data.message
             }
         }).then(async response => {
             if (!response) {
                 return
             }
-
             if ($('.DemoDiv').length == 0) {
                 const demoDiv = $('<div>').prop({
                     className: 'container-fluid DemoDiv',
@@ -759,25 +715,18 @@ const ProgrammingBox = (programmingKey) => {
         const customCode = $("#custom").data('CodeMirror')
 
         const keyCode = programmingKey.key
-        await axios({
-            method: 'post',
-            url: '/student/savecode',
-            data: {
-                setting: settingCode.getValue(),
-                config: configCode.getValue(),
-                preload: preloadCode.getValue(),
-                create: createCode.getValue(),
-                update: updateCode.getValue(),
-                custom: customCode.getValue(),
-                keyCode: keyCode,
-                courseId: NormalizeFunc.getFrontEndCode('courseId')
+        await studentClientConnect.saveCode(
+            settingCode.getValue(),
+            configCode.getValue(),
+            preloadCode.getValue(),
+            createCode.getValue(),
+            updateCode.getValue(),
+            customCode.getValue(),
+            keyCode
+        ).then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                GoListFunc.saveCodeStatus(false)
             }
-        }).then(response => {
-            if (response.data.status != 200) {
-                window.alert(response.data.message)
-                return
-            }
-            GoListFunc.saveCodeStatus(false)
         })
     }
 
@@ -810,16 +759,10 @@ const ProgrammingBox = (programmingKey) => {
                 return
             }
         }
-        await axios({
-            method: 'post',
-            url: '/launch/uploadimg',
-            data: uploadFile
-        }).then(response => {
-            if (response.data.status != 200) {
-                window.alert(response.data.message)
-                return
+        await studentClientConnect.uploadFile(uploadFile).then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                NormalizeFunc.loadingPage(false)
             }
-            NormalizeFunc.loadingPage(false)
         })
 
     }
@@ -873,81 +816,68 @@ const ProgrammingBox = (programmingKey) => {
         }).appendTo(datamediaContainer)
 
         //搜尋file
-        axios({
-            method: 'post',
-            url: '/launch/searchmedia'
-        }).then(response => {
-            if (response.data.status != 200) {
-                window.alert(response.data.message)
-                return
-            }
-            //去除Loading畫面
-            datamediaLoading.remove()
+        studentClientConnect.searchFile().then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                //去除Loading畫面
+                datamediaLoading.remove()
 
-            if (response.data.files != undefined) {
-                //製作 IMG 的列表圖
-                for (let mediaFile of response.data.files) {
-                    const fileItem = $('<div>').prop({
-                        className: 'col-2 media_item',
-                        innerHTML: `<img src=${mediaFile.src} style="width:40px;height:40px"></img>` +
-                            `<p>${mediaFile.name}</p>`,
-                        name: mediaFile.name
-                    }).hover(
-                        (e) => {
-                            deleteIcon.fadeIn(200)
-                        },
-                        (e) => {
-                            deleteIcon.fadeOut(50)
-                        }).appendTo(datamediaContainer)
+                if (response.data.files != undefined) {
+                    //製作 IMG 的列表圖
+                    for (let mediaFile of response.data.files) {
+                        const fileItem = $('<div>').prop({
+                            className: 'col-2 media_item',
+                            innerHTML: `<img src=${mediaFile.src} style="width:40px;height:40px"></img>` +
+                                `<p>${mediaFile.name}</p>`,
+                            name: mediaFile.name
+                        }).hover(
+                            (e) => {
+                                deleteIcon.fadeIn(200)
+                            },
+                            (e) => {
+                                deleteIcon.fadeOut(50)
+                            }).appendTo(datamediaContainer)
 
-                    const deleteIcon = $('<div>').prop({
-                        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="10px" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>'
+                        const deleteIcon = $('<div>').prop({
+                            innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="10px" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>'
+                        }).css({
+                            'display': 'none',
+                            'background-color': 'rgba(0,0,0,0.3)',
+                            'width': '50%',
+                            'border-radius': '10px',
+                            'margin': '0 auto',
+                            'transition-duration': '0.3s'
+                        }).hover(
+                            (e) => {
+                                deleteIcon.css({
+                                    'background-color': 'rgba(255,0,0,0.7)'
+                                })
+                            }, (e) => {
+                                deleteIcon.css({
+                                    'background-color': 'rgba(0,0,0,0.3)'
+                                })
+                            }).click((e) => {
+                                deleteMedia(fileItem)
+                            }).appendTo(fileItem)
+                    }
+                } else {
+                    $('<h3>').prop({
+                        innerHTML: 'no file exist'
                     }).css({
-                        'display': 'none',
-                        'background-color': 'rgba(0,0,0,0.3)',
-                        'width': '50%',
-                        'border-radius': '10px',
-                        'margin': '0 auto',
-                        'transition-duration': '0.3s'
-                    }).hover(
-                        (e) => {
-                            deleteIcon.css({
-                                'background-color': 'rgba(255,0,0,0.7)'
-                            })
-                        }, (e) => {
-                            deleteIcon.css({
-                                'background-color': 'rgba(0,0,0,0.3)'
-                            })
-                        }).click((e) => {
-                            deleteMedia(fileItem)
-                        }).appendTo(fileItem)
+                        'margin': '0 auto'
+                    }).appendTo(datamediaContainer)
                 }
-            } else {
-                $('<h3>').prop({
-                    innerHTML: 'no file exist'
-                }).css({
-                    'margin': '0 auto'
-                }).appendTo(datamediaContainer)
             }
+
         })
         return datamediaContainer
     }
     //delete Media
     const deleteMedia = (file) => {
-        console.log(file)
         if (window.confirm(`確定刪除圖像 ${file[0].name} ?`)) {
-            axios({
-                method: 'post',
-                url: '/launch/deletemedia',
-                data: {
-                    imageName: file[0].name
+            studentClientConnect.deleteFile(file[0].name).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    file.remove()
                 }
-            }).then(response => {
-                if (response.data.status != 200) {
-                    window.alert(response.data.message)
-                    return
-                }
-                file.remove()
             })
         }
     }

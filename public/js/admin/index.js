@@ -1,5 +1,5 @@
-import { NormalizeFunc } from '../global/common.js'
-import { studentClientConnect } from '../global/axiosconnect.js'
+import { NormalizeFunc } from '../../global/common.js'
+import { adminClientConnect } from '../../global/axiosconnect.js'
 
 $('#formSubmit').click((e) => {
     login(e)
@@ -31,9 +31,9 @@ const login = (e) => {
         return
     }
 
-    studentClientConnect.login(account, password).then(response => {
+    adminClientConnect.login(account, password).then(response => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
-            window.location.href = `/home/${response.data.studentId}`
+            window.location.href = `/home/${response.data.adminId}`
         }
     })
 }

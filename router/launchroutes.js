@@ -175,7 +175,6 @@ ${req.body.custom}
          <head>
              <meta charset="UTF-8">
              <title>Demo</title>
-             <script src="../../../global/consoleListen.js"></script>
              <!-- jQuery -->
              <script src="https://code.jquery.com/jquery-3.6.1.min.js"
              integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>

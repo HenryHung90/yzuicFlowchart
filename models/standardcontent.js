@@ -32,6 +32,7 @@ const standardcontent = new mongoose.Schema({
         required: false,
     },
     // 任務內容
+    // 內容應包含 key => {target, material}
     standardStarting: {
         type: 'object',
         required: false,

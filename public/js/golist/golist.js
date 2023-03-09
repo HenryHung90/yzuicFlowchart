@@ -1,5 +1,6 @@
 import { GoListFunc, NormalizeFunc } from "../../global/common.js";
 import { chatBoxInit } from "./chatbox.js";
+import { studentClientConnect } from "../../global/axiosconnect.js";
 
 
 
@@ -335,9 +336,9 @@ const goListInit = () => {
           { category: "Formulating", text: "表徵制定" },
           { category: "Programming", text: "計畫執行" },
           { category: "Reflection", text: "監控反思" },
-          { category: "Conditional", text: "自定義" },
+          // { category: "Conditional", text: "自定義" },
           { category: "Comment", text: "筆記" },
-          { category: "Target", text: "成品展示" }
+          // { category: "Target", text: "成品展示" }
         ])
       });
 
@@ -374,6 +375,9 @@ const navInit = () => {
   $('#restart').click((e) => {
     navButton.restart()
   })
+  $('#download').click((e) => {
+    navButton.download()
+  })
   $('#logout').click((e) => {
     navButton.logout()
   })
@@ -404,22 +408,14 @@ const navButton = {
     let idx = document.title.indexOf("*");
     if (idx !== -1) {
       document.title = document.title.slice(0, idx);
+
       //存入資料庫
-      await axios({
-        method: "post",
-        url: '/student/savegolist',
-        data: {
-          goList: goData,
-          courseId: NormalizeFunc.getFrontEndCode('courseId')
-        }
-      }).then(response => {
-        console.log(response.data)
-        if (response.data.status == 500) {
-          window.alert(response.data.message)
-          return
-        }
-        NormalizeFunc.loadingPage(false)
-      })
+      await studentClientConnect.saveGoList(goData, NormalizeFunc.getFrontEndCode('courseId'))
+        .then(response => {
+          if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            NormalizeFunc.loadingPage(false)
+          }
+        })
 
       myDiagram.isModified = false;
     } else {
@@ -451,34 +447,13 @@ const navButton = {
       NormalizeFunc.loadingPage(true)
 
       //重整 goList
-      await axios({
-        method: 'post',
-        url: '/student/restartgolist',
-        data: {
-          courseId: NormalizeFunc.getFrontEndCode('courseId')
-        }
-      }).then(response => {
-        if (response.data.status != 200) {
-          window.alert(response.data.message)
-          NormalizeFunc.loadingPage(false)
-          return
-        }
-      })
-
-      //重整 code
-      await axios({
-        method: 'post',
-        url: '/student/restartcode'
-      }).then(response => {
-        if (response.data.status != 200) {
-          window.alert(response.data.message)
-          NormalizeFunc.loadingPage(false)
-          return
-        }
-      })
-
-      load()
-      NormalizeFunc.loadingPage(false)
+      await studentClientConnect.restartGoList(NormalizeFunc.getFrontEndCode('courseId'))
+        .then(response => {
+          if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            load()
+            NormalizeFunc.loadingPage(false)
+          }
+        })
     }
   },
   //download new golist
@@ -486,22 +461,12 @@ const navButton = {
     NormalizeFunc.loadingPage(true)
 
     //更新 goList
-    await axios({
-      method: 'post',
-      url: '/student/downloadgolist',
-      data: {
-        courseId: NormalizeFunc.getFrontEndCode('courseId')
-      }
-    }).then(response => {
-      if (response.data.status != 200) {
-        window.alert(response.data.message)
+    await studentClientConnect.downloadGoList(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
+      if (NormalizeFunc.serverResponseErrorDetect(response)) {
         NormalizeFunc.loadingPage(false)
-        return
+        load()
       }
     })
-
-    load()
-    NormalizeFunc.loadingPage(false)
   },
   //logout
   logout: () => {
@@ -512,24 +477,15 @@ const navButton = {
 }
 //load
 const load = async () => {
-  let goListData = {}
-
-  await axios({
-    method: 'post',
-    url: '/student/readgolist',
-    data: {
-      courseId: NormalizeFunc.getFrontEndCode('courseId')
-    }
-  }).then(response => {
-    if (response.data.status == 500) {
-      window.alert(response.data.message)
-      return
-    }
-    goListData = JSON.stringify(response.data.message)
-  })
-
+  // 讀取 Golist
+  await studentClientConnect.readGoList(NormalizeFunc.getFrontEndCode('courseId'))
+    .then(response => {
+      if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
+      }
+    })
   // myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
-  myDiagram.model = go.Model.fromJson(goListData)
+
 }
 //----------------------------------------------------------------------------------------
 //special for deleting node function
@@ -559,22 +515,15 @@ const deleteNode = (part) => {
       break
     case 'Programming':
       if (window.confirm('確定是否刪除 計畫與執行？\n這將導致該內容全部遭到刪除')) {
-        axios({
-          method: 'post',
-          url: '/student/deletecode',
-          data: {
-            keyCode: part.ob.key,
-            courseId: NormalizeFunc.getFrontEndCode('courseId')
-          }
-        }).then(response => {
-          if (response.data.status != 200) {
-            window.alert(response.data.message)
-            return
-          }
-          myDiagram.remove(part)
-          animateDeletion(part)
-          save()
-        })
+
+        studentClientConnect.deleteCode(part.ob.key, NormalizeFunc.getFrontEndCode('courseId'))
+          .then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+              myDiagram.remove(part)
+              animateDeletion(part)
+              navButton.save()
+            }
+          })
       }
       break
     case 'Comment':
@@ -589,4 +538,4 @@ const deleteNode = (part) => {
 
 window.addEventListener('DOMContentLoaded', goListInit);
 window.addEventListener('DOMContentLoaded', navInit);
-chatBoxInit()
+window.addEventListener('DOMContentLoaded', chatBoxInit);

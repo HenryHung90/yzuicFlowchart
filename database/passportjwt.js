@@ -7,6 +7,7 @@ import passportJWT from 'passport-jwt'
 import localStrategy from 'passport-local'
 
 import studentConfig from '../models/studentconfig.js'
+import adminConfig from '../models/adminconfig.js'
 
 const LocalStrategy = localStrategy.Strategy
 const JWTStrategy = passportJWT.Strategy
@@ -21,6 +22,15 @@ const EXPIRE_SECOND = 60 * 60 * 1000
 const checkPassword = async (user, inputPassword) => {
     let compareResult = false
     await bcrypt.compare(inputPassword, user.studentPassword)
+        .then(result => {
+            compareResult = result
+        })
+    return compareResult
+}
+
+const checkPasswordAdmin = async (user, inputPassword) => {
+    let compareResult = false
+    await bcrypt.compare(inputPassword, user.adminPassword)
         .then(result => {
             compareResult = result
         })
@@ -61,6 +71,38 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
         })
 }))
 
+passport.use('admin-login', new LocalStrategy({ usernameField: 'adminId', passwordField: 'adminPassword' }, (username, password, done) => {
+    adminConfig.findOne({ adminId: username })
+        .then(async (user) => {
+            if (user == null) {
+                console.log('user error')
+                done(null, { message: '無此用戶' })
+            } else {
+                let compareResult = false
+
+                await checkPasswordAdmin(user, password).then(response => {
+                    if (response) {
+                        compareResult = user
+                    }
+                })
+
+                if (compareResult == false) {
+                    console.log('password error')
+                    done(null, { message: '帳號或密碼錯誤' })
+                } else {
+                    console.log('success')
+                    const returnUser = {
+                        _id: user._id,
+                        adminId: user.adminId,
+                        adminName: user.adminName,
+                    }
+                    done(null, returnUser)
+                }
+            }
+
+        })
+}))
+
 
 let cookieExtractor = function (req) {
     let token = null;
@@ -93,6 +135,23 @@ passport.use('token', new JWTStrategy(opts,
                 done(err)
             })
     }))
+passport.use('admin-token', new JWTStrategy(opts,
+    (jwtPayload, done) => {
+        console.log('admin', jwtPayload.adminId, 'get in at', new Date())
+        adminConfig.findOne({ _id: jwtPayload._id, adminId: jwtPayload.adminId })
+            .then(user => {
+                const returnUser = {
+                    _id: user._id,
+                    adminId: user.adminId,
+                    adminName: user.adminName,
+
+                }
+                done(null, returnUser)
+            })
+            .catch(err => {
+                done(err)
+            })
+    }))
 
 const signIn = (req, res) => {
     if (req.user._id == undefined) {
@@ -106,11 +165,26 @@ const signIn = (req, res) => {
         res.cookie('token', token, { maxAge: EXPIRE_SECOND }).cookie('studentId', req.user.studentId, { maxAge: EXPIRE_SECOND }).json({
             studentId: req.user.studentId,
             studentClass: req.user.studentClass,
-            token: token,
             status: 200
         })
         // res.setHeader('token', token).redirect(`/home/${req.user.studentId}`)
     }
 }
 
-export { signIn, passport } 
+const signInAdmin = (req, res) => {
+    if (req.user._id == undefined) {
+        res.json({
+            message: req.user.message,
+            status: 401,
+        })
+    } else {
+        const token = jwt.sign({ _id: req.user._id.toString(), adminId: req.user.adminId.toString() }, secret_key, { expiresIn: EXPIRE_TIME })
+        // res.setHeader('Authorization',token).redirect(`/home/${req.user.studentId}`)
+        res.cookie('token', token, { maxAge: EXPIRE_SECOND }).cookie('adminId', req.user.adminId, { maxAge: EXPIRE_SECOND }).json({
+            adminId: req.user.adminId,
+            status: 200
+        })
+    }
+}
+
+export { signIn, signInAdmin, passport } 
