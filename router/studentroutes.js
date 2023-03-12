@@ -421,27 +421,39 @@ router.post('/downloadgolist', async (req, res) => {
 //學生讀取 code
 router.post('/readcode', async (req, res) => {
     try {
+        const returnData = {
+            code: '',
+            hint: '',
+            hintCode: '123',
+            status: 200
+        }
+
         await studentConfig.findOne({
             studentClass: req.user.studentClass,
             studentId: req.user.studentId,
             studentAccess: true
         }).then(response => {
             if (response.studentCodeList[req.body.courseId] === undefined) {
-                res.json(
-                    {
-                        code: '',
-                        status: 200
-                    }
-                )
-                return
+                returnData.code = ""
+            } else { 
+                returnData.code = response.studentCodeList[req.body.courseId][req.body.keyCode]
             }
-            res.json(
-                {
-                    code: response.studentCodeList[req.body.courseId][req.body.keyCode],
-                    status: 200
-                }
-            )
+
+
         })
+
+        await standardcontent.findOne({
+            _id: req.body.courseId
+        }).then(response => {
+            if (response.standardProgramming[req.body.keyCode] === undefined) {
+                res.json(returnData)
+            } else {
+                returnData.hint = response.standardProgramming[req.body.keyCode].hint
+                returnData.hintCode = response.standardProgramming[req.body.keyCode].hintCode
+                res.json(returnData)
+            }
+        })
+
     }
     catch (err) {
         console.log(err)

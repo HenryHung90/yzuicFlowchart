@@ -259,38 +259,6 @@ const UnderstandingBox = () => {
         className: 'justify-content-center UnderstandingContentDiv'
     })
 
-    //using Model 互動視窗 from boostrap----------------------------------
-    const modal = $('<div>').prop({
-        className: "modal fade",
-        id: 'understandingHintModal',
-        tabindex: "-1",
-    }).attr('aria-labelledby', "understandingHintModal").attr('aria-hidden', "true").prependTo($('body'))
-
-    const modalContainer = $('<div>').prop({
-        className: 'modal-dialog modal-dialog-centered'
-    }).appendTo(modal)
-
-    const modalContent = $('<div>').prop({
-        className: 'modal-content'
-    }).appendTo(modalContainer)
-
-    //header
-    $('<div>').prop({
-        className: 'modal-header',
-        innerHTML: '<h3>流程圖</h3>'
-    }).appendTo(modalContent)
-
-    //body
-    $('<div>').prop({
-        className: 'modal-body',
-        id: 'understandingHint',
-    }).appendTo(modalContent)
-
-    //footer
-    $('<div>').prop({
-        className: 'modal-footer',
-        innerHTML: ' <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>'
-    }).appendTo(modalContent)
     //----------------------------------------------------------
 
 
@@ -301,17 +269,9 @@ const UnderstandingBox = () => {
 
     //descriptions
     $('<div>').prop({
-        className: 'col-10 understandingDescription_target',
+        className: 'col-12 understandingDescription_target',
         id: 'understandingDescription'
     }).appendTo(understandingDescriptionContainer)
-
-
-    //question button
-    $('<button>').prop({
-        className: 'col-2 btn btn-outline-primary understandingDescription_targetHint',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 384 512"><path d="M192 0c-41.8 0-77.4 26.7-90.5 64H64C28.7 64 0 92.7 0 128V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64H282.5C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM105.8 229.3c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L216 328.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V314.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H158.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM160 416a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>',
-        id: 'understandingHint',
-    }).attr('data-bs-toggle', 'modal').attr('data-bs-target', "#understandingHintModal").appendTo(understandingDescriptionContainer)
 
     //operation
     $('<div>').prop({
@@ -409,7 +369,38 @@ const ProgrammingBox = (programmingKey) => {
     const contentRowDiv = $('<div>').prop({
         className: 'row justify-content-left contentColDiv',
     })
+    //using Model 互動視窗 from boostrap----------------------------------
+    const modal = $('<div>').prop({
+        className: "modal fade",
+        id: 'programmingHintModal',
+        tabindex: "-1",
+    }).attr('aria-labelledby', "programmingHintModal").attr('aria-hidden', "true").prependTo($('body'))
 
+    const modalContainer = $('<div>').prop({
+        className: 'modal-dialog modal-dialog-centered'
+    }).appendTo(modal)
+
+    const modalContent = $('<div>').prop({
+        className: 'modal-content'
+    }).appendTo(modalContainer)
+
+    //header
+    $('<div>').prop({
+        className: 'modal-header',
+        innerHTML: '<h3>流程圖</h3>'
+    }).appendTo(modalContent)
+
+    //body
+    $('<div>').prop({
+        className: 'modal-body',
+        id: 'programmingHint',
+    }).appendTo(modalContent)
+
+    //footer
+    $('<div>').prop({
+        className: 'modal-footer',
+        innerHTML: ' <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>'
+    }).appendTo(modalContent)
     //Coding Div----------------------------------------------------
     const content_CodingDiv = $('<div>').prop({
         className: 'col-11 content_codingdiv'
@@ -449,20 +440,39 @@ const ProgrammingBox = (programmingKey) => {
         }
     ]
     //render coding Area
-    for (let codingType of content_codingContainer) {
-        //title
+    for (const codingType of content_codingContainer) {
+        const content_CodingContainer = $('<div>').prop({
+            className: 'container-fluid content_codingContainer'
+        }).appendTo(content_CodingDiv)
+
+        //title Area
+        const content_CodingContainer_title = $('<div>').prop({
+            className: 'row content_codingContainer_title',
+        }).click(e => {
+            rotateIconAndSlideCode(content_CodingContainer_Code, downIcon)
+        }).appendTo(content_CodingContainer)
+
         $("<h3>").prop({
-            className: 'function_title',
+            className: 'function_title col-10',
             innerHTML: codingType.title
-        }).appendTo(content_CodingDiv)
-        const content_CodingSettingContainer = $('<div>').prop({
+        }).appendTo(content_CodingContainer_title)
+
+        //DownIcon
+        const downIcon = $('<div>').prop({
+            className: 'col-2 codeDownIcon',
+            innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" fill="white" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+        }).appendTo(content_CodingContainer_title)
+
+        //Coding Area
+        const content_CodingContainer_Code = $('<div>').prop({
             className: `container-sm ${codingType.container}`,
-        }).appendTo(content_CodingDiv)
+            id: 'open'
+        }).appendTo(content_CodingContainer)
         //textarea
         $('<textarea>').prop({
             className: 'form-control',
             id: codingType.id
-        }).appendTo(content_CodingSettingContainer)
+        }).appendTo(content_CodingContainer_Code)
     }
     //--------------------------------------------------------------
     //Button area
@@ -485,6 +495,7 @@ const ProgrammingBox = (programmingKey) => {
     }).click((e) => {
         saveCode()
     }).appendTo(content_LaunchDiv)
+
     //Save Btn
     $('.contentDiv').keydown((e) => {
         if (e.ctrlKey && e.keyCode == 83) {
@@ -497,6 +508,7 @@ const ProgrammingBox = (programmingKey) => {
         }
     })
 
+    //upload file
     $('<input>').prop({
         className: 'uploadfileInput',
         type: 'file',
@@ -508,12 +520,18 @@ const ProgrammingBox = (programmingKey) => {
     }).appendTo(content_LaunchDiv)
     //upload file
     $('<button>').prop({
-        className: 'btn btn-outline-primary content_lanchbtn',
+        className: 'btn btn-outline-primary content_launchbtn',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM216 408c0 13.3-10.7 24-24 24s-24-10.7-24-24V305.9l-31 31c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l72-72c9.4-9.4 24.6-9.4 33.9 0l72 72c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-31-31V408z"/></svg>'
     }).click((e) => {
         uploadFileClick()
     }).appendTo(content_LaunchDiv)
 
+    //question button
+    $('<button>').prop({
+        className: 'btn btn-outline-warning content_launchbtn',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" fill="orange" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
+        id: 'programmingHint',
+    }).attr('data-bs-toggle', 'modal').attr('data-bs-target', "#programmingHintModal").appendTo(content_LaunchDiv)
     //-----------------------------------------------------------------------
     //Data Visualization Area
     const dataVisualizationArea = $('<div>').prop({
@@ -521,22 +539,34 @@ const ProgrammingBox = (programmingKey) => {
     }).prependTo($('body'))
 
     const dataVisualization_container = $('<div>').prop({
-        className: 'row dataVisualizationArea_container'
-    }).hover(
-        (e) => {
-            dataVisualizationArea_upIcon.css({
-                'transform': 'rotate(180deg)'
-            })
-        }, (e) => {
+        className: 'row dataVisualizationArea_container',
+    }).click((e) => {
+        if (dataVisualizationArea_upIcon.attr('id') === 'up') {
+            dataVisualizationArea_upIcon.attr('id', 'down')
             dataVisualizationArea_upIcon.css({
                 'margin-top': '5px',
+                'transform': 'rotate(180deg)'
+            })
+            dataVisualization_container.css({
+                'transform': 'translateY(0)'
+            })
+        } else {
+            dataVisualizationArea_upIcon.attr('id', 'up')
+            dataVisualizationArea_upIcon.css({
+                'margin-top': '0',
                 'transform': 'rotate(0deg)'
             })
-        }).appendTo(dataVisualizationArea)
+            dataVisualization_container.css({
+                'transform': 'translateY(250px)'
+            })
+        }
+    }).appendTo(dataVisualizationArea)
+
 
     //upIcon
     const dataVisualizationArea_upIcon = $('<div>').prop({
         className: 'col-12 dataVisualizationArea_upIcon',
+        id: 'up',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>'
     }).appendTo(dataVisualization_container)
 
@@ -557,6 +587,7 @@ const ProgrammingBox = (programmingKey) => {
             '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 384 512"><path d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>' +
             '<p>phaserView.html</p>'
     }).click((e) => {
+        e.stopPropagation();
         dataVisualizationArea_showing.empty()
         dataVisualizationArea_showing.append(dataHtml())
     }).appendTo(dataVisualizationArea_filedisk)
@@ -567,6 +598,7 @@ const ProgrammingBox = (programmingKey) => {
             '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>' +
             '<p>phaserScript.js</p>'
     }).click((e) => {
+        e.stopPropagation();
         dataVisualizationArea_showing.empty()
         dataVisualizationArea_showing.append(dataJs())
     }).appendTo(dataVisualizationArea_filedisk)
@@ -577,38 +609,39 @@ const ProgrammingBox = (programmingKey) => {
             '<svg xmlns="http://www.w3.org/2000/svg"  width="100%" height="50px" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
             '<p>media</p>'
     }).click((e) => {
+        e.stopPropagation();
         dataVisualizationArea_showing.empty()
         dataVisualizationArea_showing.append(dataMedia())
     }).appendTo(dataVisualizationArea_filedisk)
     //-----------------------------------------------------------------------
     //console error area
-    const consoleErrorArea = $('<div>').prop({
-        className: 'justify-content-center content_consoleErrorArea'
-    }).prependTo($('body'))
+    // const consoleErrorArea = $('<div>').prop({
+    //     className: 'justify-content-center content_consoleErrorArea'
+    // }).prependTo($('body'))
 
-    const consoleError_container = $('<div>').prop({
-        className: 'row consoleErrorArea_container'
-    }).hover(
-        (e) => {
-            consoleErrorArea_leftIcon.css({
-                'transform': 'rotate(180deg)'
-            })
-        }, (e) => {
-            consoleErrorArea_leftIcon.css({
-                'transform': 'rotate(0deg)'
-            })
-        }).appendTo(consoleErrorArea)
+    // const consoleError_container = $('<div>').prop({
+    //     className: 'row consoleErrorArea_container'
+    // }).hover(
+    //     (e) => {
+    //         consoleErrorArea_leftIcon.css({
+    //             'transform': 'rotate(180deg)'
+    //         })
+    //     }, (e) => {
+    //         consoleErrorArea_leftIcon.css({
+    //             'transform': 'rotate(0deg)'
+    //         })
+    //     }).appendTo(consoleErrorArea)
 
-    //leftIcon
-    const consoleErrorArea_leftIcon = $('<div>').prop({
-        className: 'col-1 consoleErrorArea_leftIcon',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg);" width="100%" height="100%" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>'
-    }).appendTo(consoleError_container)
-    //errorText
-    $('<div>').prop({
-        className: 'col-11 consoleErrorArea_errorText',
-        id: 'testingCode'
-    }).appendTo(consoleError_container)
+    // //leftIcon
+    // const consoleErrorArea_leftIcon = $('<div>').prop({
+    //     className: 'col-1 consoleErrorArea_leftIcon',
+    //     innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg);" width="100%" height="100%" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>'
+    // }).appendTo(consoleError_container)
+    // //errorText
+    // $('<div>').prop({
+    //     className: 'col-11 consoleErrorArea_errorText',
+    //     id: 'testingCode'
+    // }).appendTo(consoleError_container)
     //--------------------------------------------------------------
     //Launch demo function
     const launchDemo = async () => {
@@ -654,7 +687,26 @@ const ProgrammingBox = (programmingKey) => {
 
                 const demoContent = $('<div>').prop({
                     className: 'col-12 demoContent',
-                    id: 'demoContent',
+                    id: 'up',
+                }).click(e => {
+                    if(demoContent.attr('id') === 'up'){
+                        demoContent.attr('id', 'down')
+                        downIcon.css({
+                            transform: 'rotate(180deg)'
+                        })
+                        demoContent.css({
+                            transform: 'translateY(-10px)'
+                        })
+                    }else{
+                        demoContent.attr('id', 'up')
+                        downIcon.css({
+                            transform: 'rotate(0deg)'
+                        })
+                        demoContent.css({
+                            transform: 'translateY(-95vh)'
+                        })
+                    }
+                    
                 }).appendTo(demoIframe)
 
                 const demoIframeInfo = $('<iframe>')
@@ -685,7 +737,7 @@ const ProgrammingBox = (programmingKey) => {
                     }, 1000)
                 })
                 //DownIcon
-                $('<div>').prop({
+                const downIcon = $('<div>').prop({
                     className: 'col-1 offset-md-5 downIcon',
                     innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
                 }).appendTo(demoContent)
@@ -701,6 +753,20 @@ const ProgrammingBox = (programmingKey) => {
                 })
             }
         })
+    }
+    //rotate
+    const rotateIconAndSlideCode = (container, icon) => {
+        if (container.attr('id') === 'open') {
+            container.attr('id', 'close').slideUp(300)
+            icon.css({
+                transform: 'rotate(0deg)'
+            }, 200)
+        } else {
+            container.attr('id', 'open').slideDown(300)
+            icon.css({
+                transform: 'rotate(180deg)'
+            }, 200)
+        }
     }
 
     //save code function
@@ -722,7 +788,8 @@ const ProgrammingBox = (programmingKey) => {
             createCode.getValue(),
             updateCode.getValue(),
             customCode.getValue(),
-            keyCode
+            keyCode,
+            NormalizeFunc.getFrontEndCode('courseId')
         ).then(response => {
             if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 GoListFunc.saveCodeStatus(false)
@@ -835,6 +902,8 @@ const ProgrammingBox = (programmingKey) => {
                             },
                             (e) => {
                                 deleteIcon.fadeOut(50)
+                            }).click(e => {
+                                e.stopPropagation()
                             }).appendTo(datamediaContainer)
 
                         const deleteIcon = $('<div>').prop({
@@ -856,6 +925,7 @@ const ProgrammingBox = (programmingKey) => {
                                     'background-color': 'rgba(0,0,0,0.3)'
                                 })
                             }).click((e) => {
+                                e.stopPropagation()
                                 deleteMedia(fileItem)
                             }).appendTo(fileItem)
                     }

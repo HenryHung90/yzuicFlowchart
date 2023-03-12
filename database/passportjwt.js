@@ -104,20 +104,25 @@ passport.use('admin-login', new LocalStrategy({ usernameField: 'adminId', passwo
 }))
 
 
-let cookieExtractor = function (req) {
+const cookieExtractor = function (req) {
     let token = null;
     if (req && req.cookies) token = req.cookies['token'];
     return token;
 };
-let opts = {
+const cookieExtractorAdmin = (req) =>{
+    let token = null;
+    if (req && req.cookies) token = req.cookies['tokenADMIN'];
+    return token;
+}
+
+
+
+passport.use('token', new JWTStrategy({
     jwtFromRequest: cookieExtractor,
     secretOrKey: secret_key,
     failureRedirect: '/',
     failureMessage: true
-}
-
-
-passport.use('token', new JWTStrategy(opts,
+},
     (jwtPayload, done) => {
         console.log('user', jwtPayload.studentId, 'get in at', new Date())
         studentConfig.findOne({ _id: jwtPayload._id, studentId: jwtPayload.studentId })
@@ -135,7 +140,13 @@ passport.use('token', new JWTStrategy(opts,
                 done(err)
             })
     }))
-passport.use('admin-token', new JWTStrategy(opts,
+passport.use('admin-token', new JWTStrategy(
+    {
+        jwtFromRequest: cookieExtractorAdmin,
+        secretOrKey: secret_key,
+        failureRedirect: '/',
+        failureMessage: true
+    },
     (jwtPayload, done) => {
         console.log('admin', jwtPayload.adminId, 'get in at', new Date())
         adminConfig.findOne({ _id: jwtPayload._id, adminId: jwtPayload.adminId })
@@ -180,7 +191,7 @@ const signInAdmin = (req, res) => {
     } else {
         const token = jwt.sign({ _id: req.user._id.toString(), adminId: req.user.adminId.toString() }, secret_key, { expiresIn: EXPIRE_TIME })
         // res.setHeader('Authorization',token).redirect(`/home/${req.user.studentId}`)
-        res.cookie('token', token, { maxAge: EXPIRE_SECOND }).cookie('adminId', req.user.adminId, { maxAge: EXPIRE_SECOND }).json({
+        res.cookie('tokenADMIN', token, { maxAge: EXPIRE_SECOND }).cookie('adminId', req.user.adminId, { maxAge: EXPIRE_SECOND }).json({
             adminId: req.user.adminId,
             status: 200
         })

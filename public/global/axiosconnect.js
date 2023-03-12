@@ -116,7 +116,7 @@ const studentClientConnect = {
         },
     //saveCode
     saveCode:
-        (setting, config, preload, create, update, custom, keyCode) => {
+        (setting, config, preload, create, update, custom, keyCode, courseId) => {
             return (
                 axios({
                     url: '/student/savecode',
@@ -128,7 +128,8 @@ const studentClientConnect = {
                         create: create,
                         update: update,
                         custom: custom,
-                        keyCode: keyCode
+                        keyCode: keyCode,
+                        courseId: courseId
                     }
                 })
             )
@@ -297,13 +298,15 @@ const adminClientConnect = {
     // 讀取 Standard
     readStandard:
         (courseId) => {
-            axios({
-                method: 'post',
-                url: '/admin/readstandard',
-                data: {
-                    courseId: courseId
-                }
-            })
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/readstandard',
+                    data: {
+                        courseId: courseId
+                    }
+                })
+            )
         },
     // 儲存 Standard
     saveStandard:

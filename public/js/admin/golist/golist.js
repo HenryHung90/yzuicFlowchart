@@ -451,7 +451,7 @@ const navButton = {
     //logout
     logout: () => {
         if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
-            window.location.href = `/home/${NormalizeFunc.getCookie('studentId')}`
+            window.location.href = `/home/${NormalizeFunc.getCookie('adminId')}`
         }
     }
 }
@@ -477,38 +477,37 @@ const deleteNode = (part) => {
         animation.start();
     }
 
-    switch (part.ob.category) {
-        case 'Target':
-            window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請自重!`)
-            break
-        case 'Start':
-            window.alert('此為必須結構，禁止刪除！')
-            break
-        case 'Understanding':
-            window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請住手!`)
-            break
-        case 'Formulating':
-            window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐我要報警囉!`)
-            break
-        case 'Programming':
-            if (window.confirm('確定是否刪除 計畫與執行？\n這將導致該內容全部遭到刪除')) {
-                adminClientConnect.deleteCode(keyCode, NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        myDiagram.remove(part)
-                        animateDeletion(part)
-                        navButton.save()
-                    }
-                })
-            }
-            break
-        case 'Comment':
-            if (window.confirm('確定是否刪除該筆記？\n這將導致該內容全部遭到刪除')) {
-                myDiagram.remove(part)
-                animateDeletion(part)
-                save()
-            }
-            break
-    }
+    animateDeletion(part)
+    myDiagram.remove(part)
+
+    // switch (part.ob.category) {
+    //     case 'Target':
+    //         window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請自重!`)
+    //         break
+    //     case 'Start':
+    //         window.alert('此為必須結構，禁止刪除！')
+    //         break
+    //     case 'Understanding':
+    //         window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請住手!`)
+    //         break
+    //     case 'Formulating':
+    //         window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐我要報警囉!`)
+    //         break
+    //     case 'Programming':
+    //         adminClientConnect.deleteCode(part.ob.key, NormalizeFunc.getFrontEndCode('courseId')).then(response => {
+    //             if (NormalizeFunc.serverResponseErrorDetect(response)) {
+    //                 myDiagram.remove(part)
+    //                 animateDeletion(part)
+    //                 navButton.save()
+    //             }
+    //         })
+    //         break
+    //     case 'Comment':
+    //         myDiagram.remove(part)
+    //         animateDeletion(part)
+    //         save()
+    //         break
+    // }
 }
 
 window.addEventListener('DOMContentLoaded', goListInit);

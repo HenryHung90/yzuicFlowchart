@@ -56,55 +56,55 @@ const mongoDbStatus = mongoose.connection
 mongoDbStatus.on('error', err => console.error('connection error', err))
 mongoDbStatus.once('open', (db) => console.log('Connection to mongodb'))
 
-// //helmet 擋住開發程式避免入侵
-// //開啟DNS預讀取
-// app.use(helmet({ dnsPrefetchControl: { allow: true } }))
-// //阻止瀏覽器對 Content-Type 不明的內容進行探查，以防止惡意程式碼的注入
-// app.use(helmet.noSniff());
-// //阻止基本的 XSS 攻擊
-// app.use(helmet.xssFilter());
-// //CSP
-// app.use(
-//     helmet(
-//         {
-//             contentSecurityPolicy: {
-//                 directives: {
-//                     defaultSrc: [
-//                         "'self'",
-//                         'http://localhost:3000',
-//                     ],
-//                     scriptSrc: [
-//                         "'self'",
-//                         "https://code.jquery.com",
-//                         "https://cdn.jsdelivr.net",
-//                         'https://cdnjs.cloudflare.com',
-//                         'https://cdn.socket.io/',
-//                         'http://localhost:3000',
-//                     ],
-//                     frameAncestors: [
-//                         "'self'",
-//                         "http://localhost:3000",
-//                     ],
-//                     frameSrc: [
-//                         "'self'",
-//                         "http://localhost:3000",
-//                     ],
-//                     childSrc: [
-//                         "'self'",
-//                         "http://localhost:3000",
-//                     ],
-//                     imgSrc: [
-//                         "'self'",
-//                         'https://media.giphy.com',
-//                         'http://localhost:3000',
-//                         'data:',
-//                         'blob:'
-//                     ]
-//                 },
-//             },
+//helmet 擋住開發程式避免入侵
+//開啟DNS預讀取
+app.use(helmet({ dnsPrefetchControl: { allow: true } }))
+//阻止瀏覽器對 Content-Type 不明的內容進行探查，以防止惡意程式碼的注入
+app.use(helmet.noSniff());
+//阻止基本的 XSS 攻擊
+app.use(helmet.xssFilter());
+//CSP
+app.use(
+    helmet(
+        {
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: [
+                        "'self'",
+                        'http://localhost:3000',
+                    ],
+                    scriptSrc: [
+                        "'self'",
+                        "https://code.jquery.com",
+                        "https://cdn.jsdelivr.net",
+                        'https://cdnjs.cloudflare.com',
+                        'https://cdn.socket.io/',
+                        'http://localhost:3000',
+                    ],
+                    frameAncestors: [
+                        "'self'",
+                        "http://localhost:3000",
+                    ],
+                    frameSrc: [
+                        "'self'",
+                        "http://localhost:3000",
+                    ],
+                    childSrc: [
+                        "'self'",
+                        "http://localhost:3000",
+                    ],
+                    imgSrc: [
+                        "'self'",
+                        'https://media.giphy.com',
+                        'http://localhost:3000',
+                        'data:',
+                        'blob:'
+                    ]
+                },
+            },
 
-//         })
-// );
+        })
+);
 
 
 //設定view ejs
@@ -129,8 +129,7 @@ app.get('/', async (req, res) => {
     }
 })
 app.post('/logout', async (req, res) => {
-    res.clearCookie('token')
-    res.clearCookie('studentId')
+    res.clearCookie('token').clearCookie('studentId')
     res.send('/')
 })
 //登入
@@ -188,7 +187,7 @@ admin.use(express.static('public'))
 admin.use(express.static(path.join(__dirname, 'public')))
 
 admin.get('/', async (req, res) => {
-    if (req.cookies['token'] == undefined) {
+    if (req.cookies['tokenADMIN'] == undefined) {
         res.render('./admin/index')
     } else {
         res.redirect(`./home/${req.cookies.adminId}`)
@@ -196,7 +195,7 @@ admin.get('/', async (req, res) => {
 })
 admin.post('/login', passport.authenticate('admin-login', { session: false }), signInAdmin)
 admin.post('/logout', async (req, res) => {
-    res.clearCookie('token')
+    res.clearCookie('tokenADMIN').clearCookie('adminId')
     res.redirect('/')
 })
 admin.get('/home/:adminId', async (req, res) => {
@@ -205,14 +204,6 @@ admin.get('/home/:adminId', async (req, res) => {
     } else {
         res.render('./admin/home', { adminId: req.cookies.adminId })
     }
-})
-
-admin.use((req, res, next) => {
-    if (req.cookies['token'] == undefined) {
-        res.redirect('/')
-        return
-    }
-    next()
 })
 
 admin.use('/admin', passport.authenticate('admin-token', { session: false }), adminroutes)

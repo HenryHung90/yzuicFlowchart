@@ -135,23 +135,6 @@ const categoryBox = {
                 }).appendTo($('#understandingLimit'))
             })
         }
-
-        //hint
-        if (data.message.hint !== undefined) {
-            data.message.hint.split('\n').forEach((hint, index) => {
-                if (index !== 0) {
-                    $('<div>').prop({
-                        className: 'understandingDescription_hintArrow',
-                        innerHTML: '<img src="../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg)"></img>'
-                    }).appendTo($('#understandingHint'))
-                }
-
-                $('<div>').prop({
-                    className: 'understandingDescription_hintText',
-                    innerHTML: `<p>👊step ${index + 1}</p>` + hint
-                }).appendTo($('#understandingHint'))
-            })
-        }
     },
     Formulating: (data) => {
         if (data.message === undefined) {
@@ -191,22 +174,84 @@ const categoryBox = {
             }
         }
     },
-    Programming: (data) => {
+    Programming: (data, key) => {
+        console.log(data)
+        let codeData = [
+            { name: 'setting', data: '' },
+            { name: 'config', data: '' },
+            { name: 'preload', data: '' },
+            { name: 'create', data: '' },
+            { name: 'update', data: '' },
+            { name: 'custom', data: '' }
+        ]
         if (data.code !== undefined) {
-            CodeMirrorFunc.codeMirrorProgram('setting', data.code.setting || '')
-            CodeMirrorFunc.codeMirrorProgram('config', data.code.config || '')
-            CodeMirrorFunc.codeMirrorProgram('preload', data.code.preload || '')
-            CodeMirrorFunc.codeMirrorProgram('create', data.code.create || '')
-            CodeMirrorFunc.codeMirrorProgram('update', data.code.update || '')
-            CodeMirrorFunc.codeMirrorProgram('custom', data.code.custom || '')
-        } else {
-            CodeMirrorFunc.codeMirrorProgram('setting', '')
-            CodeMirrorFunc.codeMirrorProgram('config', '')
-            CodeMirrorFunc.codeMirrorProgram('preload', '')
-            CodeMirrorFunc.codeMirrorProgram('create', '')
-            CodeMirrorFunc.codeMirrorProgram('update', '')
-            CodeMirrorFunc.codeMirrorProgram('custom', '')
+            codeData = [
+                { name: 'setting', data: data.code.setting || '' },
+                { name: 'config', data: data.code.config || '' },
+                { name: 'preload', data: data.code.preload || '' },
+                { name: 'create', data: data.code.create || '' },
+                { name: 'update', data: data.code.update || '' },
+                { name: 'custom', data: data.code.custom || '' }
+            ]
         }
+
+
+        for (const CodeMirror of codeData) {
+            CodeMirrorFunc.codeMirrorProgram(CodeMirror.name, CodeMirror.data)
+            $(`#${CodeMirror.name}`).data('CodeMirror').setSize('auto', 'auto')
+        }
+
+        //hint
+        if (data.hint !== undefined) {
+            data.hint.split('\n').forEach((hint, index) => {
+                if (index !== 0) {
+                    $('<div>').prop({
+                        className: 'programmingDescription_hintArrow',
+                        innerHTML: '<img src="../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg)"></img>'
+                    }).appendTo($('#programmingHint'))
+                }
+
+                $('<div>').prop({
+                    className: 'programmingDescription_hintText',
+                    innerHTML: `<p>👊step ${index + 1}</p>` + hint,
+                    id: index
+                }).attr({
+                    'data-bs-toggle': "tooltip",
+                    'data-bs-placement': 'right',
+                    'data-bs-html': "true",
+                    'name': 'hint',
+                    'title': '<h3>程式碼參考</h3>若無顯示請重新點擊'
+                }).appendTo($('#programmingHint'))
+            })
+        }
+
+        //初始化 boostrap Tooltip
+        $('[data-bs-toggle="tooltip"]').tooltip({
+            trigger: 'click'
+        });
+
+        //點擊時將其他 tooltip 關閉
+        $('[data-bs-toggle="tooltip"]').click(function () {
+            if ($(this).attr('name') === 'hint') {
+                $('[data-bs-toggle="tooltip"]').not(this).tooltip("hide");
+            }
+        })
+        // $('[data-bs-toggle="tooltip"]').on('show.bs.tooltip', function () {
+
+        // })
+        $('[data-bs-toggle="tooltip"]').on('shown.bs.tooltip', function () {
+            if ($(this).attr('name') === 'hint') {
+                $('<textarea>').prop({
+                    id: 'hint'
+                }).css({
+                    'resize': 'none'
+                }).appendTo($(".tooltip-inner"))
+                CodeMirrorFunc.codeMirrorProgram('hint', data.hintCode[$(this).attr('id')] || 'no data')
+                $('#hint').data('CodeMirror').setSize('auto', 'auto')
+            }
+        });
+
+
     },
     Reflection: (data) => {
 
@@ -271,7 +316,6 @@ const GoListFunc = {
             //unbind listenEvent
             listenMessageUnbind()
             setTimeout(() => {
-                console.log('remove')
                 $('body').css({
                     'overflow': 'auto',
                 })
@@ -281,7 +325,7 @@ const GoListFunc = {
                 $('.DemoDiv').remove()
                 $('.content_consoleErrorArea').remove()
                 $('.content_dataVisualizationArea').remove()
-                //understanding modal
+                //Programming modal
                 $('.modal').remove()
             }, 200)
         }
@@ -362,9 +406,7 @@ const GoListFunc = {
         //Programming 計畫執行
         //Reflection 監控反思
         //利用 Key 值紀錄內容
-        console.log(s)
-
-        const courseId = NormalizeFunc.getFrontEndCode('courseId')
+        // console.log(s)
 
         if (id === 'admin') {
             switch (s.category) {
@@ -425,8 +467,8 @@ const GoListFunc = {
                             //讀取該key值的Code內容
                             studentClientConnect.readCode(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
                                 if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                                    listenMessageBind()
-                                    categoryBox.Programming(response.data)
+                                    // listenMessageBind()
+                                    categoryBox.Programming(response.data, s.key)
                                     GoListFunc.saveCodeStatus(false)
                                     NormalizeFunc.loadingPage(false)
                                 }
@@ -502,10 +544,10 @@ const CodeMirrorFunc = {
         }
         const Editor = CodeMirror.fromTextArea(textProgram, {
             //編譯模式
-            mode: 'javascript',
+            mode: 'text/javascript',
             //主題
             theme: 'blackboard',
-            //行號
+            //是否要行號
             lineNumbers: true,
             //開始行號
             firstLineNumber: CodeMirrorFunc.swtichEditorNameToStartLineNumber(name),
@@ -513,12 +555,14 @@ const CodeMirrorFunc = {
             lineWrapping: true,
             //支持代碼折疊
             foldGutter: true,
+            //摺疊順序[左到右]
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
             //括號匹配
             matchBrackets: true,
             //縮排單位
-            indentUnit: 2,
+            indentUnit: 4,
             //tab寬度
-            tabSize: 2,
+            tabSize: 4,
             //選擇時是否顯示光標
             showCursorWhenSelecting: false,
             keyMap: "sublime",
@@ -527,9 +571,9 @@ const CodeMirrorFunc = {
             hintOptions: {
                 completeSingle: false
             },
-            // extraKeys: {
-            //     "Alt-Space": "autocomplete"
-            // },
+            extraKeys: {
+                "tab": "autocomplete",
+            },
             //光標接近邊緣時，上下距離
             // cursorScrollMargin: 250,
             //光標高度
@@ -537,6 +581,7 @@ const CodeMirrorFunc = {
             readOnly: name == 'tutorial' ? true : false
         })
         Editor.on('inputRead', (e) => {
+            console.log(e)
             Editor.showHint()
         })
         Editor.on('change', (e) => {
