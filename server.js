@@ -228,5 +228,5 @@ admin.listen(process.env.ADMIN_PORT, () => { console.log("admin is running at " 
 // status sign meaning
 // status 200 => success
 // status 500 => server error
-// status 501 => empty 
+// status 501 => empty
 // status 404 => error
