@@ -56,55 +56,55 @@ const mongoDbStatus = mongoose.connection
 mongoDbStatus.on('error', err => console.error('connection error', err))
 mongoDbStatus.once('open', (db) => console.log('Connection to mongodb'))
 
-//helmet 擋住開發程式避免入侵
-//開啟DNS預讀取
-app.use(helmet({ dnsPrefetchControl: { allow: true } }))
-//阻止瀏覽器對 Content-Type 不明的內容進行探查，以防止惡意程式碼的注入
-app.use(helmet.noSniff());
-//阻止基本的 XSS 攻擊
-app.use(helmet.xssFilter());
-//CSP
-app.use(
-    helmet(
-        {
-            contentSecurityPolicy: {
-                directives: {
-                    defaultSrc: [
-                        "'self'",
-                        'http://localhost:3000',
-                    ],
-                    scriptSrc: [
-                        "'self'",
-                        "https://code.jquery.com",
-                        "https://cdn.jsdelivr.net",
-                        'https://cdnjs.cloudflare.com',
-                        'https://cdn.socket.io/',
-                        'http://localhost:3000',
-                    ],
-                    frameAncestors: [
-                        "'self'",
-                        "http://localhost:3000",
-                    ],
-                    frameSrc: [
-                        "'self'",
-                        "http://localhost:3000",
-                    ],
-                    childSrc: [
-                        "'self'",
-                        "http://localhost:3000",
-                    ],
-                    imgSrc: [
-                        "'self'",
-                        'https://media.giphy.com',
-                        'http://localhost:3000',
-                        'data:',
-                        'blob:'
-                    ]
-                },
-            },
+// //helmet 擋住開發程式避免入侵
+// //開啟DNS預讀取
+// app.use(helmet({ dnsPrefetchControl: { allow: true } }))
+// //阻止瀏覽器對 Content-Type 不明的內容進行探查，以防止惡意程式碼的注入
+// app.use(helmet.noSniff());
+// //阻止基本的 XSS 攻擊
+// app.use(helmet.xssFilter());
+// //CSP
+// app.use(
+//     helmet(
+//         {
+//             contentSecurityPolicy: {
+//                 directives: {
+//                     defaultSrc: [
+//                         "'self'",
+//                         'http://localhost:3000',
+//                     ],
+//                     scriptSrc: [
+//                         "'self'",
+//                         "https://code.jquery.com",
+//                         "https://cdn.jsdelivr.net",
+//                         'https://cdnjs.cloudflare.com',
+//                         'https://cdn.socket.io/',
+//                         'http://localhost:3000',
+//                     ],
+//                     frameAncestors: [
+//                         "'self'",
+//                         "http://localhost:3000",
+//                     ],
+//                     frameSrc: [
+//                         "'self'",
+//                         "http://localhost:3000",
+//                     ],
+//                     childSrc: [
+//                         "'self'",
+//                         "http://localhost:3000",
+//                     ],
+//                     imgSrc: [
+//                         "'self'",
+//                         'https://media.giphy.com',
+//                         'http://localhost:3000',
+//                         'data:',
+//                         'blob:'
+//                     ]
+//                 },
+//             },
 
-        })
-);
+//         })
+// );
 
 
 //設定view ejs

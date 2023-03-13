@@ -433,7 +433,7 @@ router.post('/readcode', async (req, res) => {
             studentId: req.user.studentId,
             studentAccess: true
         }).then(response => {
-            if (response.studentCodeList[req.body.courseId] === undefined) {
+            if (response.studentCodeList === undefined) {
                 returnData.code = ""
             } else { 
                 returnData.code = response.studentCodeList[req.body.courseId][req.body.keyCode]
