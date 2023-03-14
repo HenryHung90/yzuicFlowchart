@@ -91,7 +91,7 @@ router.post('/createdemo', async (req, res) => {
                 }
             })
             //user media file
-            fs.mkdirSync(`${dirname}/public/Access/${req.user.studentId}/media`, (err) => {
+            fs.mkdirSync(`${directName}/public/Access/${req.user.studentId}/media`, (err) => {
                 if (err) {
                     fileWritingStatus[0].status = "失敗"
                 }

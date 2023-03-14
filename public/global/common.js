@@ -246,6 +246,7 @@ const categoryBox = {
                 }).css({
                     'resize': 'none'
                 }).appendTo($(".tooltip-inner"))
+                
                 CodeMirrorFunc.codeMirrorProgram('hint', data.hintCode[$(this).attr('id')] || 'no data')
                 $('#hint').data('CodeMirror').setSize('auto', 'auto')
             }
