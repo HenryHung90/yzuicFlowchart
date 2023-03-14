@@ -1,0 +1,55 @@
+.reflectionDescription_container {
+    padding: 10px 24px;
+    height: 75vh;
+    overflow-y: auto;
+}
+.reflectionDescription_reflection h3 {
+    font-weight: bolder;
+    font-size: 40px;
+}
+
+.reflectionDescription_learning,
+.reflectionDescription_workhard,
+.reflectionDescription_difficult,
+.reflectionDescription_scoring {
+    margin: 15px auto;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 5px 2px rgba(231, 152, 5, 0.8);
+}
+
+.reflectionDescription_learning h4,
+.reflectionDescription_workhard h4,
+.reflectionDescription_difficult h4,
+.reflectionDescription_scoring h4 {
+    font-weight: bolder;
+    margin-bottom: 10px;
+    font-size: 30px;
+}
+.reflectionDescription_learning p,
+.reflectionDescription_workhard p,
+.reflectionDescription_difficult p {
+    margin: 15px;
+    font-size: 20px;
+}
+
+.reflectionDescription_textarea {
+    resize: none;
+    height: 300px !important;
+}
+
+.reflectionDescription_scoringContainer {
+    margin: 10px 200px;
+}
+
+#scoringText p {
+    font-size: larger;
+    text-align: center;
+}
+
+.reflectionDescription_submit {
+    width: 20%;
+    margin: 50px auto;
+    filter: drop-shadow(0 0 3px green)
+}

@@ -5,7 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "push-start":"git add . ;git commit -m 'daily update'; git push; nodemon server.js"
   },
   "repository": {
     "type": "git",

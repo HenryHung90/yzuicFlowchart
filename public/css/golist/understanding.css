@@ -1,5 +1,7 @@
 .understandingDescription_container {
     padding: 10px 24px;
+    height: 75vh;
+    overflow-y: auto;
 }
 
 .understandingDescription_target h3 {

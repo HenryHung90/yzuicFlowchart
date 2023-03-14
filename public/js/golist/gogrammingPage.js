@@ -260,8 +260,6 @@ const UnderstandingBox = () => {
     })
 
     //----------------------------------------------------------
-
-
     //understanding description
     const understandingDescriptionContainer = $('<div>').prop({
         className: 'row understandingDescription_container',
@@ -689,7 +687,7 @@ const ProgrammingBox = (programmingKey) => {
                     className: 'col-12 demoContent',
                     id: 'up',
                 }).click(e => {
-                    if(demoContent.attr('id') === 'up'){
+                    if (demoContent.attr('id') === 'up') {
                         demoContent.attr('id', 'down')
                         downIcon.css({
                             transform: 'rotate(180deg)'
@@ -697,7 +695,7 @@ const ProgrammingBox = (programmingKey) => {
                         demoContent.css({
                             transform: 'translateY(-10px)'
                         })
-                    }else{
+                    } else {
                         demoContent.attr('id', 'up')
                         downIcon.css({
                             transform: 'rotate(0deg)'
@@ -706,7 +704,7 @@ const ProgrammingBox = (programmingKey) => {
                             transform: 'translateY(-95vh)'
                         })
                     }
-                    
+
                 }).appendTo(demoIframe)
 
                 const demoIframeInfo = $('<iframe>')
@@ -960,8 +958,134 @@ const ReflectionBox = () => {
     $('.content_complete').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
-        className: 'justify-content-center ReflectionContentDiv'
+        className: 'justify-content-center reflectionContentDiv'
     })
+
+    //----------------------------------------------------------
+    const ReflectionContainer = $('<div>').prop({
+        className: 'row reflectionDescription_container',
+    }).appendTo(contentDiv)
+
+    //reflection
+    $('<div>').prop({
+        className: 'col-12 reflectionDescription_reflection',
+        innerHTML: '<h3>💡問題 & 反思</h3>'
+    }).appendTo(ReflectionContainer)
+
+    //Learning--------------------------------------------------------------
+    const reflectionLearningContainer = $('<div>').prop({
+        className: 'col-12 reflectionDescription_learning',
+        innerHTML: '<h4>🔍 你學到了甚麼?</h4><p>Ex: 如何使用...、我發現某 A 與某 B 語法的差異...、我覺得某功能或許還可以...</p>'
+    }).appendTo(ReflectionContainer)
+
+    $('<div>').prop({
+        className: 'form-floating',
+        innerHTML: '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="learningValue"></textarea>' + '<label for="learningText">學到了...</label>'
+    }).appendTo(reflectionLearningContainer)
+
+    //workhard--------------------------------------------------------------
+    const reflectionWorkhardContainer = $('<div>').prop({
+        className: 'col-12 reflectionDescription_workhard',
+        innerHTML: '<h4>🔍 你覺得還需要努力甚麼?</h4><p>Ex: 我還可以把某 Function 做得更...、或許可以優化某 Function 的...</p>'
+    }).appendTo(ReflectionContainer)
+
+    $('<div>').prop({
+        className: 'form-floating',
+        innerHTML: '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="workhardValue"></textarea>' + '<label for="workhardText">努力了...</label>'
+    }).appendTo(reflectionWorkhardContainer)
+
+    //difficult--------------------------------------------------------------
+    const reflectionDifficultContainer = $('<div>').prop({
+        className: 'col-12 reflectionDescription_difficult',
+        innerHTML: '<h4>🔍 你遇到哪些困難?</h4><p>Ex: 我遇到了一種BUG...、我時常把某 A 與某 B 搞混...、在某的邏輯上我...</p>'
+    }).appendTo(ReflectionContainer)
+
+    $('<div>').prop({
+        className: 'form-floating',
+        innerHTML: '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="difficultValue"></textarea>' + '<label for="difficultText">困難了...</label>'
+    }).appendTo(reflectionDifficultContainer)
+
+    //scoring--------------------------------------------------------------
+    const reflectionScoringContainer = $('<div>').prop({
+        className: 'col-12 reflectionDescription_scoring',
+        innerHTML: '<h4>💯 自我評分</h4>'
+    }).appendTo(ReflectionContainer)
+
+    const scoringContainer = $('<div>').prop({
+        className: 'reflectionDescription_scoringContainer'
+    }).appendTo(reflectionScoringContainer)
+
+    $('<div>').prop({
+        id: 'scoringText',
+        innerHTML: '<p>評分!(最左邊為0分，最右邊為10分)</p>'
+    }).appendTo(scoringContainer)
+
+    $('<input>').prop({
+        className: 'form-range',
+        min: '0',
+        max: '10',
+        step: '1',
+        type: 'range',
+        value: 0,
+        id: 'scoringValue'
+    }).change(e => {
+        switch (e.target.value) {
+            case '0':
+                $('#scoringText').html('<p>0分，我完全不滿意我的表現，好爛!</p>')
+                break
+            case '1':
+                $('#scoringText').html('<p>1分，我甚麼都不會😢</p>')
+                break
+            case '2':
+                $('#scoringText').html('<p>2分，我的人生怎麼會遇到這種難題😵</p>')
+                break
+            case '3':
+                $('#scoringText').html('<p>3分，我的程式碼跟我的人生一樣，只有一半成功，另一半還在Debug。</p>')
+                break
+            case '4':
+                $('#scoringText').html('<p>4分，感覺有了，但不多</p>')
+                break
+            case '5':
+                $('#scoringText').html('<p>5分，中規中矩🤏</p>')
+                break
+            case '6':
+                $('#scoringText').html('<p>6分，只要程式碼會跑，再亂都沒問題👌</p>')
+                break
+            case '7':
+                $('#scoringText').html('<p>7分，只要程式碼夠亂，就沒有人能抄襲😎</p>')
+                break
+            case '8':
+                $('#scoringText').html('<p>8分，程式碼有沒有問題不重要，能用就好</p>')
+                break
+            case '9':
+                $('#scoringText').html('<p>9分，這個世界上只有我搞不定的女生，沒有我搞不定的程式碼🤙🤙</p>')
+                break
+            case '10':
+                $('#scoringText').html('<p>10分，我的程式碼都是 ChatGPT 教我的，呵😎🤏</p>')
+                break
+        }
+    }).appendTo(scoringContainer)
+
+    //submit--------------------------------------------------------------
+    $('<button>').prop({
+        className: 'btn btn-success reflectionDescription_submit',
+        type: 'button',
+        innerHTML: '送出'
+    }).click(e => {
+        e.stopPropagation()
+        submitReflection()
+    }).appendTo(ReflectionContainer)
+
+
+    function submitReflection() {
+        if ($('#learningValue').val() == '' || $('#workhardValue').val() == '' || $('#difficultValue').val() == ''){
+            window.alert("欄位不得為空")
+            return
+        }
+        if ($('#scoringValue').val() == '0' && window.confirm("確定要給自己0分ㄇ🧐")){
+            
+        }
+    }
 
     return contentDiv
 }
