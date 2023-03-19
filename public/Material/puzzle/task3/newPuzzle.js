@@ -85,5 +85,10 @@ function create() {
 }
 
 function update() {
-
+    for (let i = 0; i < puzzle的張數; i++) {
+        自定義全域變數.crop.create(
+            x位置, y位置, '使用圖片名稱', 第幾張
+            //將其大小初始設置為 0 以便製作簡易小動畫
+        ).setScale(0)
+    }
 }

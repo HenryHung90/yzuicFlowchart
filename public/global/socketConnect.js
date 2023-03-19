@@ -64,7 +64,6 @@ const socketConnect = {
     },
 }
 
-
 const MessageType = {
     // 進入房間時創造訊息
     enterRoom: (message) => {

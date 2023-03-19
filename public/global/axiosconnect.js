@@ -280,8 +280,35 @@ const studentClientConnect = {
     //reflection--------------------------------
     // 送出 Reflection
     saveReflection:
-        (courseId) => {
-
+        (courseId, key, learning, workhard, difficult, scoring) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/savereflection',
+                    data: {
+                        courseId: courseId,
+                        key: key,
+                        learning: learning,
+                        workhard: workhard,
+                        difficult: difficult,
+                        scoring: scoring
+                    }
+                })
+            )
+        },
+    // 讀取 Reflection
+    readReflection:
+        (courseId, key) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/readreflection',
+                    data: {
+                        courseId: courseId,
+                        key: key
+                    }
+                })
+            )
         }
 }
 

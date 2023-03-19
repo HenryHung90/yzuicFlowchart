@@ -436,5 +436,42 @@ router.post('/restartstandard', async (req, res) => {
     }
 })
 
+//Admin 新增 programming 中的 hint
+router.post('/updateprogramminghint', async (req, res) => {
+    try {
+        const programmingHintData = await standardcontent.findOne({
+            courseId: req.body.courseId
+        })
+
+        programmingHintData.standardProgramming[req.body.key] = req.body.standardProgramming
+
+        await standardcontent.updateOne({
+            courseId: req.body.courseId
+        }, {
+            standardProgramming: programmingHintData.standardProgramming
+        }).then(response => {
+            if (response.acknowledged) {
+                res.json({
+                    message: 'success',
+                    status: 200
+                })
+                return
+            }
+            res.json({
+                message: '新增失敗，請再試一次!',
+                status: 500
+            })
+        })
+
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: '新增 hint 失敗，請聯繫管理員(err)',
+            status: 500
+        })
+    }
+})
+
 
 export default router

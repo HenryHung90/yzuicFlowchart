@@ -1,10 +1,11 @@
-import express from 'express'
+import express, { response } from 'express'
 import bcrypt from 'bcryptjs'
 const router = express.Router()
 
 import studentConfig from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
+import reflectionconfig from '../models/reflectionconfig.js'
 
 const saltRound = 10
 
@@ -375,9 +376,7 @@ router.post('/downloadgolist', async (req, res) => {
     try {
         //尋找 GoList
         const standardData = await standardcontent.findOne({
-            class: req.user.studentClass,
-            _id: req.body.courseId,
-            access: true
+            _id: req.body.courseId
         })
         //尋找學生資料
         const studentData = await studentConfig.findOne({
@@ -387,7 +386,7 @@ router.post('/downloadgolist', async (req, res) => {
         })
         // GoList
         if (studentData.studentGoList[req.body.courseId] !== undefined) {
-            studentData.studentGoList[req.body.courseId] = standardData.standardGoList[req.body.courseId]
+            studentData.studentGoList[req.body.courseId] = standardData.standardGoList
         }
         //更新 GoList
         await studentConfig.updateOne(
@@ -435,7 +434,7 @@ router.post('/readcode', async (req, res) => {
         }).then(response => {
             if (response.studentCodeList === undefined) {
                 returnData.code = ""
-            } else { 
+            } else {
                 returnData.code = response.studentCodeList[req.body.courseId][req.body.keyCode]
             }
 
@@ -574,6 +573,130 @@ router.post('/deletecode', async (req, res) => {
     }
 })
 
+//學生儲存 reflection
+router.post('/savereflection', async (req, res) => {
+    try {
+        const reflectionData = await reflectionconfig.findOne({
+            studentId: req.user.studentId,
+            class: req.user.studentClass,
+            courseId: req.body.courseId,
+        })
+        //若為第一次新增該 course 的 relfeciton
+        if (reflectionData == null) {
+            const newReflectionData = new reflectionconfig({
+                studentName: req.user.studentName,
+                studentId: req.user.studentId,
+                class: req.user.studentClass,
+                courseId: req.body.courseId,
+                studentReflectionData: {
+                    [req.body.key]: {
+                        learing: req.body.learning || '',
+                        workhard: req.body.workhard || '',
+                        difficult: req.body.difficult || '',
+                        scoring: req.body.scoring || 0
+                    }
+                }
+            })
+
+            newReflectionData.save()
+
+            res.json({
+                message: 'success',
+                status: 200
+            })
+            return
+        }
+
+        //其他
+        reflectionData.studentReflectionData[req.body.key] = {
+            learing: req.body.learning || '',
+            workhard: req.body.workhard || '',
+            difficult: req.body.difficult || '',
+            scoring: req.body.scoring || 0
+        }
+
+        const studentData = await studentConfig.findOne({
+            studentId: req.user.studentId,
+            studentClass: req.user.studentClass,
+            studentAccess: true,
+        })
+
+        const nextProgress = parseInt(req.body.key.split('-')[0]) + 1
+
+        studentData.studentGoList[req.body.courseId].progress > nextProgress ? null : studentData.studentGoList[req.body.courseId].progress = nextProgress
+
+        await studentConfig.updateOne({
+            studentId: req.user.studentId,
+            studentClass: req.user.studentClass,
+            studentAccess: true,
+        }, {
+            studentGoList: studentData.studentGoList
+        })
+
+        await reflectionconfig.updateOne({
+            studentId: req.user.studentId,
+            class: req.user.studentClass,
+            courseId: req.body.courseId,
+        }, {
+            studentReflectionData: reflectionData.studentReflectionData
+        }).then(response => {
+            if (response.acknowledged) {
+                res.json({
+                    message: 'success',
+                    status: 200
+                })
+                return
+            }
+            res.json({
+                message: '儲存 reflection 失敗，請再試一次!',
+                status: 500
+            })
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "儲存 Reflection 失敗，請聯繫管理員(err)",
+            status: 500
+        })
+    }
+})
+//學生讀取 reflection
+router.post('/readreflection', async (req, res) => {
+    try {
+        const reflectionData = await reflectionconfig.findOne({
+            studentId: req.user.studentId,
+            class: req.user.studentClass,
+            courseId: req.body.courseId,
+        })
+
+        if (reflectionData == undefined) {
+            res.json({
+                status: 501
+            })
+            return
+        }
+
+        if (reflectionData.studentReflectionData[req.body.key] == undefined) {
+            res.json({
+                status: 501
+            })
+            return
+        }
+
+        res.json({
+            message: reflectionData.studentReflectionData[req.body.key],
+            status: 200
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得 reflection 失敗，請聯絡管理員(err)",
+            status: 500
+        })
+    }
+})
+
 //學生取得訊息紀錄
 router.post('/getmessagehistory', async (req, res) => {
     try {
@@ -585,7 +708,6 @@ router.post('/getmessagehistory', async (req, res) => {
 
         if (sliceEnd < 0) {
             res.json({
-                message: 'no more',
                 status: 501,
             })
             return

@@ -1,10 +1,17 @@
 import path from 'path'
+import { fileURLToPath } from 'url'
 
-module.exports = {
-    context: path.resolve(__dirname, 'src'), //(2)
-    entry: './index.js', //(3)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
+    context: path.resolve(__dirname, 'yzuicflowchart'), //(2)
+    target: 'node',
+    entry: {
+        'index': '../www'
+    }, //(3)
     output: {
         path: path.resolve(__dirname, './dist'), //(4)
-        filename: 'index.bundle.js' //(5)
+        filename: '[name].bundle.js' //(5)
     }
 }

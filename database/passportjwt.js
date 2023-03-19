@@ -57,6 +57,7 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                     done(null, { message: '帳號或密碼錯誤' })
                 } else {
                     console.log('success')
+                    console.log('user', user.studentId, 'get in at', new Date())
                     const returnUser = {
                         _id: user._id,
                         studentClass: user.studentClass,
@@ -91,6 +92,7 @@ passport.use('admin-login', new LocalStrategy({ usernameField: 'adminId', passwo
                     done(null, { message: '帳號或密碼錯誤' })
                 } else {
                     console.log('success')
+                    console.log('admin', user.adminId, 'get in at', new Date())
                     const returnUser = {
                         _id: user._id,
                         adminId: user.adminId,
@@ -109,7 +111,7 @@ const cookieExtractor = function (req) {
     if (req && req.cookies) token = req.cookies['token'];
     return token;
 };
-const cookieExtractorAdmin = (req) =>{
+const cookieExtractorAdmin = (req) => {
     let token = null;
     if (req && req.cookies) token = req.cookies['tokenADMIN'];
     return token;
@@ -124,7 +126,6 @@ passport.use('token', new JWTStrategy({
     failureMessage: true
 },
     (jwtPayload, done) => {
-        console.log('user', jwtPayload.studentId, 'get in at', new Date())
         studentConfig.findOne({ _id: jwtPayload._id, studentId: jwtPayload.studentId })
             .then(user => {
                 const returnUser = {
@@ -148,7 +149,6 @@ passport.use('admin-token', new JWTStrategy(
         failureMessage: true
     },
     (jwtPayload, done) => {
-        console.log('admin', jwtPayload.adminId, 'get in at', new Date())
         adminConfig.findOne({ _id: jwtPayload._id, adminId: jwtPayload.adminId })
             .then(user => {
                 const returnUser = {

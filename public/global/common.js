@@ -36,7 +36,6 @@ const NormalizeFunc = {
                 window.alert(response.data.message)
                 NormalizeFunc.loadingPage(false)
                 return false
-
         }
     },
     //取得 cookie值
@@ -175,7 +174,6 @@ const categoryBox = {
         }
     },
     Programming: (data, key) => {
-        console.log(data)
         let codeData = [
             { name: 'setting', data: '' },
             { name: 'config', data: '' },
@@ -218,6 +216,7 @@ const categoryBox = {
                 }).attr({
                     'data-bs-toggle': "tooltip",
                     'data-bs-placement': 'right',
+                    'data-container': "body",
                     'data-bs-html': "true",
                     'name': 'hint',
                     'title': '<h3>程式碼參考</h3>若無顯示請重新點擊'
@@ -246,16 +245,62 @@ const categoryBox = {
                 }).css({
                     'resize': 'none'
                 }).appendTo($(".tooltip-inner"))
-                
-                CodeMirrorFunc.codeMirrorProgram('hint', data.hintCode[$(this).attr('id')] || 'no data')
+
+                if (data.hintCode !== undefined) {
+                    CodeMirrorFunc.codeMirrorProgram('hint', data.hintCode[$(this).attr('id')] || 'no data')
+                } else {
+                    CodeMirrorFunc.codeMirrorProgram('hint', 'no data')
+                }
                 $('#hint').data('CodeMirror').setSize('auto', 'auto')
             }
         });
-
-
     },
     Reflection: (data) => {
+        if (data == undefined) {
+            return
+        }
+        console.log(data)
 
+        $('#learningValue').val(data.learing)
+        $('#workhardValue').val(data.workhard)
+        $('#difficultValue').val(data.difficult)
+        $('#scoringValue').val(data.scoring)
+
+        switch (data.scoring) {
+            case '0':
+                $('#scoringText').html('<p>0分，我完全不滿意我的表現，好爛!</p>')
+                break
+            case '1':
+                $('#scoringText').html('<p>1分，我甚麼都不會😢</p>')
+                break
+            case '2':
+                $('#scoringText').html('<p>2分，我的人生怎麼會遇到這種難題😵</p>')
+                break
+            case '3':
+                $('#scoringText').html('<p>3分，我的程式碼跟我的人生一樣，只有一半成功，另一半還在Debug。</p>')
+                break
+            case '4':
+                $('#scoringText').html('<p>4分，感覺有了，但不多</p>')
+                break
+            case '5':
+                $('#scoringText').html('<p>5分，中規中矩🤏</p>')
+                break
+            case '6':
+                $('#scoringText').html('<p>6分，只要程式碼會跑，再亂都沒問題👌</p>')
+                break
+            case '7':
+                $('#scoringText').html('<p>7分，只要程式碼夠亂，就沒有人能抄襲😎</p>')
+                break
+            case '8':
+                $('#scoringText').html('<p>8分，程式碼有沒有問題不重要，能用就好</p>')
+                break
+            case '9':
+                $('#scoringText').html('<p>9分，這個世界上只有我搞不定的女生，沒有我搞不定的程式碼🤙🤙</p>')
+                break
+            case '10':
+                $('#scoringText').html('<p>10分，我的程式碼都是 ChatGPT 教我的，呵😎🤏</p>')
+                break
+        }
     }
 }
 //------------------------------ Go.js Function -----------------------------------//
@@ -476,12 +521,18 @@ const GoListFunc = {
                             })
                         }
                     })
-
                     break;
 
                 case "Reflection":
                     ReflectionBox(s).appendTo(contentContainer)
-                    NormalizeFunc.loadingPage(false)
+
+                    //讀取 reflection 內容
+                    await studentClientConnect.readReflection(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                            categoryBox.Reflection(response.data.message)
+                            NormalizeFunc.loadingPage(false)
+                        }
+                    })
                     break;
 
                 case "Comment":
@@ -490,9 +541,6 @@ const GoListFunc = {
                     break;
             }
         }
-
-
-
     },
 }
 //------------------------------ codeMirror Function ------------------------------//
@@ -582,7 +630,6 @@ const CodeMirrorFunc = {
             readOnly: name == 'tutorial' ? true : false
         })
         Editor.on('inputRead', (e) => {
-            console.log(e)
             Editor.showHint()
         })
         Editor.on('change', (e) => {

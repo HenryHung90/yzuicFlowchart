@@ -481,6 +481,31 @@ const load = async () => {
   await studentClientConnect.readGoList(NormalizeFunc.getFrontEndCode('courseId'))
     .then(response => {
       if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        console.log(response.data.message)
+        const progress = parseInt(response.data.message.progress) || 1
+        let newNodeData = []
+        let newLinkData = []
+
+        for (const Node of response.data.message.nodeDataArray) {
+          if (Node.category === 'Target') {
+            newNodeData.push(Node)
+          }
+          if (Node.key == progress || Node.key.split("-")[0] <= progress) {
+            newNodeData.push(Node)
+          }
+        }
+
+        for (const Link of response.data.message.linkDataArray) {
+          if (Link.to.split("-")[0] <= progress) {
+            newLinkData.push(Link)
+          }
+        }
+
+        response.data.message.nodeDataArray = newNodeData
+        response.data.message.linkDataArray = newLinkData
+
+
+
         myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
       }
     })

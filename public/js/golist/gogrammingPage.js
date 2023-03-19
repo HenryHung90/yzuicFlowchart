@@ -4,6 +4,7 @@ import {
     GoListFunc
 } from "../../global/common.js"
 import { studentClientConnect } from "../../global/axiosconnect.js"
+
 //Target 顯示最終成品的Block
 const TargetBox = () => {
     // 把 Sync 字樣刪除
@@ -385,7 +386,7 @@ const ProgrammingBox = (programmingKey) => {
     //header
     $('<div>').prop({
         className: 'modal-header',
-        innerHTML: '<h3>流程圖</h3>'
+        innerHTML: '<h3>你可以嘗試這麼想...</h3>'
     }).appendTo(modalContent)
 
     //body
@@ -486,6 +487,13 @@ const ProgrammingBox = (programmingKey) => {
         launchDemo()
     }).appendTo(content_LaunchDiv)
 
+    //question button
+    $('<button>').prop({
+        className: 'btn btn-warning content_questionhbtn',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
+        id: 'programmingHint',
+    }).attr('data-bs-toggle', 'modal').attr('data-bs-target', "#programmingHintModal").appendTo(content_LaunchDiv)
+
     //save code
     $('<button>').prop({
         className: 'btn btn-outline-primary content_launchbtn',
@@ -523,13 +531,6 @@ const ProgrammingBox = (programmingKey) => {
     }).click((e) => {
         uploadFileClick()
     }).appendTo(content_LaunchDiv)
-
-    //question button
-    $('<button>').prop({
-        className: 'btn btn-outline-warning content_launchbtn',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" fill="orange" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
-        id: 'programmingHint',
-    }).attr('data-bs-toggle', 'modal').attr('data-bs-target', "#programmingHintModal").appendTo(content_LaunchDiv)
     //-----------------------------------------------------------------------
     //Data Visualization Area
     const dataVisualizationArea = $('<div>').prop({
@@ -953,7 +954,7 @@ const ProgrammingBox = (programmingKey) => {
     return contentRowDiv
 }
 //Reflection return function
-const ReflectionBox = () => {
+const ReflectionBox = (reflectionKey) => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
     //Content Div-------------------------------------------------
@@ -980,6 +981,7 @@ const ReflectionBox = () => {
 
     $('<div>').prop({
         className: 'form-floating',
+        id: 'learningDiv',
         innerHTML: '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="learningValue"></textarea>' + '<label for="learningText">學到了...</label>'
     }).appendTo(reflectionLearningContainer)
 
@@ -991,6 +993,7 @@ const ReflectionBox = () => {
 
     $('<div>').prop({
         className: 'form-floating',
+        id: 'workhardDiv',
         innerHTML: '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="workhardValue"></textarea>' + '<label for="workhardText">努力了...</label>'
     }).appendTo(reflectionWorkhardContainer)
 
@@ -1002,6 +1005,7 @@ const ReflectionBox = () => {
 
     $('<div>').prop({
         className: 'form-floating',
+        id: 'difficultDiv',
         innerHTML: '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="difficultValue"></textarea>' + '<label for="difficultText">困難了...</label>'
     }).appendTo(reflectionDifficultContainer)
 
@@ -1072,18 +1076,93 @@ const ReflectionBox = () => {
         type: 'button',
         innerHTML: '送出'
     }).click(e => {
-        e.stopPropagation()
+        e.preventDefault()
         submitReflection()
     }).appendTo(ReflectionContainer)
 
 
     function submitReflection() {
-        if ($('#learningValue').val() == '' || $('#workhardValue').val() == '' || $('#difficultValue').val() == ''){
-            window.alert("欄位不得為空")
-            return
+        const formData = [
+            {
+                textarea: $('#learningValue'),
+                div: $('.reflectionDescription_learning'),
+                isPass: false
+            },
+            {
+                textarea: $('#workhardValue'),
+                div: $('.reflectionDescription_workhard'),
+                isPass: false
+            },
+            {
+                textarea: $('#difficultValue'),
+                div: $('.reflectionDescription_difficult'),
+                isPass: false
+            }
+        ]
+
+        for (const form of formData) {
+            if (form.textarea.val() == '') {
+                form.div.css({
+                    'box-shadow': '0 0 5px 2px red'
+                })
+                form.isPass = false
+            } else {
+                form.div.css({
+                    'box-shadow': '0 0 5px 2px rgba(231, 152, 5, 0.8)'
+                })
+                form.isPass = true
+            }
         }
-        if ($('#scoringValue').val() == '0' && window.confirm("確定要給自己0分ㄇ🧐")){
-            
+        for (const form of formData) {
+            if (!form.isPass) {
+                window.alert("欄位不得為空!")
+                return
+            }
+        }
+
+        if ($('#scoringValue').val() !== '0') {
+            submitFunc()
+        }
+        if ($('#scoringValue').val() == '0' && window.confirm("確定要給自己0分ㄇ🧐")) {
+            submitFunc()
+        }
+
+
+        function submitFunc() {
+            NormalizeFunc.loadingPage(true)
+            studentClientConnect.saveReflection(
+                NormalizeFunc.getFrontEndCode('courseId'),
+                reflectionKey.key,
+                $('#learningValue').val(),
+                $('#workhardValue').val(),
+                $('#difficultValue').val(),
+                $('#scoringValue').val()
+            ).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    window.alert(response.data.message)
+                    NormalizeFunc.loadingPage(false)
+                    $('.block').fadeOut(200)
+                    $('.contentDiv').fadeOut(200)
+                    //iframe
+                    $('.DemoDiv').fadeOut(200)
+                    $('.content_dataVisualizationArea').fadeOut(200)
+                    $('.content_consoleErrorArea').fadeOut(200)
+                    setTimeout(() => {
+                        $('body').css({
+                            'overflow': 'auto',
+                        })
+                        $('.contentDiv').remove()
+                        $('.block').remove()
+                        //iframe
+                        $('.DemoDiv').remove()
+                        $('.content_consoleErrorArea').remove()
+                        $('.content_dataVisualizationArea').remove()
+                        //Programming modal
+                        $('.modal').remove()
+                        location.reload()
+                    }, 200)
+                }
+            })
         }
     }
 
