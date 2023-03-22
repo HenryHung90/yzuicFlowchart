@@ -102,7 +102,7 @@ const goListInit = () => {
     }
 
     // define the Node templates for regular nodes
-    let standardSetting =
+    const standardSetting =
         $(go.Node, "Table", nodeStyle(), { deletable: false },
             // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
             $(go.Panel, "Auto",
@@ -130,10 +130,79 @@ const goListInit = () => {
             )
         )
 
+    const completedSetting =
+        $(go.Node, "Table", nodeStyle(), { deletable: false },
+            // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+            $(go.Panel, "Auto",
+                $(go.Shape, "RoundedRectangle",
+                    { fill: "#FFC78E", stroke: "#FFD306", strokeWidth: 3.5 },
+                    new go.Binding("figure", "figure")
+                ),
+                $(go.TextBlock,
+                    {
+                        font: "bold 11pt Lato, Helvetica, Arial, sans-serif",
+                        stroke: 'black'
+                    },
+                    {
+                        margin: 10,
+                        maxSize: new go.Size(160, 160),
+                        wrap: go.TextBlock.WrapFit,
+                        editable: false,
+                        textAlign: 'center',
+                    },
+                    //攜結text 呼叫時會使用建立之node 名稱作為內部text
+                    //綁定TextBlock.text 屬性爲Node.data.name的值，Model對象可以通過Node.data.name獲取和設置TextBlock.text
+                    new go.Binding("text").makeTwoWay()
+                ),
+                // four named ports, one on each side:
+                makePort("T", go.Spot.Top, go.Spot.TopSide, false, true),
+                makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true),
+                makePort("R", go.Spot.Right, go.Spot.RightSide, true, true),
+                makePort("B", go.Spot.Bottom, go.Spot.BottomSide, true, false)
+            )
+        )
+    const bonusSetting =
+        $(go.Node, "Table", nodeStyle(), { deletable: false },
+            // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+            $(go.Panel, "Auto",
+                $(go.Shape, "RoundedRectangle",
+                    { fill: "#282c34", stroke: "#FF0000", strokeWidth: 3.5 },
+                    new go.Binding("figure", "figure")
+                ),
+                $(go.TextBlock, textStyle(),
+                    {
+                        margin: 10,
+                        maxSize: new go.Size(160, 160),
+                        wrap: go.TextBlock.WrapFit,
+                        editable: false,
+                        textAlign: 'center',
+                    },
+                    //攜結text 呼叫時會使用建立之node 名稱作為內部text
+                    //綁定TextBlock.text 屬性爲Node.data.name的值，Model對象可以通過Node.data.name獲取和設置TextBlock.text
+                    new go.Binding("text").makeTwoWay()
+                ),
+                // four named ports, one on each side:
+                makePort("T", go.Spot.Top, go.Spot.TopSide, false, true),
+                makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true),
+                makePort("R", go.Spot.Right, go.Spot.RightSide, true, true),
+                makePort("B", go.Spot.Bottom, go.Spot.BottomSide, true, false)
+            )
+        )
+
     myDiagram.nodeTemplateMap.add("Understanding", standardSetting)
     myDiagram.nodeTemplateMap.add("Formulating", standardSetting)
     myDiagram.nodeTemplateMap.add("Programming", standardSetting)
     myDiagram.nodeTemplateMap.add("Reflection", standardSetting)
+
+    myDiagram.nodeTemplateMap.add("Completed-Understanding", completedSetting)
+    myDiagram.nodeTemplateMap.add("Completed-Formulating", completedSetting)
+    myDiagram.nodeTemplateMap.add("Completed-Programming", completedSetting)
+    myDiagram.nodeTemplateMap.add("Completed-Reflection", completedSetting)
+
+    myDiagram.nodeTemplateMap.add("Bonus-Understanding", bonusSetting)
+    myDiagram.nodeTemplateMap.add("Bonus-Formulating", bonusSetting)
+    myDiagram.nodeTemplateMap.add("Bonus-Programming", bonusSetting)
+    myDiagram.nodeTemplateMap.add("Bonus-Reflection", bonusSetting)
 
     myDiagram.nodeTemplateMap.add("Conditional",
         $(go.Node, "Table", nodeStyle(),
@@ -330,13 +399,21 @@ const goListInit = () => {
 
                 nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
                 model: new go.GraphLinksModel([  // specify the contents of the Palette
+                    { category: "Target", text: "成品展示" },
                     { category: "Understanding", text: "探索理解" },
                     { category: "Formulating", text: "表徵制定" },
                     { category: "Programming", text: "計畫執行" },
                     { category: "Reflection", text: "監控反思" },
+                    { category: "Completed-Understanding", text: "探索理解" },
+                    { category: "Completed-Formulating", text: "表徵制定" },
+                    { category: "Completed-Programming", text: "計畫執行" },
+                    { category: "Completed-Reflection", text: "監控反思" },
+                    { category: "Bonus-Understanding", text: "探索理解" },
+                    { category: "Bonus-Formulating", text: "表徵制定" },
+                    { category: "Bonus-Programming", text: "計畫執行" },
+                    { category: "Bonus-Reflection", text: "監控反思" },
                     // { category: "Conditional", text: "自定義" },
                     { category: "Comment", text: "筆記" },
-                    { category: "Target", text: "成品展示" }
                 ])
             });
 

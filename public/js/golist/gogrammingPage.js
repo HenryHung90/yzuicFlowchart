@@ -9,6 +9,8 @@ import { studentClientConnect } from "../../global/axiosconnect.js"
 const TargetBox = () => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
+    // 把 收合 字樣刪除
+    $('.content_slide').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center TargetContentDiv'
@@ -25,6 +27,8 @@ const TargetBox = () => {
 const StartBox = () => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
+    // 把 收合 字樣刪除
+    $('.content_slide').remove()
 
     const startBoxContainer = $('<div>').prop({
         className: 'row justify-content-start startBoxContainer'
@@ -77,6 +81,8 @@ const StartBox = () => {
 const CommentBox = () => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
+    // 把 收合 字樣刪除
+    $('.content_slide').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center commentContentDiv'
@@ -255,6 +261,8 @@ const CommentBox = () => {
 const UnderstandingBox = () => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
+    // 把 收合 字樣刪除
+    $('.content_slide').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center UnderstandingContentDiv'
@@ -293,6 +301,8 @@ const UnderstandingBox = () => {
 const FormulatingBox = () => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
+    // 把 收合 字樣刪除
+    $('.content_slide').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center FormulatingContentDiv'
@@ -957,6 +967,8 @@ const ProgrammingBox = (programmingKey) => {
 const ReflectionBox = (reflectionKey) => {
     // 把 Sync 字樣刪除
     $('.content_complete').remove()
+    // 把 收合 字樣刪除
+    $('.content_slide').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center reflectionContentDiv'
@@ -976,7 +988,7 @@ const ReflectionBox = (reflectionKey) => {
     //Learning--------------------------------------------------------------
     const reflectionLearningContainer = $('<div>').prop({
         className: 'col-12 reflectionDescription_learning',
-        innerHTML: '<h4>🔍 你學到了甚麼?</h4><p>Ex: 如何使用...、我發現某 A 與某 B 語法的差異...、我覺得某功能或許還可以...</p>'
+        innerHTML: '<h4>🔍 你學到了甚麼?</h4><p>Ex: 如何使用...、我發現某 A 與某 B 語法的差異...、我覺得某功能或許還可以...，請舉例說明。</p>'
     }).appendTo(ReflectionContainer)
 
     $('<div>').prop({
@@ -988,7 +1000,7 @@ const ReflectionBox = (reflectionKey) => {
     //workhard--------------------------------------------------------------
     const reflectionWorkhardContainer = $('<div>').prop({
         className: 'col-12 reflectionDescription_workhard',
-        innerHTML: '<h4>🔍 你覺得還需要努力甚麼?</h4><p>Ex: 我還可以把某 Function 做得更...、或許可以優化某 Function 的...</p>'
+        innerHTML: '<h4>🔍 你覺得還需要努力甚麼?</h4><p>Ex: 我還可以把某 Function 做得更...、或許可以優化某 Function 的...，請詳細說明。</p>'
     }).appendTo(ReflectionContainer)
 
     $('<div>').prop({
@@ -1000,7 +1012,7 @@ const ReflectionBox = (reflectionKey) => {
     //difficult--------------------------------------------------------------
     const reflectionDifficultContainer = $('<div>').prop({
         className: 'col-12 reflectionDescription_difficult',
-        innerHTML: '<h4>🔍 你遇到哪些困難?</h4><p>Ex: 我遇到了一種BUG...、我時常把某 A 與某 B 搞混...、在某的邏輯上我...</p>'
+        innerHTML: '<h4>🔍 你遇到哪些困難?</h4><p>Ex: 我遇到了一種BUG...、我時常把某 A 與某 B 搞混...、在某的邏輯上我...，請詳細說明。</p>'
     }).appendTo(ReflectionContainer)
 
     $('<div>').prop({

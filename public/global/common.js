@@ -67,10 +67,7 @@ const NormalizeFunc = {
             case "SecondTime":
                 return hour + ":" + minute + ":" + second
             case "FullTime":
-                return date.getYear() + "/" +
-                    date.getMonth() - 1 +
-                    date.getDay() + " " +
-                    date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+                return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
         }
     },
     //取得 Front-end Code
@@ -212,6 +209,12 @@ const categoryBox = {
                 $('<div>').prop({
                     className: 'programmingDescription_hintText',
                     innerHTML: `<p>👊step ${index + 1}</p>` + hint,
+                    id: `text_${index}`
+                }).appendTo($('#programmingHint'))
+
+                $('<div>').prop({
+                    className: 'programmingDescription_hintCode',
+                    innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="100%" fill="orange"><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>',
                     id: index
                 }).attr({
                     'data-bs-toggle': "tooltip",
@@ -220,7 +223,8 @@ const categoryBox = {
                     'data-bs-html': "true",
                     'name': 'hint',
                     'title': '<h3>程式碼參考</h3>若無顯示請重新點擊'
-                }).appendTo($('#programmingHint'))
+                }).appendTo($(`#text_${index}`))
+
             })
         }
 
@@ -240,6 +244,8 @@ const categoryBox = {
         // })
         $('[data-bs-toggle="tooltip"]').on('shown.bs.tooltip', function () {
             if ($(this).attr('name') === 'hint') {
+
+                //Code 展示區
                 $('<textarea>').prop({
                     id: 'hint'
                 }).css({
@@ -252,6 +258,17 @@ const categoryBox = {
                     CodeMirrorFunc.codeMirrorProgram('hint', 'no data')
                 }
                 $('#hint').data('CodeMirror').setSize('auto', 'auto')
+
+                //Code 複製 button
+                $('<button>').prop({
+                    id: 'hintCopy',
+                    className: 'btn btn-primary',
+                    innerHTML: 'Copy'
+                }).click(e => {
+                    e.stopPropagation()
+                    navigator.clipboard.writeText(data.hintCode[$(this).attr('id')])
+                    $('#hintCopy').html("Success")
+                }).appendTo($(".tooltip-inner"))
             }
         });
     },
@@ -353,6 +370,29 @@ const GoListFunc = {
         }
         //click close function
         const closePage = () => {
+            //關閉自動儲存
+            //取得各階段程式碼
+            if (s.category === 'Programming' || s.category === 'Completed-Programming') {
+                const settingCode = $("#setting").data('CodeMirror')
+                const configCode = $('#config').data('CodeMirror')
+                const preloadCode = $("#preload").data('CodeMirror')
+                const createCode = $('#create').data('CodeMirror')
+                const updateCode = $('#update').data('CodeMirror')
+                const customCode = $("#custom").data('CodeMirror')
+                const keyCode = s.key
+
+                studentClientConnect.saveCode(
+                    settingCode.getValue(),
+                    configCode.getValue(),
+                    preloadCode.getValue(),
+                    createCode.getValue(),
+                    updateCode.getValue(),
+                    customCode.getValue(),
+                    keyCode,
+                    NormalizeFunc.getFrontEndCode('courseId')
+                )
+            }
+
             block.fadeOut(200)
             contentDiv.fadeOut(200)
             //iframe
@@ -376,6 +416,47 @@ const GoListFunc = {
             }, 200)
         }
 
+
+        //rotate Slide Code
+        const rotateAllIconAndSlideAllCode = () => {
+            const content_codingContainer = [
+                '.content_coding_settingContainer',
+                '.content_coding_configContainer',
+                '.content_coding_preloadContainer',
+                '.content_coding_createContainer',
+                '.content_coding_updateContainer',
+                '.content_coding_customContainer'
+            ]
+
+
+            if ($('.content_slide').attr('id') === 'open') {
+                console.log(123)
+                for (const codeContainer of content_codingContainer) {
+                    if ($(codeContainer).attr('id') === 'open') {
+                        $(codeContainer).attr('id', 'close').slideUp(300)
+                        $('.codeDownIcon').css({
+                            transform: 'rotate(0deg)'
+                        }, 200)
+
+                        $('.content_slide').attr("id", 'close')
+                    }
+                }
+            } else {
+                for (const codeContainer of content_codingContainer) {
+                    if ($(codeContainer).attr('id') === 'close') {
+                        $(codeContainer).attr('id', 'open').slideDown(300)
+                        $('.codeDownIcon').css({
+                            transform: 'rotate(180deg)'
+                        }, 200)
+
+                        $('.content_slide').attr("id", 'open')
+                    }
+                }
+            }
+
+
+
+        }
         // loadingPage(true)
 
         //辨別任務
@@ -433,6 +514,15 @@ const GoListFunc = {
             closePage()
         }).appendTo(content_iconContainer)
         //------------------------------------------------
+        $('<button>').prop({
+            className: 'col-1 content_slide btn-outline-primary btn',
+            id: 'open',
+            innerHTML: '收合'
+        }).click(e => {
+            e.stopPropagation()
+            rotateAllIconAndSlideAllCode()
+        }).appendTo(content_iconContainer)
+
         //complete Icon
         $('<div>').prop({
             className: 'col-1 content_complete',
@@ -482,7 +572,7 @@ const GoListFunc = {
                     })
                     break;
 
-                case "Understanding":
+                case "Understanding": case "Completed-Understanding":
                     UnderstandingBox().appendTo(contentContainer)
 
                     await studentClientConnect.getUnderstanding(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
@@ -493,7 +583,7 @@ const GoListFunc = {
                     })
                     break;
 
-                case "Formulating":
+                case "Formulating": case "Completed-Formulating":
                     FormulatingBox(s).appendTo(contentContainer)
 
                     await studentClientConnect.getFormulating(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
@@ -504,7 +594,7 @@ const GoListFunc = {
                     })
                     break;
 
-                case "Programming":
+                case "Programming": case "Completed-Programming":
                     ProgrammingBox(s).appendTo(contentContainer)
 
                     //確認userId資料夾是否建立
@@ -523,7 +613,7 @@ const GoListFunc = {
                     })
                     break;
 
-                case "Reflection":
+                case "Reflection": case "Completed-Reflection":
                     ReflectionBox(s).appendTo(contentContainer)
 
                     //讀取 reflection 內容
@@ -682,10 +772,41 @@ const CodeMirrorFunc = {
         $(`#${name}`).data('CodeMirror', Editor)
     }
 }
+//------------------------------ Clicking Listening Function ------------------------------//
+const ClickListening = (e) => {
+    const clickingOperationMap = new Map([
+        // home page
+        ['logout', '登出'],
+        ['changePassword', '開啟修改密碼'],
+    ])
 
+    const targetId = e.target.id
+    console.log(e.target.parentNode)
+    console.log(e.target.parentNode.parentNode)
+    console.log(e.target.parentNode.parentNode.parentNode)
+    // for(let path of e.target.path){
+    //     console.log(path)
+    // }
+
+    const time = NormalizeFunc.getNowTime("FullTime")
+    const operation = clickingOperationMap.get(e.target.id)
+
+    console.log(operation)
+
+    // studentClientConnect.listenerUpload().then(response => {
+    //     if (NormalizeFunc.serverResponseErrorDetect(response)) {
+    //         return
+    //     }
+    // })
+
+
+
+
+}
 
 export {
     NormalizeFunc,
     GoListFunc,
-    CodeMirrorFunc
+    CodeMirrorFunc,
+    ClickListening
 }

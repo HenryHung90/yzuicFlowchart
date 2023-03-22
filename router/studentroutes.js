@@ -1,11 +1,40 @@
-import express, { response } from 'express'
+import express from 'express'
 import bcrypt from 'bcryptjs'
 const router = express.Router()
+
+
+import createDOMPurify from 'dompurify'
+import { JSDOM } from 'jsdom'
+
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 
 import studentConfig from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
 import reflectionconfig from '../models/reflectionconfig.js'
+import listenerconfig from '../models/listenerconfig.js'
+
+function converDangerString(string) {
+    let clean = DOMPurify.sanitize(string)
+    let outputString = []
+
+    const converString = new Map(
+        [
+            ["\<", "&lt;"],
+            ["\>", "&gt;"],
+            ["\&", "$amp;"],
+            ["\"", "&quot;"],
+            ["\'", "&#039;"]
+        ]
+    )
+
+    clean.split("").map((value) => {
+        converString.get(value) == undefined ? outputString.push(value) : outputString.push(converString.get(value))
+    })
+    return outputString.join("")
+}
+
 
 const saltRound = 10
 
@@ -590,9 +619,9 @@ router.post('/savereflection', async (req, res) => {
                 courseId: req.body.courseId,
                 studentReflectionData: {
                     [req.body.key]: {
-                        learing: req.body.learning || '',
-                        workhard: req.body.workhard || '',
-                        difficult: req.body.difficult || '',
+                        learing: converDangerString(req.body.learning) || '',
+                        workhard: converDangerString(req.body.workhard) || '',
+                        difficult: converDangerString(req.body.difficult) || '',
                         scoring: req.body.scoring || 0
                     }
                 }
@@ -609,9 +638,9 @@ router.post('/savereflection', async (req, res) => {
 
         //其他
         reflectionData.studentReflectionData[req.body.key] = {
-            learing: req.body.learning || '',
-            workhard: req.body.workhard || '',
-            difficult: req.body.difficult || '',
+            learing: converDangerString(req.body.learning) || '',
+            workhard: converDangerString(req.body.workhard) || '',
+            difficult: converDangerString(req.body.difficult) || '',
             scoring: req.body.scoring || 0
         }
 
@@ -623,6 +652,8 @@ router.post('/savereflection', async (req, res) => {
 
         const nextProgress = parseInt(req.body.key.split('-')[0]) + 1
 
+        // 如果接收到的 Progress 比原本的大 才進行覆蓋
+        // 否則維持原本的 Progress
         studentData.studentGoList[req.body.courseId].progress > nextProgress ? null : studentData.studentGoList[req.body.courseId].progress = nextProgress
 
         await studentConfig.updateOne({
@@ -734,6 +765,18 @@ router.post('/getmessagehistory', async (req, res) => {
         res.json({
             message: '取得歷史訊息失敗，請聯繫管理員 (err)',
             status: 500
+        })
+    }
+})
+//學生點擊事件監聽
+router.post('/listener', async (req, res) => {
+    try{
+        
+
+    }catch(err){
+        res.json({
+            message: 'DOM 監聽事件失敗，請重新整理網頁',
+            status: 501,
         })
     }
 })

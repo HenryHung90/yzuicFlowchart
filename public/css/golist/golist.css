@@ -172,6 +172,10 @@ body {
     transition-duration: 0.5s;
 }
 
+.content_slide{
+    margin: 0 15px;
+}
+
 .content_status {
     display: none;
     height: 40px;

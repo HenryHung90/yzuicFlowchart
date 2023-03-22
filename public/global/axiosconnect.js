@@ -309,6 +309,22 @@ const studentClientConnect = {
                     }
                 })
             )
+        },
+
+    //listener---------------------------------
+    listenerUpload:
+        (time, operation, description) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/listener',
+                    data: {
+                        time: time,
+                        operation: operation,
+                        description: description
+                    }
+                })
+            )
         }
 }
 

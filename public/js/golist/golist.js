@@ -104,7 +104,7 @@ const goListInit = () => {
   }
 
   // define the Node templates for regular nodes
-  let standardSetting =
+  const standardSetting =
     $(go.Node, "Table", nodeStyle(), { deletable: false },
       // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
       $(go.Panel, "Auto",
@@ -132,10 +132,79 @@ const goListInit = () => {
       )
     )
 
+  const completedSetting =
+    $(go.Node, "Table", nodeStyle(), { deletable: false },
+      // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+      $(go.Panel, "Auto",
+        $(go.Shape, "RoundedRectangle",
+          { fill: "#FFC78E", stroke: "#FFD306", strokeWidth: 3.5 },
+          new go.Binding("figure", "figure")
+        ),
+        $(go.TextBlock,
+          {
+            font: "bold 11pt Lato, Helvetica, Arial, sans-serif",
+            stroke: 'black'
+          },
+          {
+            margin: 10,
+            maxSize: new go.Size(160, 160),
+            wrap: go.TextBlock.WrapFit,
+            editable: false,
+            textAlign: 'center',
+          },
+          //攜結text 呼叫時會使用建立之node 名稱作為內部text
+          //綁定TextBlock.text 屬性爲Node.data.name的值，Model對象可以通過Node.data.name獲取和設置TextBlock.text
+          new go.Binding("text").makeTwoWay()
+        ),
+        // four named ports, one on each side:
+        makePort("T", go.Spot.Top, go.Spot.TopSide, false, true),
+        makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true),
+        makePort("R", go.Spot.Right, go.Spot.RightSide, true, true),
+        makePort("B", go.Spot.Bottom, go.Spot.BottomSide, true, false)
+      )
+    )
+  const bonusSetting =
+    $(go.Node, "Table", nodeStyle(), { deletable: false },
+      // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+      $(go.Panel, "Auto",
+        $(go.Shape, "RoundedRectangle",
+          { fill: "#282c34", stroke: "#FF0000", strokeWidth: 3.5 },
+          new go.Binding("figure", "figure")
+        ),
+        $(go.TextBlock, textStyle(),
+          {
+            margin: 10,
+            maxSize: new go.Size(160, 160),
+            wrap: go.TextBlock.WrapFit,
+            editable: false,
+            textAlign: 'center',
+          },
+          //攜結text 呼叫時會使用建立之node 名稱作為內部text
+          //綁定TextBlock.text 屬性爲Node.data.name的值，Model對象可以通過Node.data.name獲取和設置TextBlock.text
+          new go.Binding("text").makeTwoWay()
+        ),
+        // four named ports, one on each side:
+        makePort("T", go.Spot.Top, go.Spot.TopSide, false, true),
+        makePort("L", go.Spot.Left, go.Spot.LeftSide, true, true),
+        makePort("R", go.Spot.Right, go.Spot.RightSide, true, true),
+        makePort("B", go.Spot.Bottom, go.Spot.BottomSide, true, false)
+      )
+    )
+
   myDiagram.nodeTemplateMap.add("Understanding", standardSetting)
   myDiagram.nodeTemplateMap.add("Formulating", standardSetting)
   myDiagram.nodeTemplateMap.add("Programming", standardSetting)
   myDiagram.nodeTemplateMap.add("Reflection", standardSetting)
+
+  myDiagram.nodeTemplateMap.add("Completed-Understanding", completedSetting)
+  myDiagram.nodeTemplateMap.add("Completed-Formulating", completedSetting)
+  myDiagram.nodeTemplateMap.add("Completed-Programming", completedSetting)
+  myDiagram.nodeTemplateMap.add("Completed-Reflection", completedSetting)
+
+  myDiagram.nodeTemplateMap.add("Bonus-Understanding", bonusSetting)
+  myDiagram.nodeTemplateMap.add("Bonus-Formulating", bonusSetting)
+  myDiagram.nodeTemplateMap.add("Bonus-Programming", bonusSetting)
+  myDiagram.nodeTemplateMap.add("Bonus-Reflection", bonusSetting)
 
   myDiagram.nodeTemplateMap.add("Conditional",
     $(go.Node, "Table", nodeStyle(),
@@ -321,26 +390,38 @@ const goListInit = () => {
 
 
   // initialize the Palette that is on the left side of the page
-  let myPalette =
-    $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
-      {
-        // Instead of the default animation, use a custom fade-down
-        "animationManager.initialAnimationStyle": go.AnimationManager.None,
-        "InitialAnimationStarting": animateFadeDown, // Instead, animate with this function
-        //禁止縮放
-        allowZoom: false,
+  if (NormalizeFunc.getCookie('adminId')) {
+    let myPalette =
+      $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
+        {
+          // Instead of the default animation, use a custom fade-down
+          "animationManager.initialAnimationStyle": go.AnimationManager.None,
+          "InitialAnimationStarting": animateFadeDown, // Instead, animate with this function
+          //禁止縮放
+          allowZoom: false,
 
-        nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
-        model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Understanding", text: "探索理解" },
-          { category: "Formulating", text: "表徵制定" },
-          { category: "Programming", text: "計畫執行" },
-          { category: "Reflection", text: "監控反思" },
-          // { category: "Conditional", text: "自定義" },
-          { category: "Comment", text: "筆記" },
-          // { category: "Target", text: "成品展示" }
-        ])
-      });
+          nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
+          model: new go.GraphLinksModel([  // specify the contents of the Palette
+            { category: "Target", text: "成品展示" },
+            { category: "Understanding", text: "探索理解" },
+            { category: "Formulating", text: "表徵制定" },
+            { category: "Programming", text: "計畫執行" },
+            { category: "Reflection", text: "監控反思" },
+            { category: "Completed-Understanding", text: "探索理解" },
+            { category: "Completed-Formulating", text: "表徵制定" },
+            { category: "Completed-Programming", text: "計畫執行" },
+            { category: "Completed-Reflection", text: "監控反思" },
+            { category: "Bonus-Understanding", text: "探索理解" },
+            { category: "Bonus-Formulating", text: "表徵制定" },
+            { category: "Bonus-Programming", text: "計畫執行" },
+            { category: "Bonus-Reflection", text: "監控反思" },
+            // { category: "Conditional", text: "自定義" },
+            { category: "Comment", text: "筆記" },
+
+          ])
+        });
+  }
+
 
   // This is a re-implementation of the default animation, except it fades in from downwards, instead of upwards.
   function animateFadeDown(e) {
@@ -357,6 +438,12 @@ const goListInit = () => {
 
   load();  // load an initial diagram from some JSON text
 }
+
+
+let ALLNODE
+let ALLLINK
+let PROGRESS
+
 //nav & click function
 const navInit = () => {
   //初始化 boostrap Tooltip
@@ -393,6 +480,10 @@ const navInit = () => {
     }
   })
 
+  $(document).on('click', (e) => {
+    ClickListening(e)
+  })
+
   NormalizeFunc.loadingPage(false)
 }
 
@@ -408,6 +499,10 @@ const navButton = {
     let idx = document.title.indexOf("*");
     if (idx !== -1) {
       document.title = document.title.slice(0, idx);
+
+      goData.progress = PROGRESS
+      goData.nodeDataArray = ALLNODE
+      goData.linkDataArray = ALLLINK
 
       //存入資料庫
       await studentClientConnect.saveGoList(goData, NormalizeFunc.getFrontEndCode('courseId'))
@@ -481,16 +576,38 @@ const load = async () => {
   await studentClientConnect.readGoList(NormalizeFunc.getFrontEndCode('courseId'))
     .then(response => {
       if (NormalizeFunc.serverResponseErrorDetect(response)) {
-        console.log(response.data.message)
         const progress = parseInt(response.data.message.progress) || 1
         let newNodeData = []
         let newLinkData = []
 
+        ALLNODE = response.data.message.nodeDataArray
+        ALLLINK = response.data.message.linkDataArray
+        PROGRESS = response.data.message.progress
+
         for (const Node of response.data.message.nodeDataArray) {
+          //若是 Target 類型，則直接顯示
           if (Node.category === 'Target') {
             newNodeData.push(Node)
           }
+          //在 Progress 目標前的通通都顯示
           if (Node.key == progress || Node.key.split("-")[0] <= progress) {
+            // 若是已經歷過 則換成已完成樣式
+            if (Node.key.split("-")[0] < progress) {
+              switch (Node.category) {
+                case 'Understanding':
+                  Node.category = "Completed-Understanding"
+                  break
+                case 'Formulating':
+                  Node.category = "Completed-Formulating"
+                  break
+                case 'Programming':
+                  Node.category = "Completed-Programming"
+                  break
+                case 'Reflection':
+                  Node.category = "Completed-Reflection"
+                  break
+              }
+            }
             newNodeData.push(Node)
           }
         }

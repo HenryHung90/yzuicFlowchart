@@ -9,6 +9,8 @@ import localStrategy from 'passport-local'
 import studentConfig from '../models/studentconfig.js'
 import adminConfig from '../models/adminconfig.js'
 
+import listenerconfig from '../models/listenerconfig.js'
+
 const LocalStrategy = localStrategy.Strategy
 const JWTStrategy = passportJWT.Strategy
 const extractJWT = passportJWT.ExtractJwt
@@ -37,11 +39,13 @@ const checkPasswordAdmin = async (user, inputPassword) => {
     return compareResult
 }
 
+const date = new Date()
+const Time = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+
 passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordField: 'studentPassword' }, (username, password, done) => {
     studentConfig.findOne({ studentId: username, studentAccess: true })
         .then(async (user) => {
             if (user == null) {
-                console.log('user error')
                 done(null, { message: '無此用戶' })
             } else {
                 let compareResult = false
@@ -53,11 +57,49 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                 })
 
                 if (compareResult == false) {
-                    console.log('password error')
                     done(null, { message: '帳號或密碼錯誤' })
                 } else {
-                    console.log('success')
-                    console.log('user', user.studentId, 'get in at', new Date())
+                    console.log('user', user.studentId, 'get in at', Time)
+
+                    const listenerData = await listenerconfig.findOne(
+                        {
+                            studentId: user.studentId,
+                            studentClass: user.studentClass,
+                            Access: true
+                        })
+
+                    if (listenerData == null) {
+                        const newListenerData = new listenerconfig({
+                            studentName: user.studentName,
+                            studentClass: user.studentClass,
+                            studentId: user.studentId,
+                            listenerData: [
+                                {
+                                    time: Time,
+                                    operation: '登入',
+                                    description: `${user.studentId} 在 ${Time} 登入系統`
+                                }
+                            ]
+                        })
+
+                        newListenerData.save()
+                    } else {
+                        listenerData.listenerData.push({
+                            time: Time,
+                            operation: '登入',
+                            description: `${user.studentId} 在 ${Time} 登入系統`
+                        })
+
+                        listenerconfig.updateOne({
+                            studentId: user.studentId,
+                            studentClass: user.studentClass,
+                            Access: true
+                        }, {
+                            listenerData: listenerData.listenerData
+                        })
+                    }
+
+
                     const returnUser = {
                         _id: user._id,
                         studentClass: user.studentClass,
@@ -76,7 +118,6 @@ passport.use('admin-login', new LocalStrategy({ usernameField: 'adminId', passwo
     adminConfig.findOne({ adminId: username })
         .then(async (user) => {
             if (user == null) {
-                console.log('user error')
                 done(null, { message: '無此用戶' })
             } else {
                 let compareResult = false
@@ -86,13 +127,10 @@ passport.use('admin-login', new LocalStrategy({ usernameField: 'adminId', passwo
                         compareResult = user
                     }
                 })
-
                 if (compareResult == false) {
-                    console.log('password error')
                     done(null, { message: '帳號或密碼錯誤' })
                 } else {
-                    console.log('success')
-                    console.log('admin', user.adminId, 'get in at', new Date())
+                    console.log('admin', user.adminId, 'get in at', Time)
                     const returnUser = {
                         _id: user._id,
                         adminId: user.adminId,

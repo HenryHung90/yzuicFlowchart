@@ -1,4 +1,4 @@
-import { NormalizeFunc } from '../global/common.js'
+import { NormalizeFunc, ClickListening } from '../global/common.js'
 import { studentClientConnect } from '../global/axiosconnect.js'
 NormalizeFunc.loadingPage(true)
 
@@ -10,6 +10,8 @@ const homeInit = async () => {
             }
         }
     })
+
+    document.addEventListener('mousedown', ClickListening, false)
 
     NormalizeFunc.loadingPage(false)
 }
