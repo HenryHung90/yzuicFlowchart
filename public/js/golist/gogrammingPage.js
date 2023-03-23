@@ -1,7 +1,8 @@
 import {
     NormalizeFunc,
     CodeMirrorFunc,
-    GoListFunc
+    GoListFunc,
+    ClickListening
 } from "../../global/common.js"
 import { studentClientConnect } from "../../global/axiosconnect.js"
 
@@ -408,7 +409,7 @@ const ProgrammingBox = (programmingKey) => {
     //footer
     $('<div>').prop({
         className: 'modal-footer',
-        innerHTML: ' <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>'
+        innerHTML: ' <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="LS_closeProgrammingModal">關閉</button>'
     }).appendTo(modalContent)
     //Coding Div----------------------------------------------------
     const content_CodingDiv = $('<div>').prop({
@@ -458,7 +459,7 @@ const ProgrammingBox = (programmingKey) => {
         const content_CodingContainer_title = $('<div>').prop({
             className: 'row content_codingContainer_title',
         }).click(e => {
-            rotateIconAndSlideCode(content_CodingContainer_Code, downIcon)
+            rotateIconAndSlideCode(content_CodingContainer_Code, downIcon, codingType.title)
         }).appendTo(content_CodingContainer)
 
         $("<h3>").prop({
@@ -492,6 +493,7 @@ const ProgrammingBox = (programmingKey) => {
     //launch
     $('<button>').prop({
         className: 'btn btn-success content_launchbtn',
+        id: 'LS_programmingLaunchDemo',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>'
     }).click((e) => {
         launchDemo()
@@ -501,7 +503,7 @@ const ProgrammingBox = (programmingKey) => {
     $('<button>').prop({
         className: 'btn btn-warning content_questionhbtn',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
-        id: 'programmingHint',
+        id: 'LS_programmingHint',
     }).attr('data-bs-toggle', 'modal').attr('data-bs-target', "#programmingHintModal").appendTo(content_LaunchDiv)
 
     //save code
@@ -544,14 +546,15 @@ const ProgrammingBox = (programmingKey) => {
     //-----------------------------------------------------------------------
     //Data Visualization Area
     const dataVisualizationArea = $('<div>').prop({
-        className: 'justify-content-center content_dataVisualizationArea'
+        className: 'justify-content-center content_dataVisualizationArea',
     }).prependTo($('body'))
 
     const dataVisualization_container = $('<div>').prop({
         className: 'row dataVisualizationArea_container',
+        id: 'LS_programmingVisualizationArea'
     }).click((e) => {
-        if (dataVisualizationArea_upIcon.attr('id') === 'up') {
-            dataVisualizationArea_upIcon.attr('id', 'down')
+        if (dataVisualizationArea_upIcon.attr('id') === 'LS_programmingVisualizationArea_up') {
+            dataVisualizationArea_upIcon.attr('id', 'LS_programmingVisualizationArea_down')
             dataVisualizationArea_upIcon.css({
                 'margin-top': '5px',
                 'transform': 'rotate(180deg)'
@@ -560,7 +563,7 @@ const ProgrammingBox = (programmingKey) => {
                 'transform': 'translateY(0)'
             })
         } else {
-            dataVisualizationArea_upIcon.attr('id', 'up')
+            dataVisualizationArea_upIcon.attr('id', 'LS_programmingVisualizationArea_up')
             dataVisualizationArea_upIcon.css({
                 'margin-top': '0',
                 'transform': 'rotate(0deg)'
@@ -575,7 +578,7 @@ const ProgrammingBox = (programmingKey) => {
     //upIcon
     const dataVisualizationArea_upIcon = $('<div>').prop({
         className: 'col-12 dataVisualizationArea_upIcon',
-        id: 'up',
+        id: 'LS_programmingVisualizationArea_up',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>'
     }).appendTo(dataVisualization_container)
 
@@ -592,6 +595,7 @@ const ProgrammingBox = (programmingKey) => {
     ////html icon
     $('<div>').prop({
         className: 'dataVisualizationArea_filedisk_icon',
+        id: 'LS_programmingVisualizationArea_htmlIcon',
         innerHTML:
             '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 384 512"><path d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>' +
             '<p>phaserView.html</p>'
@@ -603,6 +607,7 @@ const ProgrammingBox = (programmingKey) => {
     ////js icon
     $('<div>').prop({
         className: 'dataVisualizationArea_filedisk_icon',
+        id: 'LS_programmingVisualizationArea_jsIcon',
         innerHTML:
             '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>' +
             '<p>phaserScript.js</p>'
@@ -614,6 +619,7 @@ const ProgrammingBox = (programmingKey) => {
     ////media folder icon
     $('<div>').prop({
         className: 'dataVisualizationArea_filedisk_icon',
+        id: 'LS_programmingVisualizationArea_fileIcon',
         innerHTML:
             '<svg xmlns="http://www.w3.org/2000/svg"  width="100%" height="50px" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
             '<p>media</p>'
@@ -696,10 +702,10 @@ const ProgrammingBox = (programmingKey) => {
 
                 const demoContent = $('<div>').prop({
                     className: 'col-12 demoContent',
-                    id: 'up',
+                    id: 'LS_programmingDemoContent_up',
                 }).click(e => {
-                    if (demoContent.attr('id') === 'up') {
-                        demoContent.attr('id', 'down')
+                    if (demoContent.attr('id') === 'LS_programmingDemoContent_up') {
+                        demoContent.attr('id', 'LS_programmingDemoContent_down')
                         downIcon.css({
                             transform: 'rotate(180deg)'
                         })
@@ -707,7 +713,7 @@ const ProgrammingBox = (programmingKey) => {
                             transform: 'translateY(-10px)'
                         })
                     } else {
-                        demoContent.attr('id', 'up')
+                        demoContent.attr('id', 'LS_programmingDemoContent_up')
                         downIcon.css({
                             transform: 'rotate(0deg)'
                         })
@@ -764,13 +770,17 @@ const ProgrammingBox = (programmingKey) => {
         })
     }
     //rotate
-    const rotateIconAndSlideCode = (container, icon) => {
+    const rotateIconAndSlideCode = (container, icon, title) => {
         if (container.attr('id') === 'open') {
+            ClickListening('', `收合 計畫執行 程式之${title}`)
+
             container.attr('id', 'close').slideUp(300)
             icon.css({
                 transform: 'rotate(0deg)'
             }, 200)
         } else {
+            ClickListening('', `展開 計畫執行 程式之${title}`)
+
             container.attr('id', 'open').slideDown(300)
             icon.css({
                 transform: 'rotate(180deg)'
@@ -788,6 +798,8 @@ const ProgrammingBox = (programmingKey) => {
         const createCode = $('#create').data('CodeMirror')
         const updateCode = $('#update').data('CodeMirror')
         const customCode = $("#custom").data('CodeMirror')
+
+        ClickListening('', '儲存 計畫執行 Code')
 
         const keyCode = programmingKey.key
         await studentClientConnect.saveCode(
@@ -817,6 +829,8 @@ const ProgrammingBox = (programmingKey) => {
         NormalizeFunc.loadingPage(true)
         let uploadFile = new FormData()
 
+        ClickListening('', `上傳 計畫執行 檔案 名稱為${files[0].name}`)        
+
         for (let file of files) {
             const extension = file.name.substring(file.name.lastIndexOf('.'), file.name.length).toLowerCase();
 
@@ -827,10 +841,10 @@ const ProgrammingBox = (programmingKey) => {
                 return
             }
             //檢查檔案副檔名結構
-            if (extension == '.png' || extension == '.jpg' || extension == '.jpeg') {
+            if (extension == '.png' || extension == '.jpg' || extension == '.jpeg' || extension == '.mp3') {
                 uploadFile.append('image', file)
             } else {
-                window.alert("上傳檔案僅限 png jpg jpeg")
+                window.alert("上傳檔案僅限 png jpg jpeg , mp3")
                 NormalizeFunc.loadingPage(false)
                 return
             }
@@ -902,6 +916,7 @@ const ProgrammingBox = (programmingKey) => {
                     for (let mediaFile of response.data.files) {
                         const fileItem = $('<div>').prop({
                             className: 'col-2 media_item',
+                            id: `programmingFile___${mediaFile.name}`,
                             innerHTML: `<img src=${mediaFile.src} style="width:40px;height:40px"></img>` +
                                 `<p>${mediaFile.name}</p>`,
                             name: mediaFile.name
@@ -955,6 +970,7 @@ const ProgrammingBox = (programmingKey) => {
         if (window.confirm(`確定刪除圖像 ${file[0].name} ?`)) {
             studentClientConnect.deleteFile(file[0].name).then(response => {
                 if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    ClickListening('',`刪除 計畫執行 檔案 名稱為${file[0].name}`)
                     file.remove()
                 }
             })
@@ -982,12 +998,14 @@ const ReflectionBox = (reflectionKey) => {
     //reflection
     $('<div>').prop({
         className: 'col-12 reflectionDescription_reflection',
+        id:'LS_reflectionDescription_title',
         innerHTML: '<h3>💡問題 & 反思</h3>'
     }).appendTo(ReflectionContainer)
 
     //Learning--------------------------------------------------------------
     const reflectionLearningContainer = $('<div>').prop({
         className: 'col-12 reflectionDescription_learning',
+        id: 'LS_reflectionDescription_learning',
         innerHTML: '<h4>🔍 你學到了甚麼?</h4><p>Ex: 如何使用...、我發現某 A 與某 B 語法的差異...、我覺得某功能或許還可以...，請舉例說明。</p>'
     }).appendTo(ReflectionContainer)
 
@@ -1000,6 +1018,7 @@ const ReflectionBox = (reflectionKey) => {
     //workhard--------------------------------------------------------------
     const reflectionWorkhardContainer = $('<div>').prop({
         className: 'col-12 reflectionDescription_workhard',
+        id: 'LS_reflectionDescription_workhard',
         innerHTML: '<h4>🔍 你覺得還需要努力甚麼?</h4><p>Ex: 我還可以把某 Function 做得更...、或許可以優化某 Function 的...，請詳細說明。</p>'
     }).appendTo(ReflectionContainer)
 
@@ -1012,6 +1031,7 @@ const ReflectionBox = (reflectionKey) => {
     //difficult--------------------------------------------------------------
     const reflectionDifficultContainer = $('<div>').prop({
         className: 'col-12 reflectionDescription_difficult',
+        id: 'LS_reflectionDescription_difficult',
         innerHTML: '<h4>🔍 你遇到哪些困難?</h4><p>Ex: 我遇到了一種BUG...、我時常把某 A 與某 B 搞混...、在某的邏輯上我...，請詳細說明。</p>'
     }).appendTo(ReflectionContainer)
 
@@ -1024,6 +1044,7 @@ const ReflectionBox = (reflectionKey) => {
     //scoring--------------------------------------------------------------
     const reflectionScoringContainer = $('<div>').prop({
         className: 'col-12 reflectionDescription_scoring',
+        id: 'LS_reflectionDescription_scoring',
         innerHTML: '<h4>💯 自我評分</h4>'
     }).appendTo(ReflectionContainer)
 
@@ -1080,6 +1101,7 @@ const ReflectionBox = (reflectionKey) => {
                 $('#scoringText').html('<p>10分，我的程式碼都是 ChatGPT 教我的，呵😎🤏</p>')
                 break
         }
+        ClickListening('',`更改 問題反思 之自我評分為 ${e.target.value} 分`)
     }).appendTo(scoringContainer)
 
     //submit--------------------------------------------------------------
@@ -1141,6 +1163,7 @@ const ReflectionBox = (reflectionKey) => {
 
 
         function submitFunc() {
+            ClickListening('', `送出 ${reflectionKey.key} 問題反思 `)
             NormalizeFunc.loadingPage(true)
             studentClientConnect.saveReflection(
                 NormalizeFunc.getFrontEndCode('courseId'),

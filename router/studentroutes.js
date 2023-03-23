@@ -461,13 +461,15 @@ router.post('/readcode', async (req, res) => {
             studentId: req.user.studentId,
             studentAccess: true
         }).then(response => {
-            if (response.studentCodeList === undefined) {
+            if (response.studentCodeList === undefined || response.studentCodeList === null) {
                 returnData.code = ""
             } else {
-                returnData.code = response.studentCodeList[req.body.courseId][req.body.keyCode]
+                if (response.studentCodeList[req.body.courseId] === null) {
+                    returnData.code = ""
+                } else {
+                    returnData.code = response.studentCodeList[req.body.courseId][req.body.keyCode]
+                }
             }
-
-
         })
 
         await standardcontent.findOne({
@@ -502,7 +504,7 @@ router.post('/savecode', async (req, res) => {
             studentAccess: true
         })
 
-        if (studentData.studentCodeList[req.body.courseId] === undefined) {
+        if (studentData.studentCodeList[req.body.courseId] === undefined || studentData.studentCodeList[req.body.courseId] === null) {
             // 初始化載入
             studentData.studentCodeList[req.body.courseId] = {
                 [req.body.keyCode]: {
@@ -770,10 +772,65 @@ router.post('/getmessagehistory', async (req, res) => {
 })
 //學生點擊事件監聽
 router.post('/listener', async (req, res) => {
-    try{
-        
+    try {
+        const listenerData = await listenerconfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+            studentName: req.user.studentName
+        })
 
-    }catch(err){
+        if (listenerData == null) {
+            const newListenerData = new listenerconfig({
+                studentName: req.user.studentName,
+                studentClass: req.user.studentClass,
+                studentId: req.user.studentId,
+                listenerData: [
+                    {
+                        time: req.body.time,
+                        operation: req.body.operation,
+                        description: req.body.description,
+                        courseTitle: req.body.courseTitle,
+                    }
+                ]
+            })
+
+            newListenerData.save()
+
+            res.json({
+                message: 'success',
+                status: 200
+            })
+        } else {
+            listenerData.listenerData.push({
+                time: req.body.time,
+                operation: req.body.operation,
+                description: req.body.description,
+                courseTitle: req.body.courseTitle,
+            })
+
+            await listenerconfig.updateOne({
+                studentName: req.user.studentName,
+                studentId: req.user.studentId,
+                studentClass: req.user.studentClass,
+            }, {
+                listenerData: listenerData.listenerData
+            }).then(response => {
+                if(response.acknowledged){
+                    res.json({
+                        message: 'success',
+                        status: 200
+                    })
+                    return
+                }
+                res.json({
+                    message: 'DOM 監聽事件失敗，請重新整理網頁',
+                    status: 501
+                })
+            })
+        }
+
+    } catch (err) {
+        console.log(err)
         res.json({
             message: 'DOM 監聽事件失敗，請重新整理網頁',
             status: 501,

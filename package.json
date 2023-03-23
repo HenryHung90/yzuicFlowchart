@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "nodemon server.js",
-    "push-start": "git add . & git commit -m 'daily update' & git push & nodemon server.js",
+    "push-start": "git add . && git commit -m 'daily update' && git push & nodemon server.js",
     "webpack": "webpack",
-    "push": "git add . & git commit -m 'daily update' & git push"
+    "push": "git add . && git commit -m 'daily update' && git push"
   },
   "repository": {
     "type": "git",

@@ -103,7 +103,7 @@ const goListInit = () => {
 
     // define the Node templates for regular nodes
     const standardSetting =
-        $(go.Node, "Table", nodeStyle(), { deletable: false },
+        $(go.Node, "Table", nodeStyle(),
             // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
             $(go.Panel, "Auto",
                 $(go.Shape, "RoundedRectangle",
@@ -131,7 +131,7 @@ const goListInit = () => {
         )
 
     const completedSetting =
-        $(go.Node, "Table", nodeStyle(), { deletable: false },
+        $(go.Node, "Table", nodeStyle(),
             // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
             $(go.Panel, "Auto",
                 $(go.Shape, "RoundedRectangle",
@@ -228,14 +228,18 @@ const goListInit = () => {
         ));
 
     myDiagram.nodeTemplateMap.add("Start",
-        $(go.Node, "Table", nodeStyle(), { deletable: false },
+        $(go.Node, "Table", nodeStyle(),
             $(go.Panel, "Spot",
                 $(go.Shape, "Circle",
                     { desiredSize: new go.Size(100, 100), fill: "#282c34", stroke: "#09d3ac", strokeWidth: 3.5 }),
-                $(go.TextBlock, "Start", textStyle(),
-                    // {
-                    //   editable: true
-                    // },
+                $(go.TextBlock, "Start",
+                    {
+                        font: "bold 15pt Lato, Helvetica, Arial, sans-serif",
+                        stroke: "#F8F8F8"
+                    },
+                    {
+                        editable: true
+                    },
                     new go.Binding("text").makeTwoWay())
             ),
             // three named ports, one on each side except the top, all output only:
@@ -400,6 +404,7 @@ const goListInit = () => {
                 nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
                 model: new go.GraphLinksModel([  // specify the contents of the Palette
                     { category: "Target", text: "成品展示" },
+                    { category: "Start", text: "Task" },
                     { category: "Understanding", text: "探索理解" },
                     { category: "Formulating", text: "表徵制定" },
                     { category: "Programming", text: "計畫執行" },

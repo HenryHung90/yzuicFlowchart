@@ -23,12 +23,10 @@ $('#changePassword').click(e => changePassword())
 
 
 const logout = () => {
-    if (window.confirm("確定登出嗎？退出前請記得儲存內容喔!")) {
-        NormalizeFunc.loadingPage(true)
-        studentClientConnect.logout().then(response => {
-            window.location.href = '/'
-        })
-    }
+    NormalizeFunc.loadingPage(true)
+    studentClientConnect.logout().then(response => {
+        window.location.href = '/'
+    })
 }
 
 const changePassword = () => {
@@ -84,12 +82,14 @@ const changePassword = () => {
     }).appendTo(CP_PasswordContent)
     $('<button>').prop({
         className: 'col-4 btn btn-info',
+        id: 'LS_ComfirmChangePassword',
         innerHTML: '確認'
     }).click(e => {
         confirmCP()
     }).appendTo(CP_Button)
     $('<button>').prop({
         className: 'col-4 offset-md-4 btn btn-outline-info',
+        id: 'LS_CancelChangePassword',
         innerHTML: '取消'
     }).click(e => {
         cancelCP()
@@ -98,6 +98,7 @@ const changePassword = () => {
     //----Block----//
     $('<div>').prop({
         className: 'container-fluid block',
+        id: 'LS_CancelChangePassword'
     }).click(e => {
         cancelCP()
     }).appendTo(changePasswordDiv)
@@ -127,6 +128,7 @@ const changePassword = () => {
         }
         NormalizeFunc.loadingPage(true)
         studentClientConnect.changePassword(OP, NP_2).then(async response => {
+            ClickListening('', `確認修改密碼，新密碼為 ${NP_1}`)
             if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
                 NormalizeFunc.loadingPage(false)
@@ -148,9 +150,11 @@ const changePassword = () => {
 const renderGoList = (standardData) => {
     standardData.forEach((value, index) => {
         const goListContainer = $('<div>').prop({
-            className: 'goListCourse_contentContainer'
+            className: 'goListCourse_contentContainer',
         }).click(e => {
             enterClass(value._id)
+            // 進入課程LS
+            ClickListening('', `進入課程 ${value.goListTitle}`)
         }).appendTo($('.goListCourse'))
 
         //Image Box

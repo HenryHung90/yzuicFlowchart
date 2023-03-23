@@ -1,4 +1,4 @@
-import { GoListFunc, NormalizeFunc } from "../../global/common.js";
+import { GoListFunc, NormalizeFunc, ClickListening } from "../../global/common.js";
 import { chatBoxInit } from "./chatbox.js";
 import { studentClientConnect } from "../../global/axiosconnect.js";
 
@@ -234,10 +234,11 @@ const goListInit = () => {
       $(go.Panel, "Spot",
         $(go.Shape, "Circle",
           { desiredSize: new go.Size(100, 100), fill: "#282c34", stroke: "#09d3ac", strokeWidth: 3.5 }),
-        $(go.TextBlock, "Start", textStyle(),
-          // {
-          //   editable: true
-          // },
+        $(go.TextBlock, "Start",
+          {
+            font: "bold 15pt Lato, Helvetica, Arial, sans-serif",
+            stroke: "#F8F8F8"
+          },
           new go.Binding("text").makeTwoWay())
       ),
       // three named ports, one on each side except the top, all output only:
@@ -465,8 +466,8 @@ const navInit = () => {
   $('#download').click((e) => {
     navButton.download()
   })
-  $('#logout').click((e) => {
-    navButton.logout()
+  $('#leave').click((e) => {
+    navButton.leave()
   })
   //Save Btn
   $('#myDiagramDiv').keydown((e) => {
@@ -480,9 +481,8 @@ const navInit = () => {
     }
   })
 
-  $(document).on('click', (e) => {
-    ClickListening(e)
-  })
+  // 監聽事件
+  document.addEventListener('mousedown', ClickListening, false)
 
   NormalizeFunc.loadingPage(false)
 }
@@ -490,6 +490,7 @@ const navInit = () => {
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
+
   //save
   save: async () => {
     NormalizeFunc.loadingPage(true)
@@ -497,6 +498,8 @@ const navButton = {
     const goData = JSON.parse(myDiagram.model.toJson());
     //刪除 * 字號
     let idx = document.title.indexOf("*");
+    ClickListening('', '儲存 List')
+
     if (idx !== -1) {
       document.title = document.title.slice(0, idx);
 
@@ -545,6 +548,7 @@ const navButton = {
       await studentClientConnect.restartGoList(NormalizeFunc.getFrontEndCode('courseId'))
         .then(response => {
           if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            ClickListening('', '重整 List')
             load()
             NormalizeFunc.loadingPage(false)
           }
@@ -554,18 +558,19 @@ const navButton = {
   //download new golist
   download: async () => {
     NormalizeFunc.loadingPage(true)
-
     //更新 goList
     await studentClientConnect.downloadGoList(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
       if (NormalizeFunc.serverResponseErrorDetect(response)) {
-        NormalizeFunc.loadingPage(false)
+        ClickListening('', '載入最新版本 List')
         load()
+        NormalizeFunc.loadingPage(false)
       }
     })
   },
-  //logout
-  logout: () => {
+  //leave
+  leave: () => {
     if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
+      ClickListening('', '退出')
       window.location.href = `/home/${NormalizeFunc.getCookie('studentId')}`
     }
   }

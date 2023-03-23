@@ -1,5 +1,5 @@
 import { socketConnect, MessageType } from '../../global/socketConnect.js'
-import { NormalizeFunc } from '../../global/common.js'
+import { ClickListening, NormalizeFunc } from '../../global/common.js'
 import { studentClientConnect } from '../../global/axiosconnect.js'
 
 const chatBoxInit = () => {
@@ -95,6 +95,7 @@ const chatBoxInit = () => {
     // send message
     const sendMessage = () => {
         if ($('#Message').val() !== '') {
+            ClickListening('', `向聊天室傳送訊息 內容為:${$('#Message').val() }`)
             socketConnect.sendMessage($('#Message').val())
             $('#Message').val('')
         }

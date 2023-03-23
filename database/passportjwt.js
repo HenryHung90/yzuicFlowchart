@@ -90,7 +90,7 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                             description: `${user.studentId} 在 ${Time} 登入系統`
                         })
 
-                        listenerconfig.updateOne({
+                        await listenerconfig.updateOne({
                             studentId: user.studentId,
                             studentClass: user.studentClass,
                             Access: true

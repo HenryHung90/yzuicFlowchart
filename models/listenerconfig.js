@@ -17,7 +17,7 @@ const listenerConfig = new mongoose.Schema({
         required: true,
     },
     // 監聽資料
-    // 內容應包含 [{time, operation, description}]
+    // 內容應包含 [{time,courseTitle, operation, description}]
     listenerData: {
         type: 'array',
         required: true,

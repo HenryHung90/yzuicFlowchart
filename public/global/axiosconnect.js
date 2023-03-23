@@ -313,7 +313,7 @@ const studentClientConnect = {
 
     //listener---------------------------------
     listenerUpload:
-        (time, operation, description) => {
+        (time, operation, description, courseTitle) => {
             return (
                 axios({
                     method: 'post',
@@ -321,7 +321,8 @@ const studentClientConnect = {
                     data: {
                         time: time,
                         operation: operation,
-                        description: description
+                        description: description,
+                        courseTitle: courseTitle
                     }
                 })
             )
