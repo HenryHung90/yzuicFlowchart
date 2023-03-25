@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const listenerConfig = new mongoose.Schema({
+const formulatingConfig = new mongoose.Schema({
     // 學生屆數
     studentClass: {
         type: 'string',
@@ -16,13 +16,14 @@ const listenerConfig = new mongoose.Schema({
         type: 'string',
         required: true,
     },
-    // 監聽資料
-    // 內容應包含 [{time, courseTitle, operation, keyName, detail, description}]
-    listenerData: {
-        type: 'array',
+    // 表徵制定 內容
+    // 語法 => 動畫 互動 監聽
+    // 內容應包含 key = {content[{title, code, description}], hint}
+    formulatingData: {
+        type: 'object',
         required: true,
     }
 
 })
 
-export default mongoose.model('listenerConfigs', listenerConfig)
+export default mongoose.model('formulatingConfigs', formulatingConfig)

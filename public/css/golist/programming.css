@@ -99,10 +99,6 @@
     margin-bottom: 10px;
 }
 
-.content_questionhbtn {
-    animation: breathLight 2s infinite steps(3000);
-    margin-bottom: 10px;
-}
 
 /**dataVisulization**/
 .content_dataVisualizationArea {

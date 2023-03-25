@@ -277,6 +277,36 @@ const studentClientConnect = {
                 })
             )
         },
+    //Bonus
+    // 取得 Formulating
+    getWriteFormulating:
+        (courseId, key) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/getwriteformulating',
+                    data: {
+                        courseId: courseId,
+                        key: key
+                    }
+                })
+            )
+        },
+    // 儲存 Formulating
+    saveWriteFormulating:
+        (courseId, key, formulatingData) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/savewriteformulating',
+                    data: {
+                        courseId: courseId,
+                        key: key,
+                        formulatingData: formulatingData
+                    }
+                })
+            )
+        },
     //reflection--------------------------------
     // 送出 Reflection
     saveReflection:
@@ -313,16 +343,18 @@ const studentClientConnect = {
 
     //listener---------------------------------
     listenerUpload:
-        (time, operation, description, courseTitle) => {
+        (time, courseTitle, operation, keyName, detail, description) => {
             return (
                 axios({
                     method: 'post',
                     url: '/student/listener',
                     data: {
                         time: time,
+                        courseTitle: courseTitle,
                         operation: operation,
+                        keyName: keyName,
+                        detail: detail,
                         description: description,
-                        courseTitle: courseTitle
                     }
                 })
             )

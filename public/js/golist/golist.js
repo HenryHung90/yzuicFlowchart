@@ -498,7 +498,7 @@ const navButton = {
     const goData = JSON.parse(myDiagram.model.toJson());
     //刪除 * 字號
     let idx = document.title.indexOf("*");
-    ClickListening('', '儲存 List')
+    ClickListening('', '儲存--List')
 
     if (idx !== -1) {
       document.title = document.title.slice(0, idx);
@@ -548,7 +548,7 @@ const navButton = {
       await studentClientConnect.restartGoList(NormalizeFunc.getFrontEndCode('courseId'))
         .then(response => {
           if (NormalizeFunc.serverResponseErrorDetect(response)) {
-            ClickListening('', '重整 List')
+            ClickListening('', '重整--List')
             load()
             NormalizeFunc.loadingPage(false)
           }
@@ -561,7 +561,7 @@ const navButton = {
     //更新 goList
     await studentClientConnect.downloadGoList(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
       if (NormalizeFunc.serverResponseErrorDetect(response)) {
-        ClickListening('', '載入最新版本 List')
+        ClickListening('', '載入最新版本--List')
         load()
         NormalizeFunc.loadingPage(false)
       }

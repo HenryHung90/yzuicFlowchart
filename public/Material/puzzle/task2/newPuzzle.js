@@ -39,8 +39,8 @@ function create() {
     //將 crop 設為 Phaser 的群組
     puzzleInformation.crop = this.add.group()
 
-    // 隨機從 0 ~ 8 選擇一塊生成
-    let randomPick = Math.floor(Math.random() * 9)
+    // 從 0 ~ 8 選擇一塊生成
+    let randomPick = 2
 
 
     // 則生成該 puzzle

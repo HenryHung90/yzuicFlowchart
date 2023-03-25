@@ -172,7 +172,12 @@ body {
     transition-duration: 0.5s;
 }
 
-.content_slide{
+.content_slide {
+    margin: 0 15px;
+}
+
+.content_question {
+    animation: breathLight 2s infinite steps(3000);
     margin: 0 15px;
 }
 

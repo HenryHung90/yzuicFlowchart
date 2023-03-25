@@ -1,4 +1,4 @@
-import { TargetBox, StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox } from "../js/golist/gogrammingPage.js"
+import { TargetBox, StartBox, CommentBox, UnderstandingBox, FormulatingBox, ProgrammingBox, ReflectionBox, WriteFormulatingBox } from "../js/golist/gogrammingPage.js"
 import { adminTargetBox, adminStartBox, adminUnderstandingBox, adminFormulatingBox, adminProgrammingBox, adminReflectionBox } from '../js/admin/golist/gogrammingPage.js'
 import { adminClientConnect, studentClientConnect } from "./axiosconnect.js"
 
@@ -87,7 +87,6 @@ const categoryBox = {
     },
     Start: (data, key) => {
         if (data.message === undefined) {
-            CodeMirrorFunc.codeMirrorProgram('tutorial', '')
             $('#startDescription').html(`<h3>Task undefined</h3>`)
             return
         }
@@ -157,7 +156,7 @@ const categoryBox = {
                     innerHTML: code
                 }).appendTo(contentBox)
 
-                CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code)
+                CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code, true)
                 $(`#code_${index}`).data('CodeMirror').setSize('auto', 'auto')
                 $(`#code_${index}`).data('CodeMirror').setOption('readOnly', true)
                 index++
@@ -166,6 +165,44 @@ const categoryBox = {
                 $('<div>').prop({
                     className: 'formulatingDescription_contentDescription',
                     innerHTML: `<p>${description}</p>`
+                }).appendTo(contentBox)
+            }
+        }
+    },
+    WriteFormulating: (data) => {
+        if (data.message === undefined) {
+            return
+        }
+        if (data.message.content !== undefined) {
+            let index = 0
+            for (const { title, code, description } of data.message.content) {
+                // ContentBox
+                const contentBox = $('<div>').prop({
+                    className: 'writeFormulatingDescription_contentBox',
+                }).insertBefore($('#addFormulationBtn'))
+
+                //Title
+                $('<div>').prop({
+                    className: 'form-floating writeFormulatingDescription_contentTitle',
+                    innerHTML: `<input type="text" class="form-control formulatingContentTitleValue" id="formulatingContentTitleValue" placeholder="將使用到的語法" value=${title}/>` +
+                        '<label for="formulatingContentTitle">將使用到的語法</label>'
+                }).appendTo(contentBox)
+                //Code
+                $('<textarea>').prop({
+                    className: 'formulatingDescription_contentCode',
+                    id: `code_${index}`,
+                    innerHTML: code
+                }).appendTo(contentBox)
+
+                CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code, false)
+                $(`#code_${index}`).data('CodeMirror').setSize('auto', 'auto')
+                index++
+
+                //Description
+                $('<div>').prop({
+                    className: 'form-floating writeFormulatingDescription_contentDescription',
+                    innerHTML: `<textarea class="form-control formulatingContentDescription" id="formulatingContentDescription" placeholder="該語法的描述" style="height:300px;resize:none">${description}</textarea>` +
+                        '<label for="formulatingContentDescription">該語法的描述</label>'
                 }).appendTo(contentBox)
             }
         }
@@ -192,7 +229,7 @@ const categoryBox = {
 
 
         for (const CodeMirror of codeData) {
-            CodeMirrorFunc.codeMirrorProgram(CodeMirror.name, CodeMirror.data)
+            CodeMirrorFunc.codeMirrorProgram(CodeMirror.name, CodeMirror.data, false)
             $(`#${CodeMirror.name}`).data('CodeMirror').setSize('auto', 'auto')
         }
 
@@ -253,9 +290,9 @@ const categoryBox = {
                 }).appendTo($(".tooltip-inner"))
 
                 if (data.hintCode !== undefined) {
-                    CodeMirrorFunc.codeMirrorProgram('hint', data.hintCode[$(this).attr('id').split("_")[1]] || 'no data')
+                    CodeMirrorFunc.codeMirrorProgram('hint', data.hintCode[$(this).attr('id').split("_")[1]] || 'no data', true)
                 } else {
-                    CodeMirrorFunc.codeMirrorProgram('hint', 'no data')
+                    CodeMirrorFunc.codeMirrorProgram('hint', 'no data', true)
                 }
                 $('#hint').data('CodeMirror').setSize('auto', 'auto')
 
@@ -344,7 +381,7 @@ const GoListFunc = {
     },
     //show Each Box
     showContainer: async (s, id) => {
-        ClickListening('', `進入 ${s.key} ${s.text}`)
+        ClickListening('', `打開-${s.key} ${s.text}`)
         //取得 Iframe 發出之 Error 警訊
         const reciveMessage = (e) => {
             e.preventDefault()
@@ -370,10 +407,11 @@ const GoListFunc = {
         }
         //click close function
         const closePage = () => {
-            ClickListening('', `離開 ${s.key} ${s.text}`)
+            ClickListening('', `離開-${s.key} ${s.text}`)
             //關閉自動儲存
             //取得各階段程式碼
             if (s.category === 'Programming' || s.category === 'Completed-Programming') {
+                NormalizeFunc.loadingPage(true)
                 const settingCode = $("#setting").data('CodeMirror')
                 const configCode = $('#config').data('CodeMirror')
                 const preloadCode = $("#preload").data('CodeMirror')
@@ -381,6 +419,7 @@ const GoListFunc = {
                 const updateCode = $('#update').data('CodeMirror')
                 const customCode = $("#custom").data('CodeMirror')
                 const keyCode = s.key
+
 
                 studentClientConnect.saveCode(
                     settingCode.getValue(),
@@ -391,7 +430,40 @@ const GoListFunc = {
                     customCode.getValue(),
                     keyCode,
                     NormalizeFunc.getFrontEndCode('courseId')
-                )
+                ).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
+            }
+
+            //Auto save For Bonus-Formulating
+            if (s.category === 'Bonus-Formulating') {
+                //得出現在共有多少個 Formulating
+                const formulatingCount = $('.formulatingDescription_contentBox').length
+
+                if (formulatingCount !== 0) {
+                    NormalizeFunc.loadingPage(true)
+                    let formulatingData = []
+
+                    for (let i = 0; i < formulatingCount; i++) {
+                        formulatingData.push({
+                            title: $('.formulatingContentTitleValue')[i].value,
+                            description: $('.formulatingContentDescription')[i].value,
+                            code: $(`#code_${i}`).data('CodeMirror').getValue()
+                        })
+                    }
+
+                    studentClientConnect.saveWriteFormulating(
+                        NormalizeFunc.getFrontEndCode('courseId'),
+                        s.key,
+                        formulatingData
+                    ).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                            NormalizeFunc.loadingPage(false)
+                        }
+                    })
+                }
             }
 
             block.fadeOut(200)
@@ -431,7 +503,7 @@ const GoListFunc = {
 
 
             if ($('.content_slide').attr('id') === 'open') {
-                ClickListening('', `全部收合 ${s.key} ${s.text}`)
+                ClickListening('', `全部收合-${s.key} ${s.text}-Code`)
                 for (const codeContainer of content_codingContainer) {
                     if ($(codeContainer).attr('id') === 'open') {
                         $(codeContainer).attr('id', 'close').slideUp(300)
@@ -443,7 +515,7 @@ const GoListFunc = {
                     }
                 }
             } else {
-                ClickListening('', `全部展開 ${s.key} ${s.text}`)
+                ClickListening('', `全部展開-${s.key} ${s.text}-Code`)
                 for (const codeContainer of content_codingContainer) {
                     if ($(codeContainer).attr('id') === 'close') {
                         $(codeContainer).attr('id', 'open').slideDown(300)
@@ -525,6 +597,13 @@ const GoListFunc = {
             rotateAllIconAndSlideAllCode()
         }).appendTo(content_iconContainer)
 
+        //question button
+        $('<button>').prop({
+            className: 'col-1 btn btn-warning content_question',
+            innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
+            id: 'LS_programmingHint',
+        }).attr('data-bs-toggle', 'modal').attr('data-bs-target', "#programmingHintModal").appendTo(content_iconContainer)
+
         //complete Icon
         $('<div>').prop({
             className: 'col-1 content_complete',
@@ -552,6 +631,7 @@ const GoListFunc = {
             }
         } else {
             switch (s.category) {
+                // 一般情況所使用
                 case "Target":
                     TargetBox().appendTo(contentContainer)
 
@@ -562,7 +642,6 @@ const GoListFunc = {
                         }
                     })
                     break
-
                 case "Start":
                     StartBox().appendTo(contentContainer)
 
@@ -573,8 +652,7 @@ const GoListFunc = {
                         }
                     })
                     break;
-
-                case "Understanding": case "Completed-Understanding":
+                case "Understanding": case "Completed-Understanding": case "Bonus-Understanding":
                     UnderstandingBox().appendTo(contentContainer)
 
                     await studentClientConnect.getUnderstanding(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
@@ -584,7 +662,6 @@ const GoListFunc = {
                         }
                     })
                     break;
-
                 case "Formulating": case "Completed-Formulating":
                     FormulatingBox(s).appendTo(contentContainer)
 
@@ -595,8 +672,7 @@ const GoListFunc = {
                         }
                     })
                     break;
-
-                case "Programming": case "Completed-Programming":
+                case "Programming": case "Completed-Programming": case "Bonus-Programming":
                     ProgrammingBox(s).appendTo(contentContainer)
 
                     //確認userId資料夾是否建立
@@ -614,7 +690,6 @@ const GoListFunc = {
                         }
                     })
                     break;
-
                 case "Reflection": case "Completed-Reflection":
                     ReflectionBox(s).appendTo(contentContainer)
 
@@ -626,10 +701,20 @@ const GoListFunc = {
                         }
                     })
                     break;
-
                 case "Comment":
                     CommentBox(s).appendTo(contentContainer)
                     NormalizeFunc.loadingPage(false)
+                    break;
+                // Bouns 使用
+                case "Bonus-Formulating":
+                    WriteFormulatingBox(s).appendTo(contentContainer)
+
+                    await studentClientConnect.getWriteFormulating(NormalizeFunc.getFrontEndCode('courseId'), s.key).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                            categoryBox.WriteFormulating(response.data)
+                            NormalizeFunc.loadingPage(false)
+                        }
+                    })
                     break;
             }
         }
@@ -678,7 +763,7 @@ const CodeMirrorFunc = {
         }
     },
     //初始化各個Editor
-    codeMirrorProgram: (name, content) => {
+    codeMirrorProgram: (name, content, isReadOnly) => {
         const textProgram = document.getElementById(name)
         CodeMirror.commands.autocomplete = function (cm) {
             cm.showHint({ hint: CodeMirror.hint.javascript });
@@ -719,7 +804,7 @@ const CodeMirrorFunc = {
             // cursorScrollMargin: 250,
             //光標高度
             cursorHeight: name == 'tutorial' ? 0 : 0.85,
-            readOnly: name == 'tutorial' ? true : false
+            readOnly: name == isReadOnly
         })
         Editor.on('inputRead', (e) => {
             Editor.showHint()
@@ -782,48 +867,48 @@ function ClickListening(e, customClick) {
     const clickingOperationMap = new Map([
         // home page //
         ['logout', '登出'],
-        ['settingDropDown', '點擊設定'],
-        ['changePassword', '開啟修改密碼'],
-        ['LS_ComfirmChangePassword', '送出修改密碼'],
-        ['LS_CancelChangePassword', '取消修改密碼'],
+        ['settingDropDown', '點擊-設定'],
+        ['changePassword', '開啟-修改密碼'],
+        ['LS_ComfirmChangePassword', '送出-修改密碼'],
+        ['LS_CancelChangePassword', '取消-修改密碼'],
         // go list class //
-        ['courseTitle', '點擊課程名稱'],
-        ['studentId', '點擊自己的ID'],
+        ['courseTitle', '點擊-課程名稱'],
+        ['studentId', '點擊-自己的ID'],
         // Start //
-        ['start_launchbtn', '重新執行範例'],
+        ['start_launchbtn', '重新執行-任務-範例'],
         // Understanding //
-        ['understandingDescription', '點擊 探索理解 之標題'],
-        ['understandingOperation', '點擊 探索理解 之操作'],
-        ['understandingLimit', '點擊 探索理解 之限制'],
+        ['understandingDescription', '點擊-探索理解-之標題'],
+        ['understandingOperation', '點擊-探索理解-之操作'],
+        ['understandingLimit', '點擊-探索理解-之限制'],
         // Formulating //
-        ['formulatingDescription', '點擊 表徵制定 之標題'],
-        ['formulatingContent', '點擊 表徵制定 之內容'],
+        ['formulatingDescription', '點擊-表徵制定-標題'],
+        ['formulatingContent', '點擊-表徵制定-內容'],
         // Programming //
-        ['LS_programmingLaunchDemo', '執行 計畫執行 之Code'],
-        ['LS_programmingHint', '打開 計畫執行 之Hint'],
-        ['programmingHintModal', '關閉 計畫執行 之Hint'],
-        ['LS_closeProgrammingModal', '關閉 計畫執行 之Hint'],
-        ['LS_programmingVisualizationArea', '點擊 計畫執行 之檔案區'],
-        ['LS_programmingVisualizationArea_up', '點擊 計畫執行 之檔案區'],
-        ['LS_programmingVisualizationArea_down', '點擊 計畫執行 之檔案區'],
-        ['LS_programmingVisualizationArea_htmlIcon', '點擊 計畫執行 之檔案區 html檔案'],
-        ['LS_programmingVisualizationArea_jsIcon', '點擊 計畫執行 之檔案區 js檔案'],
-        ['LS_programmingVisualizationArea_fileIcon', '點擊 計畫執行 之檔案區 file檔案'],
-        ['LS_programmingDemoContent_up', '打開 計畫執行 之程式執行結果畫面'],
-        ['LS_programmingDemoContent_down', '關閉 計畫執行 之程式執行結果畫面'],
+        ['LS_programmingLaunchDemo', '執行-計畫執行-Code'],
+        ['LS_programmingHint', '打開-計畫執行-Hint'],
+        ['programmingHintModal', '關閉-計畫執行-Hint'],
+        ['LS_closeProgrammingModal', '關閉-計畫執行-Hint'],
+        ['LS_programmingVisualizationArea', '點擊-計畫執行-檔案區'],
+        ['LS_programmingVisualizationArea_up', '點擊-計畫執行-檔案區'],
+        ['LS_programmingVisualizationArea_down', '點擊-計畫執行-檔案區'],
+        ['LS_programmingVisualizationArea_htmlIcon', '點擊-計畫執行-檔案區 html檔案'],
+        ['LS_programmingVisualizationArea_jsIcon', '點擊-計畫執行-檔案區 js檔案'],
+        ['LS_programmingVisualizationArea_fileIcon', '點擊-計畫執行-檔案區 file檔案'],
+        ['LS_programmingDemoContent_up', '打開-計畫執行-程式執行結果畫面'],
+        ['LS_programmingDemoContent_down', '關閉-計畫執行-程式執行結果畫面'],
         // Reflection //
-        ['LS_reflectionDescription_title', '點擊 問題反思 之標題'],
-        ['LS_reflectionDescription_learning', '點擊 問題反思 之學到了甚麼'],
-        ['LS_reflectionDescription_workhard', '點擊 問題反思 之還要努力甚麼'],
-        ['LS_reflectionDescription_difficult', '點擊 問題反思 之遇到那些困難'],
-        ['LS_reflectionDescription_scoring', '點擊 問題反思 自我評分'],
-        ['scoringText', '點擊 問題反思 之自我評分敘述'],
-        ['learningValue', '點擊 問題反思 之學到了甚麼輸入框'],
-        ['workhardValue', '點擊 問題反思 之還要努力甚麼輸入框'],
-        ['difficultValue', '點擊 問題反思 之遇到那些困難輸入框'],
+        ['LS_reflectionDescription_title', '點擊-問題反思-標題'],
+        ['LS_reflectionDescription_learning', '點擊-問題反思-學到了甚麼'],
+        ['LS_reflectionDescription_workhard', '點擊-問題反思-還要努力甚麼'],
+        ['LS_reflectionDescription_difficult', '點擊-問題反思-遇到那些困難'],
+        ['LS_reflectionDescription_scoring', '點擊-問題反思-自我評分'],
+        ['scoringText', '點擊-問題反思-自我評分敘述'],
+        ['learningValue', '點擊-問題反思-之學到了甚麼輸入框'],
+        ['workhardValue', '點擊-問題反思-之還要努力甚麼輸入框'],
+        ['difficultValue', '點擊-問題反思-之遇到那些困難輸入框'],
         // ChatBox //
-        ['chatBox_Close', '打開聊天室'],
-        ['chatBox_Open', '關閉聊天室'],
+        ['chatBox_Close', '打開-聊天室'],
+        ['chatBox_Open', '關閉-聊天室'],
     ])
 
     const time = NormalizeFunc.getNowTime("FullTime")
@@ -833,7 +918,7 @@ function ClickListening(e, customClick) {
 
     //如果直接輸入值，則以輸入值為優先
     if (customClick !== undefined) {
-        operation = customClick + `[${courseTitle || null}]`
+        operation = customClick
     } else {
         // 若無則從 id 查找
         for (const PathingId of [e.target.id || '', e.target.parentNode.id || '', e.target.parentNode.parentNode.id || '', e.target.parentNode.parentNode.parentNode.id || '']) {
@@ -841,11 +926,11 @@ function ClickListening(e, customClick) {
             const ProgrammingMediaAry = PathingId.split("___")
             //Programming Hint特殊區域----------------------------------------------------
             if (ProgrammingHintAry[0] === 'programmingHint') {
-                operation = '點擊 計畫執行 第 ' + (parseInt(ProgrammingHintAry[1]) + 1) + ' 之Hint'
+                operation = '點擊-計畫執行-第 ' + (parseInt(ProgrammingHintAry[1]) + 1) + ' 之Hint'
             } else if (ProgrammingHintAry[0] === 'programmingHintCode') {
-                operation = '打開 計畫執行 第 ' + (parseInt(ProgrammingHintAry[1]) + 1) + ' 之HintCode'
+                operation = '打開-計畫執行-第 ' + (parseInt(ProgrammingHintAry[1]) + 1) + ' 之HintCode'
             } else if (ProgrammingMediaAry[0] === 'programmingFile') {
-                operation = `點擊 計畫執行 檔案之${ProgrammingMediaAry[1]}`
+                operation = `點擊-計畫執行-檔案之${ProgrammingMediaAry[1]}`
             }
             else {
                 if (PathingId !== '') {
@@ -854,7 +939,7 @@ function ClickListening(e, customClick) {
 
                     if (checkingMap === undefined) return
 
-                    operation = checkingMap + ` [${courseTitle || ''}]`
+                    operation = checkingMap
                 }
             }
 
@@ -865,11 +950,19 @@ function ClickListening(e, customClick) {
 
     if (operation === 'undefined[null]' || operation === undefined || operation === null) return
 
-    const description = `${NormalizeFunc.getCookie('studentId')} 在 ${time} ${operation} - [${courseTitle}]`
-    console.warn("DESCRIPTION: ", description)
+    // operation => [0]operation , [1]keyName , [2]detail
+
+    const description = `${NormalizeFunc.getCookie('studentId')} 在 ${time} ${courseTitle} ${operation}`
+
+    const tempOperation = operation.split("-")
+    operation = tempOperation[0]
+    const keyName = tempOperation[1] || courseTitle
+    const detail = tempOperation[2] || ''
+
+    console.warn(`T:${time} O:${operation} K:${keyName} D:${detail}`)
 
 
-    studentClientConnect.listenerUpload(time, operation, description, courseTitle).then(response => {
+    studentClientConnect.listenerUpload(time, courseTitle, operation, keyName, detail, description).then(response => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
             return
         }

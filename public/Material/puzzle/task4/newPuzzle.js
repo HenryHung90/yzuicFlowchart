@@ -20,7 +20,7 @@ let game = new Phaser.Game({
 //定義遊戲變數
 const puzzleInformation = {
     // puzzle 的數量
-    amount: 9,
+    amount: [0, 1, 5, 2, 8, 6, 7, 3, 4],
     // 每一個 puzzle 的大小
     scale: {
         width: 300,
@@ -50,41 +50,32 @@ function preload() {
     })
 }
 function create() {
-    //隨機選擇一塊 puzzle 並記住他，在生成時不會生成他
-    puzzleInformation.invisiblePuzzle = Math.floor(Math.random() * 9)
+    //選擇一塊 puzzle 並記住他，在生成時不會生成他
+    puzzleInformation.invisiblePuzzle = 8
     //將 crop 設為 Phaser 的群組
     puzzleInformation.crop = this.add.group()
 
 
-    for (let i = 0; i < puzzleInformation.amount; i++) {
-        // 隨機從 0 ~ 8 選擇一塊生成
-        let randomPick = Math.floor(Math.random() * 9)
-
-        // 若選到已經生成過的，則跳過他
-        if (puzzleInformation.motionPosition.includes(randomPick)) {
-            i--
-        }
-
+    for (let i = 0; i < puzzleInformation.amount.length; i++) {
         // 若選到的是要去掉的那塊，則跳過他
-        else if (randomPick == puzzleInformation.invisiblePuzzle) {
+        if (puzzleInformation.amount[i] == puzzleInformation.invisiblePuzzle) {
             // 創建隱藏的 puzzle ，並將其設置看不到
             puzzleInformation.crop.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
-                randomPick
+                puzzleInformation.amount[i]
             ).setVisible(false).setScale(puzzleInformation.cropScale)
             // 在renderedPuzzle 中加入該 puzzle
-            puzzleInformation.motionPosition.push(randomPick)
+            puzzleInformation.motionPosition.push(puzzleInformation.amount[i])
         }
-
         // 若無上述問題 則生成該 puzzle
         else {
             let puzzle = puzzleInformation.crop.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
-                randomPick
+                puzzleInformation.amount[i]
             )
                 //將其大小初始設置為 0
                 .setScale(0)
@@ -99,12 +90,12 @@ function create() {
             })
 
             // 在renderedPuzzle 中加入該 puzzle
-            puzzleInformation.motionPosition.push(randomPick)
+            puzzleInformation.motionPosition.push(puzzleInformation.amount[i])
             // 使 puzzle 能夠互動
             puzzle.setInteractive()
             // 設定 Puzzle 在 pointerup 的監聽事件
             puzzle.on('pointerup', (e) => {
-                puzzleClicking(puzzle, randomPick)
+                puzzleClicking(puzzle, puzzleInformation.amount[i])
             })
         }
     }

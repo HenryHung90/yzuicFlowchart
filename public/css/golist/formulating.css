@@ -1,20 +1,28 @@
-.formulatingDescription_container {
+.formulatingDescription_container,
+.writeFormulatingDescription_container {
     padding: 10px 24px;
     height: 75vh;
     overflow-y: auto;
 }
 
+.writeFormulatingDescription_target h3,
 .formulatingDescription_target h3 {
     font-weight: bolder;
     font-size: 40px;
 }
 
-.formulatingDescription_contentBox {
+.formulatingDescription_contentBox,
+.writeFormulatingDescription_contentBox {
     margin: 15px auto;
     padding: 12px 20px;
     border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.4);
     box-shadow: 0 0 5px 2px rgba(94, 94, 94, 0.8);
+    transition-duration: 0.3s;
+}
+
+.writeFormulatingDescription_contentBox:hover {
+    background-color: rgba(94, 94, 94, 0.8);
 }
 
 .formulatingDescription_contentTitle h4 {
@@ -33,3 +41,16 @@
 .formulatingDescription_contentDescription {
     padding: 5px 20px;
 }
+
+/*write Formulating Description */
+.writeFormulatingDescription_contentCode{
+    margin: 15px;
+}
+.writeFormulatingDescription_contentTitle {
+    margin: 15px;
+}
+.writeFormulatingDescription_contentDescription {
+    height: 300px;
+    margin: 15px;
+}
+

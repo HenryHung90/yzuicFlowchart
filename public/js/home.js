@@ -128,7 +128,7 @@ const changePassword = () => {
         }
         NormalizeFunc.loadingPage(true)
         studentClientConnect.changePassword(OP, NP_2).then(async response => {
-            ClickListening('', `確認修改密碼，新密碼為 ${NP_1}`)
+            ClickListening('', `確認修改-密碼-新密碼為 ${NP_1}`)
             if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
                 NormalizeFunc.loadingPage(false)
@@ -154,7 +154,7 @@ const renderGoList = (standardData) => {
         }).click(e => {
             enterClass(value._id)
             // 進入課程LS
-            ClickListening('', `進入課程 ${value.goListTitle}`)
+            ClickListening('', `進入課程-${value.goListTitle}`)
         }).appendTo($('.goListCourse'))
 
         //Image Box

@@ -19,8 +19,8 @@ let game = new Phaser.Game({
 
 //定義遊戲變數
 const puzzleInformation = {
-    // puzzle 的數量
-    amount: 9,
+    // puzzle 的排序
+    amount: [1, 6, 4, 2, 3, 5, 8, 7, 0],
     // 每一個 puzzle 的大小
     scale: {
         width: 300,
@@ -52,43 +52,29 @@ function create() {
     puzzleInformation.crop = this.add.group()
 
 
-    for (let i = 0; i < puzzleInformation.amount; i++) {
-        // 隨機從 0 ~ 8 選擇一塊生成
-        let randomPick = Math.floor(Math.random() * 9)
+    for (let i = 0; i < puzzleInformation.amount.length; i++) {
 
-        // 若選到已經生成過的，則跳過他
-        if (puzzleInformation.motionPosition.includes(randomPick)) {
-            i--
-        }
-        // 若無上述問題 則生成該 puzzle
-        else {
-            let puzzle = puzzleInformation.crop.create(
-                puzzleInformation.standardPosition[i].x,
-                puzzleInformation.standardPosition[i].y,
-                'puzzle',
-                randomPick
-                //將其大小初始設置為 0
-            ).setScale(0)
+        let puzzle = puzzleInformation.crop.create(
+            puzzleInformation.standardPosition[i].x,
+            puzzleInformation.standardPosition[i].y,
+            'puzzle',
+            puzzleInformation.amount[i]
+            //將其大小初始設置為 0
+        ).setScale(0)
 
-            // 在renderedPuzzle 中加入該 puzzle
-            puzzleInformation.motionPosition.push(randomPick)
-            // 製作一個簡單的小動畫使其放大
-            this.tweens.add({
-                targets: puzzle,
-                delay: 500,
-                duration: 800,
-                ease: 'Power3',
-                scale: puzzleInformation.cropScale,
-            })
-        }
+        // 在renderedPuzzle 中加入該 puzzle
+        puzzleInformation.motionPosition.push(randomPick)
+        // 製作一個簡單的小動畫使其放大
+        this.tweens.add({
+            targets: puzzle,
+            delay: 500,
+            duration: 800,
+            ease: 'Power3',
+            scale: puzzleInformation.cropScale,
+        })
     }
 }
 
 function update() {
-    for (let i = 0; i < puzzle的張數; i++) {
-        自定義全域變數.crop.create(
-            x位置, y位置, '使用圖片名稱', 第幾張
-            //將其大小初始設置為 0 以便製作簡易小動畫
-        ).setScale(0)
-    }
+
 }

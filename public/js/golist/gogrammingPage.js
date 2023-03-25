@@ -12,6 +12,8 @@ const TargetBox = () => {
     $('.content_complete').remove()
     // 把 收合 字樣刪除
     $('.content_slide').remove()
+    // 把 Hint 刪除
+    $('.content_question').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center TargetContentDiv'
@@ -30,6 +32,8 @@ const StartBox = () => {
     $('.content_complete').remove()
     // 把 收合 字樣刪除
     $('.content_slide').remove()
+    // 把 Hint 刪除
+    $('.content_question').remove()
 
     const startBoxContainer = $('<div>').prop({
         className: 'row justify-content-start startBoxContainer'
@@ -84,6 +88,8 @@ const CommentBox = () => {
     $('.content_complete').remove()
     // 把 收合 字樣刪除
     $('.content_slide').remove()
+    // 把 Hint 刪除
+    $('.content_question').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center commentContentDiv'
@@ -252,7 +258,7 @@ const CommentBox = () => {
 
         contentContainer.append(codeContentContainer)
         //codeMirror append to codeContent
-        CodeMirrorFunc.codeMirrorProgram(codeContentId, '//write your comment code here')
+        CodeMirrorFunc.codeMirrorProgram(codeContentId, '//write your comment code here', false)
         $(`#${codeContentId}`).data('CodeMirror').setSize(null, 200)
     }
 
@@ -264,6 +270,8 @@ const UnderstandingBox = () => {
     $('.content_complete').remove()
     // 把 收合 字樣刪除
     $('.content_slide').remove()
+    // 把 Hint 刪除
+    $('.content_question').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center UnderstandingContentDiv'
@@ -304,6 +312,8 @@ const FormulatingBox = () => {
     $('.content_complete').remove()
     // 把 收合 字樣刪除
     $('.content_slide').remove()
+    // 把 Hint 刪除
+    $('.content_question').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center FormulatingContentDiv'
@@ -373,6 +383,84 @@ const FormulatingBox = () => {
 
     return contentDiv
 }
+
+//WriteFormulatingBox return function (For Bonus)
+const WriteFormulatingBox = () => {
+    // 把 Sync 字樣刪除
+    $('.content_complete').remove()
+    // 把 收合 字樣刪除
+    $('.content_slide').remove()
+    // 把 Hint 刪除
+    $('.content_question').remove()
+    //Content Div-------------------------------------------------
+    const contentDiv = $('<div>').prop({
+        className: 'justify-content-center writeFormulatingContentDiv'
+    })
+    const writeFormulatingDescriptionContainer = $('<div>').prop({
+        className: 'row writeFormulatingDescription_container',
+    }).appendTo(contentDiv)
+
+    //descriptions
+    $('<div>').prop({
+        className: 'col-10 writeFormulatingDescription_target',
+        id: 'writeFormulatingDescription',
+        innerHTML: '<h3>語法的使用與制定</h3>'
+    }).appendTo(writeFormulatingDescriptionContainer)
+
+    const content = $('<div>').prop({
+        className: 'col-12 writeFormulatingDescription_content',
+        id: 'writeFormulatingContent'
+    }).appendTo(writeFormulatingDescriptionContainer)
+
+
+    // Add Formulating Button
+    const contentBox = $('<div>').prop({
+        className: 'writeFormulatingDescription_contentBox',
+        id: 'addFormulationBtn'
+    }).click(e => {
+        addFormulating(e.currentTarget)
+    }).appendTo(content)
+
+    $('<div>').prop({
+        className: 'formulatingDescription_addFormulating',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 448 512"><path d="M240 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H176V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H384c17.7 0 32-14.3 32-32s-14.3-32-32-32H240V80z"/></svg>'
+    }).appendTo(contentBox)
+
+
+    function addFormulating(addBtn) {
+        //得出現在共有多少個 Formulating
+        const formulatingCount = $('.formulatingDescription_contentBox').length
+
+        // ContentBox
+        const contentBox = $('<div>').prop({
+            className: 'formulatingDescription_contentBox',
+        }).insertBefore(addBtn)
+
+        //Title
+        $('<div>').prop({
+            className: 'form-floating writeFormulatingDescription_contentTitle',
+            innerHTML: `<input type="text" class="form-control formulatingContentTitleValue" id="formulatingContentTitleValue" placeholder="將使用到的語法"/>` +
+                '<label for="formulatingContentTitle">將使用到的語法</label>'
+        }).appendTo(contentBox)
+        //Code
+        $('<textarea>').prop({
+            className: 'writeFormulatingDescription_contentCode',
+            id: `code_${formulatingCount}`,
+        }).appendTo(contentBox)
+
+        CodeMirrorFunc.codeMirrorProgram(`code_${formulatingCount}`, '//使用方式', false)
+        $(`#code_${formulatingCount}`).data('CodeMirror').setSize('auto', 'auto')
+
+        //Description
+        $('<div>').prop({
+            className: 'form-floating writeFormulatingDescription_contentDescription',
+            innerHTML: `<textarea class="form-control formulatingContentDescription" id="formulatingContentDescription" placeholder="該語法的描述" style="height:300px;resize:none"></textarea>` +
+                '<label for="formulatingContentDescription">該語法的描述</label>'
+        }).appendTo(contentBox)
+    }
+    return contentDiv
+}
+
 //Programming return function
 const ProgrammingBox = (programmingKey) => {
     //Content Row 分行器
@@ -498,13 +586,6 @@ const ProgrammingBox = (programmingKey) => {
     }).click((e) => {
         launchDemo()
     }).appendTo(content_LaunchDiv)
-
-    //question button
-    $('<button>').prop({
-        className: 'btn btn-warning content_questionhbtn',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
-        id: 'LS_programmingHint',
-    }).attr('data-bs-toggle', 'modal').attr('data-bs-target', "#programmingHintModal").appendTo(content_LaunchDiv)
 
     //save code
     $('<button>').prop({
@@ -772,14 +853,14 @@ const ProgrammingBox = (programmingKey) => {
     //rotate
     const rotateIconAndSlideCode = (container, icon, title) => {
         if (container.attr('id') === 'open') {
-            ClickListening('', `收合 計畫執行 程式之${title}`)
+            ClickListening('', `收合-計畫執行-程式之${title}`)
 
             container.attr('id', 'close').slideUp(300)
             icon.css({
                 transform: 'rotate(0deg)'
             }, 200)
         } else {
-            ClickListening('', `展開 計畫執行 程式之${title}`)
+            ClickListening('', `展開-計畫執行-程式之${title}`)
 
             container.attr('id', 'open').slideDown(300)
             icon.css({
@@ -799,7 +880,7 @@ const ProgrammingBox = (programmingKey) => {
         const updateCode = $('#update').data('CodeMirror')
         const customCode = $("#custom").data('CodeMirror')
 
-        ClickListening('', '儲存 計畫執行 Code')
+        ClickListening('', '儲存-計畫執行-Code')
 
         const keyCode = programmingKey.key
         await studentClientConnect.saveCode(
@@ -829,7 +910,7 @@ const ProgrammingBox = (programmingKey) => {
         NormalizeFunc.loadingPage(true)
         let uploadFile = new FormData()
 
-        ClickListening('', `上傳 計畫執行 檔案 名稱為${files[0].name}`)        
+        ClickListening('', `上傳-計畫執行-檔案，名稱為${files[0].name}`)
 
         for (let file of files) {
             const extension = file.name.substring(file.name.lastIndexOf('.'), file.name.length).toLowerCase();
@@ -970,7 +1051,7 @@ const ProgrammingBox = (programmingKey) => {
         if (window.confirm(`確定刪除圖像 ${file[0].name} ?`)) {
             studentClientConnect.deleteFile(file[0].name).then(response => {
                 if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                    ClickListening('',`刪除 計畫執行 檔案 名稱為${file[0].name}`)
+                    ClickListening('', `刪除-計畫執行-檔案，名稱為${file[0].name}`)
                     file.remove()
                 }
             })
@@ -985,6 +1066,8 @@ const ReflectionBox = (reflectionKey) => {
     $('.content_complete').remove()
     // 把 收合 字樣刪除
     $('.content_slide').remove()
+    // 把 Hint 刪除
+    $('.content_question').remove()
     //Content Div-------------------------------------------------
     const contentDiv = $('<div>').prop({
         className: 'justify-content-center reflectionContentDiv'
@@ -998,7 +1081,7 @@ const ReflectionBox = (reflectionKey) => {
     //reflection
     $('<div>').prop({
         className: 'col-12 reflectionDescription_reflection',
-        id:'LS_reflectionDescription_title',
+        id: 'LS_reflectionDescription_title',
         innerHTML: '<h3>💡問題 & 反思</h3>'
     }).appendTo(ReflectionContainer)
 
@@ -1101,7 +1184,7 @@ const ReflectionBox = (reflectionKey) => {
                 $('#scoringText').html('<p>10分，我的程式碼都是 ChatGPT 教我的，呵😎🤏</p>')
                 break
         }
-        ClickListening('',`更改 問題反思 之自我評分為 ${e.target.value} 分`)
+        ClickListening('', `更改-問題反思-自我評分為 ${e.target.value} 分`)
     }).appendTo(scoringContainer)
 
     //submit--------------------------------------------------------------
@@ -1163,7 +1246,7 @@ const ReflectionBox = (reflectionKey) => {
 
 
         function submitFunc() {
-            ClickListening('', `送出 ${reflectionKey.key} 問題反思 `)
+            ClickListening('', `送出-${reflectionKey.key} 監控反思 `)
             NormalizeFunc.loadingPage(true)
             studentClientConnect.saveReflection(
                 NormalizeFunc.getFrontEndCode('courseId'),
@@ -1211,6 +1294,7 @@ export {
     CommentBox,
     UnderstandingBox,
     FormulatingBox,
+    WriteFormulatingBox,
     ProgrammingBox,
     ReflectionBox
 }

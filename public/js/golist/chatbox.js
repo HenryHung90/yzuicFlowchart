@@ -95,7 +95,7 @@ const chatBoxInit = () => {
     // send message
     const sendMessage = () => {
         if ($('#Message').val() !== '') {
-            ClickListening('', `向聊天室傳送訊息 內容為:${$('#Message').val() }`)
+            ClickListening('', `傳送訊息--內容為:${$('#Message').val() }`)
             socketConnect.sendMessage($('#Message').val())
             $('#Message').val('')
         }

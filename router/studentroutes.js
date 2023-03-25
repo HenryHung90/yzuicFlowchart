@@ -14,6 +14,7 @@ import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
 import reflectionconfig from '../models/reflectionconfig.js'
 import listenerconfig from '../models/listenerconfig.js'
+import formulatingconfig from '../models/formulatingconfig.js'
 
 function converDangerString(string) {
     let clean = DOMPurify.sanitize(string)
@@ -246,6 +247,37 @@ router.post('/getformulating', async (req, res) => {
         console.log(err)
         res.json({
             message: "取得 表徵制定 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
+//學生取得 writeFormulating 內容
+router.post('/getwriteformulating', async (req, res) => {
+    try {
+        res.json({
+            message: 'success',
+            status: 200,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得 Bonus表徵制定 失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//學生儲存 writeFormulating 內容
+router.post('/savewriteformulating', async (req, res) => {
+    try {
+        res.json({
+            message: 'success',
+            status: 200,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "儲存 Bonus表徵制定 失敗，請聯繫管理員(err)",
             status: 500,
         })
     }
@@ -779,6 +811,8 @@ router.post('/listener', async (req, res) => {
             studentName: req.user.studentName
         })
 
+        //time, courseTitle, operation, keyName, detail, description
+
         if (listenerData == null) {
             const newListenerData = new listenerconfig({
                 studentName: req.user.studentName,
@@ -787,9 +821,11 @@ router.post('/listener', async (req, res) => {
                 listenerData: [
                     {
                         time: req.body.time,
-                        operation: req.body.operation,
-                        description: req.body.description,
                         courseTitle: req.body.courseTitle,
+                        operation: req.body.operation,
+                        keyName: req.body.keyName,
+                        detail: req.body.detail,
+                        description: req.body.description,
                     }
                 ]
             })
@@ -803,9 +839,11 @@ router.post('/listener', async (req, res) => {
         } else {
             listenerData.listenerData.push({
                 time: req.body.time,
-                operation: req.body.operation,
-                description: req.body.description,
                 courseTitle: req.body.courseTitle,
+                operation: req.body.operation,
+                keyName: req.body.keyName,
+                detail: req.body.detail,
+                description: req.body.description,
             })
 
             await listenerconfig.updateOne({
@@ -815,7 +853,7 @@ router.post('/listener', async (req, res) => {
             }, {
                 listenerData: listenerData.listenerData
             }).then(response => {
-                if(response.acknowledged){
+                if (response.acknowledged) {
                     res.json({
                         message: 'success',
                         status: 200
