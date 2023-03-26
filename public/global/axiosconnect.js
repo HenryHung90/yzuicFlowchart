@@ -308,6 +308,24 @@ const studentClientConnect = {
             )
         },
     //reflection--------------------------------
+    // 暫存 Reflection
+    tempSaveReflection:
+        (courseId, key, learning, workhard, difficult, scoring) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/tempsavereflection',
+                    data: {
+                        courseId: courseId,
+                        key: key,
+                        learning: learning,
+                        workhard: workhard,
+                        difficult: difficult,
+                        scoring: scoring
+                    }
+                })
+            )
+        },
     // 送出 Reflection
     saveReflection:
         (courseId, key, learning, workhard, difficult, scoring) => {

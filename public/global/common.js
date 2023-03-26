@@ -83,9 +83,8 @@ const NormalizeFunc = {
             case "SecondTime":
                 return hour + ":" + minute + ":" + second
             case "FullTime":
-                return `${date.getFullYear()}/${
-                    date.getMonth() + 1
-                }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+                return `${date.getFullYear()}/${date.getMonth() + 1
+                    }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
         }
     },
     //取得 Front-end Code
@@ -387,7 +386,7 @@ const categoryBox = {
                     CodeMirrorFunc.codeMirrorProgram(
                         "hint",
                         data.hintCode[$(this).attr("id").split("_")[1]] ||
-                            "no data",
+                        "no data",
                         true
                     )
                 } else {
@@ -621,6 +620,25 @@ const GoListFunc = {
                             }
                         })
                 }
+            }
+
+            console.log(s.category)
+            //Auto save For Reflection and Bonus-Reflection
+            if (s.category === "Reflection" || s.category === "Bonus-Reflection" || s.category === "Completed-Reflection") {
+                ClickListening("", `暫存-${s.key} 監控反思 `)
+                NormalizeFunc.loadingPage(true)
+                studentClientConnect.tempSaveReflection(
+                    NormalizeFunc.getFrontEndCode("courseId"),
+                    s.key,
+                    $("#learningValue").val(),
+                    $("#workhardValue").val(),
+                    $("#difficultValue").val(),
+                    $("#scoringValue").val()
+                ).then(response=>{
+                    if(NormalizeFunc.serverResponseErrorDetect(response)){
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
             }
 
             block.fadeOut(200)
@@ -1090,18 +1108,18 @@ const CodeMirrorFunc = {
                 case "config":
                     Editor.setValue(
                         "//Config writing here\n" +
-                            "let config = {\n" +
-                            "type: Phaser.AUTO,\n" +
-                            "width: 1200,\n" +
-                            "height: 800,\n" +
-                            "scene: {\n" +
-                            "preload: preload,\n" +
-                            "create: create,\n" +
-                            "update: update\n" +
-                            "},\n" +
-                            'parent:"container",\n' +
-                            "};\n" +
-                            "let game = new Phaser.Game(config);\n"
+                        "let config = {\n" +
+                        "type: Phaser.AUTO,\n" +
+                        "width: 1200,\n" +
+                        "height: 800,\n" +
+                        "scene: {\n" +
+                        "preload: preload,\n" +
+                        "create: create,\n" +
+                        "update: update\n" +
+                        "},\n" +
+                        'parent:"container",\n' +
+                        "};\n" +
+                        "let game = new Phaser.Game(config);\n"
                     )
                     break
                 case "custom":

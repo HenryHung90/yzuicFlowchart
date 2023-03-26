@@ -483,14 +483,11 @@ const navInit = () => {
 
   // 監聽事件
   document.addEventListener('mousedown', ClickListening, false)
-
-  NormalizeFunc.loadingPage(false)
 }
 
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
-
   //save
   save: async () => {
     NormalizeFunc.loadingPage(true)
@@ -500,25 +497,23 @@ const navButton = {
     let idx = document.title.indexOf("*");
     ClickListening('', '儲存--List')
 
-    if (idx !== -1) {
-      document.title = document.title.slice(0, idx);
+    document.title = document.title.slice(0, idx);
 
-      goData.progress = PROGRESS
-      goData.nodeDataArray = ALLNODE
-      goData.linkDataArray = ALLLINK
+    goData.progress = PROGRESS
+    goData.nodeDataArray = ALLNODE
+    goData.linkDataArray = ALLLINK
 
-      //存入資料庫
-      await studentClientConnect.saveGoList(goData, NormalizeFunc.getFrontEndCode('courseId'))
-        .then(response => {
-          if (NormalizeFunc.serverResponseErrorDetect(response)) {
-            NormalizeFunc.loadingPage(false)
-          }
-        })
+    //存入資料庫
+    await studentClientConnect.saveGoList(goData, NormalizeFunc.getFrontEndCode('courseId'))
+      .then(response => {
+        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+          NormalizeFunc.loadingPage(false)
+        }
+      })
 
-      myDiagram.isModified = false;
-    } else {
-      NormalizeFunc.loadingPage(false)
-    }
+    myDiagram.isModified = false;
+
+    NormalizeFunc.loadingPage(false)
   },
   //print
   printList: () => {
@@ -581,7 +576,7 @@ const load = async () => {
   await studentClientConnect.readGoList(NormalizeFunc.getFrontEndCode('courseId'))
     .then(response => {
       if (NormalizeFunc.serverResponseErrorDetect(response)) {
-        const progress = parseInt(response.data.message.progress) || 1
+        const progress = parseInt(response.data.message.progress || 1)
         let newNodeData = []
         let newLinkData = []
 
@@ -629,6 +624,7 @@ const load = async () => {
 
 
         myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
+        navButton.save()
       }
     })
   // myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
