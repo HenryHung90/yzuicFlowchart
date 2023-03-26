@@ -399,7 +399,6 @@ const WriteFormulatingBox = () => {
     const writeFormulatingDescriptionContainer = $('<div>').prop({
         className: 'row writeFormulatingDescription_container',
     }).appendTo(contentDiv)
-
     //descriptions
     $('<div>').prop({
         className: 'col-10 writeFormulatingDescription_target',
@@ -413,7 +412,7 @@ const WriteFormulatingBox = () => {
     }).appendTo(writeFormulatingDescriptionContainer)
 
 
-    // Add Formulating Button
+    // Add Formulating Button-------------------------------------
     const contentBox = $('<div>').prop({
         className: 'writeFormulatingDescription_contentBox',
         id: 'addFormulationBtn'
@@ -425,16 +424,32 @@ const WriteFormulatingBox = () => {
         className: 'formulatingDescription_addFormulating',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 448 512"><path d="M240 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H176V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H384c17.7 0 32-14.3 32-32s-14.3-32-32-32H240V80z"/></svg>'
     }).appendTo(contentBox)
-
+    //----------------------------------------------------------
 
     function addFormulating(addBtn) {
         //得出現在共有多少個 Formulating
-        const formulatingCount = $('.formulatingDescription_contentBox').length
+        const formulatingCount = parseInt($('.formulatingDescription_contentBox')[$('.formulatingDescription_contentBox').length - 1].id) + 1
+
 
         // ContentBox
         const contentBox = $('<div>').prop({
             className: 'formulatingDescription_contentBox',
+            id: `writeFormulating_${formulatingCount}`
         }).insertBefore(addBtn)
+
+        //Button area------------------------------------
+        const formulatingButton = $('<div>').prop({
+            className: 'row writeFormulatingButton',
+        }).appendTo(contentBox)
+
+        $('<button>').prop({
+            className: 'col-1 btn btn-outline-danger writeFormulatingButton_cancel',
+            id: formulatingCount,
+            innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/></svg>'
+        }).click(e => {
+            removeFormulating(e.currentTarget.id)
+        }).appendTo(formulatingButton)
+        //-----------------------------------------------
 
         //Title
         $('<div>').prop({
@@ -457,6 +472,13 @@ const WriteFormulatingBox = () => {
             innerHTML: `<textarea class="form-control formulatingContentDescription" id="formulatingContentDescription" placeholder="該語法的描述" style="height:300px;resize:none"></textarea>` +
                 '<label for="formulatingContentDescription">該語法的描述</label>'
         }).appendTo(contentBox)
+    }
+
+    function removeFormulating(index) {
+        $(`#writeFormulating_${index}`).fadeOut('fast')
+        setTimeout(e => {
+            $(`#writeFormulating_${index}`).remove()
+        }, 500)
     }
     return contentDiv
 }

@@ -226,12 +226,12 @@ router.post('/getunderstanding', async (req, res) => {
 //學生取得 formulating 內容
 router.post('/getformulating', async (req, res) => {
     try {
-        const understandingData = await standardcontent.findOne({
+        const formulatingData = await standardcontent.findOne({
             _id: req.body.courseId
         })
 
-        if (understandingData.standardFormulating === undefined ||
-            understandingData.standardFormulating === null) {
+        if (formulatingData.standardFormulating === undefined ||
+            formulatingData.standardFormulating === null) {
             res.json({
                 message: "查無 表徵制定，請稍後再試",
                 status: 500,
@@ -239,7 +239,7 @@ router.post('/getformulating', async (req, res) => {
             return
         }
         res.json({
-            message: understandingData.standardFormulating[req.body.key],
+            message: formulatingData.standardFormulating[req.body.key],
             status: 200
         })
 
@@ -255,9 +255,27 @@ router.post('/getformulating', async (req, res) => {
 //學生取得 writeFormulating 內容
 router.post('/getwriteformulating', async (req, res) => {
     try {
+        const formulatingData = await formulatingconfig.findOne({
+            studentClass: req.user.studentClass,
+            studentName: req.user.studentName,
+            studentId: req.user.studentId
+        })
+
+        if (formulatingData === null) {
+            res.json({
+                status: 501
+            })
+            return
+        }
+        if (formulatingData[req.body.courseId] === null) {
+            res.json({
+                status: 501
+            })
+            return
+        }
         res.json({
-            message: 'success',
-            status: 200,
+            message: formulatingData.formulatingData[req.body.courseId][req.body.key],
+            status: 200
         })
     } catch (err) {
         console.log(err)
@@ -270,9 +288,57 @@ router.post('/getwriteformulating', async (req, res) => {
 //學生儲存 writeFormulating 內容
 router.post('/savewriteformulating', async (req, res) => {
     try {
-        res.json({
-            message: 'success',
-            status: 200,
+        const formulatingData = await formulatingconfig.findOne({
+            studentClass: req.user.studentClass,
+            studentName: req.user.studentName,
+            studentId: req.user.studentId
+        })
+
+        if (formulatingData === null) {
+            const newFormulatingData = new formulatingconfig({
+                studentId: req.user.studentId,
+                studentName: req.user.studentName,
+                studentClass: req.user.studentClass,
+                formulatingData: {
+                    [req.body.courseId]: {
+                        [req.body.key]: req.body.formulatingData
+                    }
+                }
+            })
+
+            newFormulatingData.save()
+            res.json({
+                message: "success",
+                status: 200,
+            })
+            return
+        }
+        if (formulatingData[req.body.courseId] === null) {
+            formulatingData[req.body.courseId] = {
+                [req.body.key]: req.body.formulatingData
+            }
+        } else {
+            formulatingData.formulatingData[req.body.courseId][req.body.key] = req.body.formulatingData
+        }
+
+        await formulatingconfig.updateOne({
+            studentClass: req.user.studentClass,
+            studentName: req.user.studentName,
+            studentId: req.user.studentId
+        }, {
+            formulatingData: formulatingData.formulatingData
+        }).then(response => {
+            if (response.acknowledged) {
+                res.json({
+                    message: 'success',
+                    status: 200
+                })
+                return
+            }
+            res.json({
+                message: '儲存 writeFormulating 失敗，請再試一次',
+                status: 500
+            })
         })
     } catch (err) {
         console.log(err)

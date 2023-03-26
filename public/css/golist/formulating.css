@@ -43,6 +43,10 @@
 }
 
 /*write Formulating Description */
+.writeFormulatingButton{
+    margin:20px;
+}
+
 .writeFormulatingDescription_contentCode{
     margin: 15px;
 }

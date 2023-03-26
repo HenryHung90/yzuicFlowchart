@@ -17,9 +17,9 @@ const extractJWT = passportJWT.ExtractJwt
 
 const secret_key = 'secret-cat'
 
-const EXPIRE_TIME = '1h'
+const EXPIRE_TIME = '3h'
 //ms 毫秒單位
-const EXPIRE_SECOND = 60 * 60 * 1000
+const EXPIRE_SECOND = 3 * 60 * 60 * 1000
 
 const checkPassword = async (user, inputPassword) => {
     let compareResult = false

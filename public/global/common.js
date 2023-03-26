@@ -172,14 +172,28 @@ const categoryBox = {
     WriteFormulating: (data) => {
         if (data.message === undefined) {
             return
-        }
-        if (data.message.content !== undefined) {
+        } else {
             let index = 0
-            for (const { title, code, description } of data.message.content) {
+            for (const { title, code, description } of data.message) {
                 // ContentBox
                 const contentBox = $('<div>').prop({
-                    className: 'writeFormulatingDescription_contentBox',
+                    className: 'formulatingDescription_contentBox',
+                    id: `writeFormulating_${index}`
                 }).insertBefore($('#addFormulationBtn'))
+
+                //Button area------------------------------------
+                const formulatingButton = $('<div>').prop({
+                    className: 'row writeFormulatingButton',
+                }).appendTo(contentBox)
+
+                $('<button>').prop({
+                    className: 'col-1 btn btn-outline-danger writeFormulatingButton_cancel',
+                    id: index,
+                    innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 448 512"><path d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z"/></svg>'
+                }).click(e => {
+                    removeFormulating(e.currentTarget.id)
+                }).appendTo(formulatingButton)
+                //-----------------------------------------------
 
                 //Title
                 $('<div>').prop({
@@ -205,7 +219,15 @@ const categoryBox = {
                         '<label for="formulatingContentDescription">該語法的描述</label>'
                 }).appendTo(contentBox)
             }
+
+            function removeFormulating(index) {
+                $(`#writeFormulating_${index}`).fadeOut('fast')
+                setTimeout(e => {
+                    $(`#writeFormulating_${index}`).remove()
+                }, 500)
+            }
         }
+
     },
     Programming: (data, key) => {
         let codeData = [
@@ -441,6 +463,14 @@ const GoListFunc = {
             if (s.category === 'Bonus-Formulating') {
                 //得出現在共有多少個 Formulating
                 const formulatingCount = $('.formulatingDescription_contentBox').length
+                const codeMixed = parseInt($('.formulatingDescription_contentBox')[$('.formulatingDescription_contentBox').length - 1].id)
+                let code = []
+
+                for (let i = 0; i < codeMixed; i++) {
+                    if ($(`#code_${i}`)){
+                        code.push($(`#code_${i}`).data('CodeMirror').getValue())
+                    }
+                }
 
                 if (formulatingCount !== 0) {
                     NormalizeFunc.loadingPage(true)
@@ -690,7 +720,7 @@ const GoListFunc = {
                         }
                     })
                     break;
-                case "Reflection": case "Completed-Reflection":
+                case "Reflection": case "Completed-Reflection": case "Bonus-Reflection":
                     ReflectionBox(s).appendTo(contentContainer)
 
                     //讀取 reflection 內容
