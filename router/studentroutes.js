@@ -97,7 +97,10 @@ router.post("/changepassword", async (req, res) => {
 //學生取得所有教學資料
 router.post("/getallcourse", async (req, res) => {
     try {
-        const standardData = await standardcontent.find({ class: req.user.studentClass, access: true })
+        const standardData = await standardcontent.find({
+            class: req.user.studentClass,
+            access: true,
+        })
 
         res.json({
             standardData: standardData,
@@ -128,26 +131,36 @@ router.get("/:courseId", async (req, res) => {
 
         const studentData = await studentConfig.findOne({
             studentId: req.user.studentId,
-            studentClass: req.user.studentClass
+            studentClass: req.user.studentClass,
         })
 
-        if (studentData.studentGoList[req.params.courseId] == undefined) {
-            if (studentData.studentGoList === undefined) {
-                studentData.studentGoList = {
-                    [req.params.courseId]: {}
-                }
-            } else {
-                studentData.studentGoList[req.params.courseId] = null
+        if (studentData.studentGoList === undefined) {
+            studentData.studentGoList = {
+                [req.params.courseId]: null,
             }
-
-            await studentConfig.updateOne({
-                studentId: req.user.studentId,
-                studentClass: req.user.studentClass
-            }, {
-                studentGoList: studentData.studentGoList
-            })
+            await studentConfig.updateOne(
+                {
+                    studentId: req.user.studentId,
+                    studentClass: req.user.studentClass,
+                },
+                {
+                    studentGoList: studentData.studentGoList,
+                }
+            )
+        } else if (
+            studentData.studentGoList[req.params.courseId] == undefined
+        ) {
+            studentData.studentGoList[req.params.courseId] = null
+            await studentConfig.updateOne(
+                {
+                    studentId: req.user.studentId,
+                    studentClass: req.user.studentClass,
+                },
+                {
+                    studentGoList: studentData.studentGoList,
+                }
+            )
         }
-
 
         res.render("./golist", {
             studentId: req.user.studentId,
@@ -305,7 +318,7 @@ router.post("/getwriteformulating", async (req, res) => {
         res.json({
             message:
                 formulatingData.formulatingData[req.body.courseId][
-                req.body.key
+                    req.body.key
                 ],
             status: 200,
         })
@@ -613,7 +626,7 @@ router.post("/readcode", async (req, res) => {
                     } else {
                         returnData.code =
                             response.studentCodeList[req.body.courseId][
-                            req.body.keyCode
+                                req.body.keyCode
                             ]
                     }
                 }
@@ -664,8 +677,8 @@ router.post("/savecode", async (req, res) => {
                         create: req.body.create,
                         update: req.body.update,
                         custom: req.body.custom,
-                    }
-                }
+                    },
+                },
             }
         } else {
             // 後續新增
@@ -750,7 +763,7 @@ router.post("/deletecode", async (req, res) => {
 })
 
 //學生暫存 reflection
-router.post('/tempsavereflection', async (req, res) => {
+router.post("/tempsavereflection", async (req, res) => {
     try {
         const reflectionData = await reflectionconfig.findOne({
             studentId: req.user.studentId,
@@ -879,8 +892,7 @@ router.post("/savereflection", async (req, res) => {
         studentData.studentGoList[req.body.courseId].progress > nextProgress
             ? null
             : (studentData.studentGoList[req.body.courseId].progress =
-                nextProgress)
-
+                  nextProgress)
 
         await studentConfig.updateOne(
             {
