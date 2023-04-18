@@ -40,7 +40,7 @@ function create() {
     puzzleInformation.crop = this.add.group()
 
     // 從 0 ~ 8 選擇一塊生成
-    let randomPick = 2
+    let randomPick = Math.floor(Math.random() * 10)
 
 
     // 則生成該 puzzle
