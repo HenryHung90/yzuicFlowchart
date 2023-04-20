@@ -158,6 +158,7 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
 app.use('/launch', passport.authenticate('token', { session: false }), launchroutes)
 app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
 
+
 //404
 app.use((req, res, next) => {
     res.status(404).render('./404page')

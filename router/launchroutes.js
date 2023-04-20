@@ -244,7 +244,7 @@ router.post("/searchmedia", async (req, res) => {
             `${directName}/public/Access/${req.user.studentId}/media`
         ).forEach(filename => {
             fileList.push({
-                src: `../access/${req.user.studentId}/media/${filename}`,
+                src: `../Access/${req.user.studentId}/media/${filename}`,
                 name: filename,
             })
         })

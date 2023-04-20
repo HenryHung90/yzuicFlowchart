@@ -288,9 +288,8 @@ const CommentBox = () => {
             )
             .appendTo(codeContentContainer)
 
-        const codeContentId = `codeContent_${
-            $(".CommentContainer").find(".codeContentContainer").length
-        }`
+        const codeContentId = `codeContent_${$(".CommentContainer").find(".codeContentContainer").length
+            }`
 
         const codeContentDiv = $("<div>")
             .prop({
@@ -990,104 +989,92 @@ const ProgrammingBox = programmingKey => {
                 if (!response) {
                     return
                 }
-                if ($(".DemoDiv").length == 0) {
-                    const demoDiv = $("<div>")
-                        .prop({
-                            className: "container-fluid DemoDiv",
-                        })
-                        .prependTo($("body"))
 
-                    const demoIframe = $("<div>")
-                        .prop({
-                            className:
-                                "row justify-content-start iframeContainer",
-                        })
-                        .appendTo(demoDiv)
+                $('.DemoDiv').remove()
 
-                    const demoContent = $("<div>")
-                        .prop({
-                            className: "col-12 demoContent",
-                            id: "LS_programmingDemoContent_up",
-                        })
-                        .click(e => {
-                            if (
-                                demoContent.attr("id") ===
+                const demoDiv = $("<div>")
+                    .prop({
+                        className: "container-fluid DemoDiv",
+                    })
+                    .prependTo($("body"))
+
+                const demoIframe = $("<div>")
+                    .prop({
+                        className:
+                            "row justify-content-start iframeContainer",
+                    })
+                    .appendTo(demoDiv)
+
+                const demoContent = $("<div>")
+                    .prop({
+                        className: "col-12 demoContent",
+                        id: "LS_programmingDemoContent_up",
+                    })
+                    .click(e => {
+                        if (
+                            demoContent.attr("id") ===
+                            "LS_programmingDemoContent_up"
+                        ) {
+                            demoContent.attr(
+                                "id",
+                                "LS_programmingDemoContent_down"
+                            )
+                            downIcon.css({
+                                transform: "rotate(180deg)",
+                            })
+                            demoContent.css({
+                                transform: "translateY(-10px)",
+                            })
+                        } else {
+                            demoContent.attr(
+                                "id",
                                 "LS_programmingDemoContent_up"
-                            ) {
-                                demoContent.attr(
-                                    "id",
-                                    "LS_programmingDemoContent_down"
-                                )
-                                downIcon.css({
-                                    transform: "rotate(180deg)",
-                                })
-                                demoContent.css({
-                                    transform: "translateY(-10px)",
-                                })
-                            } else {
-                                demoContent.attr(
-                                    "id",
-                                    "LS_programmingDemoContent_up"
-                                )
-                                downIcon.css({
-                                    transform: "rotate(0deg)",
-                                })
-                                demoContent.css({
-                                    transform: "translateY(-95vh)",
-                                })
-                            }
-                        })
-                        .appendTo(demoIframe)
-
-                    const demoIframeInfo = $("<iframe>")
-                        .prop({
-                            className: "col-12",
-                            id: "demoIframe",
-                            src: `../access/${NormalizeFunc.getCookie("studentId")}/${response}/${response}.html`,
-                            sandBox: "allow-scripts",
-                            //document.cookie.split("; ")[1].split("=")[1]
-                            //cookie 0 token , cookie 1 studentId
-                        })
-                        .css({
-                            width: "100%",
-                            height: "95%",
-                            margin: "0 auto",
-                            "margin-top": "5px",
-                            border: "1px dashed black",
-                            "border-radius": "20px",
-                        })
-                        .appendTo(demoContent)
-
-                    demoIframeInfo.on("load", e => {
-                        e.preventDefault()
-                        NormalizeFunc.loadingPage(false)
-                        $(".demoContent").addClass("demoFinish")
-                        setTimeout(e => {
-                            $(".demoContent").removeClass("demoFinish")
-                        }, 1000)
+                            )
+                            downIcon.css({
+                                transform: "rotate(0deg)",
+                            })
+                            demoContent.css({
+                                transform: "translateY(-95vh)",
+                            })
+                        }
                     })
-                    //DownIcon
-                    const downIcon = $("<div>")
-                        .prop({
-                            className: "col-1 offset-md-5 downIcon",
-                            innerHTML:
-                                '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
-                        })
-                        .appendTo(demoContent)
-                } else {
-                    $("#demoIframe").attr(
-                        "src",
-                        `../access/${NormalizeFunc.getCookie("studentId")}/${response}/${response}.html`
-                    )
-                    $("#demoIframe").on("load", e => {
-                        e.preventDefault()
-                        NormalizeFunc.loadingPage(false)
-                        $(".demoContent").addClass("demoFinish")
-                        setTimeout(e => {
-                            $(".demoContent").removeClass("demoFinish")
-                        }, 1000)
+                    .appendTo(demoIframe)
+
+                const demoIframeInfo = $("<iframe>")
+                    .prop({
+                        className: "col-12",
+                        id: "demoIframe",
+                        src: `../Access/${NormalizeFunc.getCookie("studentId")}/${response}/${response}.html`,
+                        sandBox: "allow-scripts",
+                        //document.cookie.split("; ")[1].split("=")[1]
+                        //cookie 0 token , cookie 1 studentId
                     })
-                }
+                    .css({
+                        width: "100%",
+                        height: "95%",
+                        margin: "0 auto",
+                        "margin-top": "5px",
+                        border: "1px dashed black",
+                        "border-radius": "20px",
+                    })
+                    .appendTo(demoContent)
+
+                demoIframeInfo.on("load", e => {
+                    e.preventDefault()
+                    NormalizeFunc.loadingPage(false)
+                    $(".demoContent").addClass("demoFinish")
+                    setTimeout(e => {
+                        $(".demoContent").removeClass("demoFinish")
+                    }, 1000)
+                })
+                //DownIcon
+                const downIcon = $("<div>")
+                    .prop({
+                        className: "col-1 offset-md-5 downIcon",
+                        innerHTML:
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+                    })
+                    .appendTo(demoContent)
             })
     }
     //rotate
