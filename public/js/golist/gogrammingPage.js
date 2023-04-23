@@ -498,14 +498,17 @@ const WriteFormulatingBox = () => {
     //----------------------------------------------------------
 
     function addFormulating(addBtn) {
+        ClickListening("", "新增-表徵制定-自訂義語法")
         //得出現在共有多少個 Formulating
-        const formulatingCount =
-            parseInt(
-                $(".formulatingDescription_contentBox")[
-                    $(".formulatingDescription_contentBox").length - 1
-                ].id
-            ) + 1
-
+        let formulatingCount = 0
+        if ($(".formulatingDescription_contentBox").length !== 0) {
+            formulatingCount =
+                parseInt(
+                    $(".formulatingDescription_contentBox")[
+                        $(".formulatingDescription_contentBox").length - 1
+                    ].id.split("_")[1]
+                ) + 1
+        }
         // ContentBox
         const contentBox = $("<div>")
             .prop({
@@ -521,6 +524,12 @@ const WriteFormulatingBox = () => {
             })
             .appendTo(contentBox)
 
+        $("<h2>")
+            .prop({
+                className: "col-1 writeFormulatingButton_hash",
+                innerHTML: `#${formulatingCount}`
+            }).appendTo(formulatingButton)
+
         $("<button>")
             .prop({
                 className:
@@ -531,6 +540,7 @@ const WriteFormulatingBox = () => {
             })
             .click(e => {
                 removeFormulating(e.currentTarget.id)
+                ClickListening("", `刪除-表徵制定-自訂義語法 ${e.currentTarget.id}`)
             })
             .appendTo(formulatingButton)
         //-----------------------------------------------
@@ -867,14 +877,26 @@ const ProgrammingBox = programmingKey => {
         })
         .appendTo(dataVisualization_container)
 
+    // index file icon
+    $("<div>")
+        .prop({
+            className: "dataVisualizationArea_filedisk_icon",
+            id: "LS_programmingVisualizationArea_indexFileIcon",
+            innerHTML:
+                '<svg xmlns="http://www.w3.org/2000/svg" width="5%" height="30px" fill="gray" style="transform:rotate(180deg);" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="lightblue" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
+                "<p>index</p>",
+        }).click(e => {
+            e.stopPropagation()
+        }).appendTo(dataVisualizationArea_filedisk)
     ////html icon
     $("<div>")
         .prop({
             className: "dataVisualizationArea_filedisk_icon",
             id: "LS_programmingVisualizationArea_htmlIcon",
             innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 384 512"><path d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>' +
-                "<p>phaserView.html</p>",
+                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="red" viewBox="0 0 384 512"><path d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>' +
+                "<p>index.html</p>",
         })
         .click(e => {
             e.stopPropagation()
@@ -888,8 +910,8 @@ const ProgrammingBox = programmingKey => {
             className: "dataVisualizationArea_filedisk_icon",
             id: "LS_programmingVisualizationArea_jsIcon",
             innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>' +
-                "<p>phaserScript.js</p>",
+                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="orange" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>' +
+                "<p>script.js</p>",
         })
         .click(e => {
             e.stopPropagation()
@@ -903,7 +925,8 @@ const ProgrammingBox = programmingKey => {
             className: "dataVisualizationArea_filedisk_icon",
             id: "LS_programmingVisualizationArea_fileIcon",
             innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg"  width="100%" height="50px" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="5%" height="30px" fill="gray" style="transform:rotate(180deg);" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="lightblue" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
                 "<p>media</p>",
         })
         .click(e => {
@@ -985,7 +1008,6 @@ const ProgrammingBox = programmingKey => {
                 }
             })
             .then(async response => {
-                console.log(response)
                 if (!response) {
                     return
                 }
@@ -1058,15 +1080,6 @@ const ProgrammingBox = programmingKey => {
                         "border-radius": "20px",
                     })
                     .appendTo(demoContent)
-
-                demoIframeInfo.on("load", e => {
-                    e.preventDefault()
-                    NormalizeFunc.loadingPage(false)
-                    $(".demoContent").addClass("demoFinish")
-                    setTimeout(e => {
-                        $(".demoContent").removeClass("demoFinish")
-                    }, 1000)
-                })
                 //DownIcon
                 const downIcon = $("<div>")
                     .prop({
@@ -1075,6 +1088,13 @@ const ProgrammingBox = programmingKey => {
                             '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
                     })
                     .appendTo(demoContent)
+
+                demoIframeInfo.on("load", e => {
+                    e.preventDefault()
+                    NormalizeFunc.loadingPage(false)
+                    demoContent.click()
+                })
+
             })
     }
     //rotate
@@ -1175,6 +1195,8 @@ const ProgrammingBox = programmingKey => {
         await studentClientConnect.uploadFile(uploadFile).then(response => {
             if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 NormalizeFunc.loadingPage(false)
+                $('.dataVisualizationArea_container').click()
+                $('#LS_programmingVisualizationArea_fileIcon').click()
             }
         })
     }
@@ -1187,7 +1209,7 @@ const ProgrammingBox = programmingKey => {
 
         $("<h2>")
             .prop({
-                innerHTML: "You can't not edit html",
+                innerHTML: "html檔案不得被更改",
             })
             .css({
                 margin: "0 auto",
@@ -1208,12 +1230,12 @@ const ProgrammingBox = programmingKey => {
                 innerHTML:
                     "Edit javascript in the box<br><br>" +
                     "If you want import media file<br>" +
-                    "For Example: './media/[filename]'",
+                    "For Example: <b>'../media/[filename]</b>'",
             })
             .css({
-                margin: "0 auto",
+                "margin": "0 auto",
                 "text-align": "center",
-                "line-height": "100%",
+                "line-height": "120%",
             })
             .appendTo(datajsContainer)
 

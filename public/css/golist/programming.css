@@ -99,7 +99,6 @@
     margin-bottom: 10px;
 }
 
-
 /**dataVisulization**/
 .content_dataVisualizationArea {
     overflow: hidden;
@@ -136,7 +135,9 @@
 
 .dataVisualizationArea_filedisk_icon {
     margin: 0 auto;
+    padding: 5px 10px;
     text-align: center;
+    display: flex;
     transition-duration: 0.3s;
 }
 
@@ -146,9 +147,17 @@
 }
 
 .dataVisualizationArea_filedisk_icon p {
-    font-size: 10px;
+    font-size: 16px;
+    margin: 0;
     font-weight: bolder;
     user-select: none;
+}
+
+/* 個別 Icon */
+#LS_programmingVisualizationArea_htmlIcon,
+#LS_programmingVisualizationArea_jsIcon {
+    padding: 2px 0;
+    margin-left: 30px;
 }
 
 .dataVisualizationArea_data {
@@ -244,7 +253,7 @@
 
 .programmingDescription_hintCode {
     width: 20%;
-    height:50px;
+    height: 50px;
     margin: 10px auto;
     padding: 10px 25px;
     transition-duration: 0.3s;
