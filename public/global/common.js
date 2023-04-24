@@ -1310,7 +1310,7 @@ function ClickListening(e, customClick) {
     const detail = tempOperation[2] || ""
 
     // console.warn(`T:${time} O:${operation} K:${keyName} D:${detail}`)
-    console.warn(description)
+    // console.warn(description)
 
     studentClientConnect
         .listenerUpload(
