@@ -230,6 +230,12 @@ const categoryBox = {
                     })
                     .appendTo(contentBox)
 
+                $("<h2>")
+                    .prop({
+                        className: "col-1 writeFormulatingButton_hash",
+                        innerHTML: `#${index}`
+                    }).appendTo(formulatingButton)
+
                 $("<button>")
                     .prop({
                         className:
@@ -240,6 +246,7 @@ const categoryBox = {
                     })
                     .click(e => {
                         removeFormulating(e.currentTarget.id)
+                        ClickListening("", `刪除-表徵制定-自訂義語法 ${e.currentTarget.id}`)
                     })
                     .appendTo(formulatingButton)
                 //-----------------------------------------------
@@ -296,6 +303,7 @@ const categoryBox = {
             { name: "update", data: "" },
             { name: "custom", data: "" },
         ]
+        // 塞入紀錄的程式內容----------------------------------
         if (data.code !== undefined) {
             codeData = [
                 { name: "setting", data: data.code.setting || "" },
@@ -315,6 +323,7 @@ const categoryBox = {
             )
             $(`#${CodeMirror.name}`).data("CodeMirror").setSize("auto", "auto")
         }
+        //-----------------------------------------------------
 
         //hint
         if (data.hint !== undefined) {
@@ -370,8 +379,13 @@ const categoryBox = {
         // $('[data-bs-toggle="tooltip"]').on('show.bs.tooltip', function () {
 
         // })
+
+        //Hint tooltip 內容
         $('[data-bs-toggle="tooltip"]').on("shown.bs.tooltip", function () {
-            if ($(this).attr("name") === "hint") {
+
+            const hintTooltip = $(this)
+
+            if (hintTooltip.attr("name") === "hint") {
                 //Code 展示區
                 $("<textarea>")
                     .prop({
@@ -385,7 +399,7 @@ const categoryBox = {
                 if (data.hintCode !== undefined) {
                     CodeMirrorFunc.codeMirrorProgram(
                         "hint",
-                        data.hintCode[$(this).attr("id").split("_")[1]] ||
+                        data.hintCode[hintTooltip.attr("id").split("_")[1]] ||
                         "no data",
                         true
                     )
@@ -403,10 +417,10 @@ const categoryBox = {
                     })
                     .click(e => {
                         e.stopPropagation()
+                        // console.log(data.hintCode[hintTooltip.attr("id").split("_")[1]])
                         navigator.clipboard.writeText(
-                            data.hintCode[$(this).attr("id")]
+                            data.hintCode[hintTooltip.attr("id").split("_")[1]]
                         )
-                        $("#hintCopy").html("Success")
                     })
                     .appendTo($(".tooltip-inner"))
             }
@@ -572,27 +586,31 @@ const GoListFunc = {
                     })
             }
 
-            //Auto save For Bonus-Formulating
+            //Auto save For Bonus-Formulating---------------------
             if (s.category === "Bonus-Formulating") {
                 //得出現在共有多少個 Formulating
                 const formulatingCount = $(
                     ".formulatingDescription_contentBox"
                 ).length
-                const codeMixed = parseInt(
-                    $(".formulatingDescription_contentBox")[
-                        $(".formulatingDescription_contentBox").length - 1
-                    ].id
-                )
-                let code = []
-
-                for (let i = 0; i < codeMixed; i++) {
-                    if ($(`#code_${i}`)) {
-                        code.push($(`#code_${i}`).data("CodeMirror").getValue())
-                    }
-                }
 
                 if (formulatingCount !== 0) {
+                    //讀出最大數字為何
+                    const codeMixed = parseInt(
+                        $(".formulatingDescription_contentBox")[
+                            $(".formulatingDescription_contentBox").length - 1
+                        ].id.split("_")[1]
+                    )
+
                     NormalizeFunc.loadingPage(true)
+
+                    let codeData = []
+
+                    for (let i = 0; i <= codeMixed; i++) {
+                        if ($(`#code_${i}`).length !== 0) {
+                            codeData.push($(`#code_${i}`).data("CodeMirror").getValue())
+                        }
+                    }
+
                     let formulatingData = []
 
                     for (let i = 0; i < formulatingCount; i++) {
@@ -600,7 +618,7 @@ const GoListFunc = {
                             title: $(".formulatingContentTitleValue")[i].value,
                             description: $(".formulatingContentDescription")[i]
                                 .value,
-                            code: $(`#code_${i}`).data("CodeMirror").getValue(),
+                            code: codeData[i],
                         })
                     }
 
@@ -619,11 +637,29 @@ const GoListFunc = {
                                 NormalizeFunc.loadingPage(false)
                             }
                         })
+                } else {
+                    studentClientConnect
+                        .saveWriteFormulating(
+                            NormalizeFunc.getFrontEndCode("courseId"),
+                            s.key,
+                            []
+                        )
+                        .then(response => {
+                            if (
+                                NormalizeFunc.serverResponseErrorDetect(
+                                    response
+                                )
+                            ) {
+                                NormalizeFunc.loadingPage(false)
+                            }
+                        })
                 }
             }
+            //----------------------------------------------------
 
-            console.log(s.category)
-            //Auto save For Reflection and Bonus-Reflection
+
+            // console.log(s.category)
+            //Auto save For Reflection and Bonus-Reflection----------
             if (s.category === "Reflection" || s.category === "Bonus-Reflection" || s.category === "Completed-Reflection") {
                 ClickListening("", `暫存-${s.key} 監控反思 `)
                 NormalizeFunc.loadingPage(true)
@@ -634,12 +670,13 @@ const GoListFunc = {
                     $("#workhardValue").val(),
                     $("#difficultValue").val(),
                     $("#scoringValue").val()
-                ).then(response=>{
-                    if(NormalizeFunc.serverResponseErrorDetect(response)){
+                ).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
                         NormalizeFunc.loadingPage(false)
                     }
                 })
             }
+            //-------------------------------------------------------
 
             block.fadeOut(200)
             contentDiv.fadeOut(200)
@@ -1140,8 +1177,9 @@ const CodeMirrorFunc = {
 }
 //------------------------------ Clicking Listening Function ------------------------------//
 function ClickListening(e, customClick) {
-    const courseTitle = $("#courseTitle").text().replace(/\s/g, "")
     // /\s/g 是一個正則表達式，表示匹配所有空格字符。g 是全局匹配，會匹配到所有空格字符。
+    // 把所有空格刪掉
+    const courseTitle = $("#courseTitle").text().replace(/\s/g, "")
 
     const clickingOperationMap = new Map([
         // home page //
@@ -1170,6 +1208,10 @@ function ClickListening(e, customClick) {
         ["LS_programmingVisualizationArea", "點擊-計畫執行-檔案區"],
         ["LS_programmingVisualizationArea_up", "點擊-計畫執行-檔案區"],
         ["LS_programmingVisualizationArea_down", "點擊-計畫執行-檔案區"],
+        [
+            "LS_programmingVisualizationArea_indexFileIcon",
+            "點擊-計畫執行-檔案區 index檔案夾"
+        ],
         [
             "LS_programmingVisualizationArea_htmlIcon",
             "點擊-計畫執行-檔案區 html檔案",
@@ -1271,6 +1313,7 @@ function ClickListening(e, customClick) {
     const detail = tempOperation[2] || ""
 
     // console.warn(`T:${time} O:${operation} K:${keyName} D:${detail}`)
+    // console.warn(description)
 
     studentClientConnect
         .listenerUpload(

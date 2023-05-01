@@ -7,6 +7,7 @@ import studentConifg from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
 import adminConfig from '../models/adminconfig.js'
+import listenerConfig from '../models/listenerconfig.js'
 
 const saltRound = 10
 
@@ -324,6 +325,105 @@ router.post('/getallcourse', async (req, res) => {
         })
     }
 })
+//Admin 取得所有學生
+router.post('/getallstudent', async (req, res) => {
+    try {
+        const studentData = await studentConifg.find({})
+
+        let returnStudentData = []
+
+
+        for (let i = 0; i < studentData.length; i++) {
+            returnStudentData.push(
+                {
+                    studentClass: studentData[i].studentClass,
+                    studentId: studentData[i].studentId,
+                    studentName: studentData[i].studentName,
+                }
+            )
+        }
+
+        returnStudentData.sort((a, b) => {
+            return a.studentId > b.studentId ? 1 : -1
+        })
+
+        res.json({
+            studentData: returnStudentData,
+            status: 200,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得學生時發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
+//Admin 取得所有監聽
+router.post('/getallstudentlistener', async (req, res) => {
+    try {
+        const listenData = await listenerConfig.find({})
+
+        let sheetName = []
+        let sheetData = []
+
+        for (const { studentName, studentId, listenerData } of listenData) {
+            // 分頁標頭
+            sheetName.push(`${studentId}_${studentName}`)
+            // 資料內容
+            sheetData.push(listenerData)
+        }
+
+        res.json({
+            message: {
+                sheetName: sheetName,
+                sheetData: sheetData
+            },
+            status: 200
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得監聽資料發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//Admin 取得單一學生監聽資料
+router.post('/getstudentlistener', async (req, res) => {
+    try {
+        const listenData = await listenerConfig.find({ studentId: req.body.studentId })
+
+        let sheetName = []
+        let sheetData = []
+
+        for (const { studentName, studentId, listenerData } of listenData) {
+            // 分頁標頭
+            sheetName.push(`${studentId}_${studentName}`)
+            // 資料內容
+            sheetData.push(listenerData)
+        }
+
+        res.json({
+            message: {
+                sheetName: sheetName,
+                sheetData: sheetData
+            },
+            status: 200
+        })
+    }
+    catch {
+        console.log(err)
+        res.json({
+            message: "取得監聽資料發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
 //Admin 進入課程
 router.get('/:courseId', async (req, res) => {
     try {
@@ -342,6 +442,59 @@ router.get('/:courseId', async (req, res) => {
         console.log(err)
         res.json({
             message: "錯誤開啟，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
+//Admin 取得學生GoList
+router.post("/getstudentcourse", async (req, res) => {
+    try {
+        const studentData = await studentConifg.findOne({
+            studentId: req.body.studentId,
+            studentClass: req.body.studentClass
+        })
+
+        const courseData = await standardcontent.find({})
+
+        if (studentData.studentGoList === {} || studentData.studentGoList === undefined) {
+            res.json({
+                status: 501
+            })
+            return
+        }
+
+        res.json({
+            message: {
+                studentCourse: studentData.studentGoList,
+                courseData: courseData
+            },
+            status: 200
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "無法取得學生 GoList，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//Admin 讀取學生GoList頁面
+router.get("/:studentId/:courseId", async (req, res) => {
+    try {
+        const courseData = await standardcontent.find({
+            _id: req.params.courseId
+        })
+
+        res.render('./admin/golist_studentdemo', {
+            studentId: req.params.studentId,
+            courseTitle: courseData.goListTitle,
+            courseId: req.params.courseId
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "無法讀取學生 GoList，請聯繫管理員(err)",
             status: 500,
         })
     }

@@ -20,6 +20,8 @@
     <!-- axios -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
 
+    <!-- xlsx model -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.1/xlsx.min.js"></script>
 </head>
 
 <body>
@@ -80,7 +82,11 @@
     </div>
     <!-- content -->
     <div class="container goListContainer">
-        <div class="container-sm goListTitle">所有課程</div>
+        <div class="container-sm goListTitle">
+            <span class="goListTitle_Selection title_selected" id="titleCourse">所有課程</span>
+            <span> / </span>
+            <span class="goListTitle_Selection" id="titleStudent">學生名單</span>
+        </div>
         <div class="container-sm goListCourse"></div>
     </div>
 </body>

@@ -624,6 +624,7 @@ const load = async () => {
 
 
         myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
+        document.title += "*"
         navButton.save()
       }
     })

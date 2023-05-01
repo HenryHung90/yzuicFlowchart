@@ -394,6 +394,50 @@ const adminClientConnect = {
                 })
             )
         },
+    // 取得所有課程
+    getAllCourse:
+        () => {
+            return (
+                axios({
+                    method: 'POST',
+                    url: '/admin/getallcourse',
+                })
+            )
+        },
+    // 取得所有學生
+    getAllStudent:
+        () => {
+            return (
+                axios({
+                    method: 'POST',
+                    url: '/admin/getallstudent'
+                })
+            )
+        },
+    // 下載所有學生監聽資料
+    getAllStudentListener:
+        () => {
+            return (
+                axios({
+                    method: 'POST',
+                    url: '/admin/getallstudentlistener'
+                })
+            )
+        },
+    // 取得學生課程
+    getStudentCourse:
+        (studentClass, studentId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/getstudentcourse',
+                    data: {
+                        studentId: studentId,
+                        studentClass: studentClass
+                    }
+                })
+            )
+        },
     //golist-----------------------------------------
     // 讀取 Standard
     readStandard:

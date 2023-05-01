@@ -158,6 +158,7 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
 app.use('/launch', passport.authenticate('token', { session: false }), launchroutes)
 app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
 
+
 //404
 app.use((req, res, next) => {
     res.status(404).render('./404page')
@@ -221,7 +222,9 @@ admin.use((err, req, res, next) => {
 })
 
 
-httpServer.listen(process.env.PORT, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT) })
+httpServer.listen(process.env.PORT_1, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_1) })
+// httpServer.listen(process.env.PORT_2, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_2) })
+
 admin.listen(process.env.ADMIN_PORT, () => { console.log("admin is running at " + process.env.HOST + ":" + process.env.ADMIN_PORT) })
 
 

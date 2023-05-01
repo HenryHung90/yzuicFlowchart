@@ -409,6 +409,7 @@ router.post("/readgolist", async (req, res) => {
             studentAccess: true,
         })
 
+        
         if (
             studentData.studentGoList === null ||
             studentData.studentGoList === undefined ||
@@ -682,14 +683,28 @@ router.post("/savecode", async (req, res) => {
             }
         } else {
             // 後續新增
-            studentData.studentCodeList[req.body.courseId][req.body.keyCode] = {
-                setting: req.body.setting,
-                config: req.body.config,
-                preload: req.body.preload,
-                create: req.body.create,
-                update: req.body.update,
-                custom: req.body.custom,
+            if(studentData.studentCodeList[req.body.courseId] === null){
+                studentData.studentCodeList[req.body.courseId] = {
+                    [req.body.keyCode] :{
+                        setting: req.body.setting,
+                        config: req.body.config,
+                        preload: req.body.preload,
+                        create: req.body.create,
+                        update: req.body.update,
+                        custom: req.body.custom,
+                    }
+                }
+            }else{
+                studentData.studentCodeList[req.body.courseId][req.body.keyCode] = {
+                    setting: req.body.setting,
+                    config: req.body.config,
+                    preload: req.body.preload,
+                    create: req.body.create,
+                    update: req.body.update,
+                    custom: req.body.custom,
+                }
             }
+            
         }
 
         //存入 coding 檔案

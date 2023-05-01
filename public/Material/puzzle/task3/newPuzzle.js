@@ -63,7 +63,7 @@ function create() {
         ).setScale(0)
 
         // 在renderedPuzzle 中加入該 puzzle
-        puzzleInformation.motionPosition.push(randomPick)
+        puzzleInformation.motionPosition.push(puzzleInformation.amount[i])
         // 製作一個簡單的小動畫使其放大
         this.tweens.add({
             targets: puzzle,
