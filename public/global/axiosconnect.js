@@ -15,6 +15,7 @@ const studentClientConnect = {
                 })
             )
         },
+    // 登出
     logout:
         () => {
             return (
@@ -24,6 +25,7 @@ const studentClientConnect = {
                 })
             )
         },
+    // 修改密碼
     changePassword:
         (oldPassword, newPassword) => {
             return (
@@ -38,6 +40,7 @@ const studentClientConnect = {
                 })
             )
         },
+    // 取得所有課程
     getAllCourse:
         () => {
             return (
@@ -363,6 +366,14 @@ const studentClientConnect = {
     // 暫存 Reflection
     tempSaveReflection:
         (courseId, key, learning, workhard, difficult, scoring) => {
+            if (NormalizeFunc.getCookie("adminId")) {
+                return (
+                    axios({
+                        method: 'post',
+                        url: '/admin/skip'
+                    })
+                )
+            }
             return (
                 axios({
                     method: 'post',
@@ -381,6 +392,14 @@ const studentClientConnect = {
     // 送出 Reflection
     saveReflection:
         (courseId, key, learning, workhard, difficult, scoring) => {
+            if (NormalizeFunc.getCookie("adminId")) {
+                return (
+                    axios({
+                        method: 'post',
+                        url: '/admin/skip'
+                    })
+                )
+            }
             return (
                 axios({
                     method: 'post',
@@ -399,6 +418,19 @@ const studentClientConnect = {
     // 讀取 Reflection
     readReflection:
         (courseId, key) => {
+            if (NormalizeFunc.getCookie("adminId")) {
+                return (
+                    axios({
+                        method: 'post',
+                        url: '/admin/readreflection',
+                        data: {
+                            studentId: NormalizeFunc.getFrontEndCode("studentId"),
+                            courseId: courseId,
+                            key: key
+                        }
+                    })
+                )
+            }
             return (
                 axios({
                     method: 'post',
@@ -476,6 +508,20 @@ const adminClientConnect = {
                 })
             )
         },
+    // 下載單一學生監聽資料
+    getSingleStudentListener:
+        (studentClass, studentId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/getsinglestudentlistener',
+                    data: {
+                        studentClass: studentClass,
+                        studentId: studentId,
+                    }
+                })
+            )
+        },
     // 取得學生課程
     getStudentCourse:
         (studentClass, studentId) => {
@@ -500,6 +546,20 @@ const adminClientConnect = {
                     data: {
                         courseId: courseId,
                         studentId: studentId,
+                    }
+                })
+            )
+        },
+    // 讀取學生 Reflection
+    getSingleStudentReflection:
+        (studentClass, studentId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/getsinglestudentreflection',
+                    data: {
+                        studentClass: studentClass,
+                        studentId: studentId
                     }
                 })
             )

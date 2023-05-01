@@ -9,6 +9,8 @@ import chatroomconfig from '../models/chatroomconfig.js'
 import adminConfig from '../models/adminconfig.js'
 import listenerConfig from '../models/listenerconfig.js'
 
+import reflectionconfig from '../models/reflectionconfig.js'
+
 const saltRound = 10
 
 
@@ -393,9 +395,9 @@ router.post('/getallstudentlistener', async (req, res) => {
     }
 })
 //Admin 取得單一學生監聽資料
-router.post('/getstudentlistener', async (req, res) => {
+router.post('/getsinglestudentlistener', async (req, res) => {
     try {
-        const listenData = await listenerConfig.find({ studentId: req.body.studentId })
+        const listenData = await listenerConfig.find({ studentId: req.body.studentId, studentClass: req.body.studentClass })
 
         let sheetName = []
         let sheetData = []
@@ -419,6 +421,42 @@ router.post('/getstudentlistener', async (req, res) => {
         console.log(err)
         res.json({
             message: "取得監聽資料發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//Admin 取得所有學生 reflection
+router.post('/getallstudentreflection', async (req, res) => {
+
+})
+//Admin 取得單一學生 refletion
+router.post('/getsinglestudentreflection', async (req, res) => {
+    try {
+        const reflectionData = await reflectionconfig.find({
+            studentId: req.body.studentId,
+        })
+
+        let sheetName = []
+        let sheetData = []
+
+        for (const { courseId, studentReflectionData } of reflectionData) {
+            const courseName = await standardcontent.findOne({ _id: courseId })
+
+            sheetName.push(courseName.goListTitle)
+            sheetData.push(Object.values(studentReflectionData))
+        }
+
+        res.json({
+            message: {
+                sheetName: sheetName,
+                sheetData: sheetData
+            },
+            status: 200,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "讀取 reflection 失敗，請聯絡管理員 (err)",
             status: 500,
         })
     }
@@ -654,6 +692,42 @@ router.post('/readcode', async (req, res) => {
         })
     }
 })
+
+//Admin 讀取學生 reflection
+router.post('/readreflection', async (req, res) => {
+    try {
+        const reflectionData = await reflectionconfig.findOne({
+            studentId: req.body.studentId,
+            courseId: req.body.courseId,
+        })
+
+        if (reflectionData == undefined) {
+            res.json({
+                status: 501,
+            })
+            return
+        }
+
+        if (reflectionData.studentReflectionData[req.body.key] == undefined) {
+            res.json({
+                status: 501,
+            })
+            return
+        }
+
+        res.json({
+            message: reflectionData.studentReflectionData[req.body.key],
+            status: 200,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "讀取 reflection 失敗，請聯絡管理員 (err)",
+            status: 500,
+        })
+    }
+})
+
 
 //Admin 新增 programming 中的 hint
 router.post('/updateprogramminghint', async (req, res) => {

@@ -430,7 +430,6 @@ const categoryBox = {
         if (data == undefined) {
             return
         }
-
         $("#learningValue").val(data.learing)
         $("#workhardValue").val(data.workhard)
         $("#difficultValue").val(data.difficult)

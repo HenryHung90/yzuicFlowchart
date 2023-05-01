@@ -260,15 +260,23 @@ const renderStudentList = () => {
                     className: 'btn btn-outline-primary',
                     innerHTML: '事件紀錄'
                 }).click(e => {
-                    controllerFunc.getListenerData()
+                    controllerFunc.getListenerData(studentClass, studentId)
                 }).appendTo(studentController)
 
                 //watch student golist data
                 $('<button>').prop({
                     className: 'btn btn-outline-primary',
-                    innerHTML: 'GoList'
+                    innerHTML: '心智圖'
                 }).click(e => {
                     controllerFunc.watchingList(studentClass, studentId)
+                }).appendTo(studentController)
+
+                //student reflection
+                $('<button>').prop({
+                    className: 'btn btn-outline-primary',
+                    innerHTML: '所有反思'
+                }).click(e => {
+                    controllerFunc.downloadReflection(studentClass, studentId)
                 }).appendTo(studentController)
 
                 //----------------------------------------------------
@@ -286,7 +294,6 @@ const renderStudentList = () => {
         NormalizeFunc.loadingPage(true)
         adminClientConnect.getAllStudentListener().then(response => {
             if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                console.log(response.data)
                 downloadDatatoExcel("listenerData", response.data.message.sheetData, response.data.message.sheetName)
             }
             NormalizeFunc.loadingPage(false)
@@ -305,11 +312,16 @@ const renderStudentList = () => {
             () => {
 
             },
-        // 監聽紀錄
+        // 下攢單一學生監聽紀錄
         getListenerData:
-            () => {
+            (studentClass, studentId) => {
                 NormalizeFunc.loadingPage(true)
-                
+                adminClientConnect.getSingleStudentListener(studentClass, studentId).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        downloadDatatoExcel(`${studentId}_listenerData`, response.data.message.sheetData, response.data.message.sheetName)
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
             },
         // 監看 Golist
         watchingList:
@@ -365,6 +377,18 @@ const renderStudentList = () => {
                                 window.location.href = `/${studentId}/${id}`
                             }
                         })
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
+            },
+        // 下載單一學生反思
+        downloadReflection:
+            (studentClass, studentId) => {
+                NormalizeFunc.loadingPage(true)
+                adminClientConnect.getSingleStudentReflection(studentClass, studentId).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        console.log(response.data.message)
+                        downloadDatatoExcel(`${studentId}_reflectionData`, response.data.message.sheetData, response.data.message.sheetName)
                         NormalizeFunc.loadingPage(false)
                     }
                 })
