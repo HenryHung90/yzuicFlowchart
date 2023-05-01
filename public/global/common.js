@@ -586,7 +586,7 @@ const GoListFunc = {
                     })
             }
 
-            //Auto save For Bonus-Formulating
+            //Auto save For Bonus-Formulating---------------------
             if (s.category === "Bonus-Formulating") {
                 //得出現在共有多少個 Formulating
                 const formulatingCount = $(
@@ -655,9 +655,11 @@ const GoListFunc = {
                         })
                 }
             }
+            //----------------------------------------------------
+
 
             // console.log(s.category)
-            //Auto save For Reflection and Bonus-Reflection
+            //Auto save For Reflection and Bonus-Reflection----------
             if (s.category === "Reflection" || s.category === "Bonus-Reflection" || s.category === "Completed-Reflection") {
                 ClickListening("", `暫存-${s.key} 監控反思 `)
                 NormalizeFunc.loadingPage(true)
@@ -674,6 +676,7 @@ const GoListFunc = {
                     }
                 })
             }
+            //-------------------------------------------------------
 
             block.fadeOut(200)
             contentDiv.fadeOut(200)
