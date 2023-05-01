@@ -222,7 +222,9 @@ admin.use((err, req, res, next) => {
 })
 
 
-httpServer.listen(process.env.PORT, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT) })
+httpServer.listen(process.env.PORT_1, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_1) })
+// httpServer.listen(process.env.PORT_2, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_2) })
+
 admin.listen(process.env.ADMIN_PORT, () => { console.log("admin is running at " + process.env.HOST + ":" + process.env.ADMIN_PORT) })
 
 
