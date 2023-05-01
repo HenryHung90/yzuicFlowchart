@@ -1,3 +1,5 @@
+import { NormalizeFunc } from "./common.js"
+
 const studentClientConnect = {
     // 登入
     login:
@@ -103,6 +105,19 @@ const studentClientConnect = {
     //readCode
     readCode:
         (courseId, keyCode) => {
+            if (NormalizeFunc.getCookie('adminId')) {
+                return (
+                    axios({
+                        method: 'post',
+                        url: '/admin/readcode',
+                        data: {
+                            studentId: NormalizeFunc.getFrontEndCode('studentId'),
+                            courseId: NormalizeFunc.getFrontEndCode('courseId'),
+                            keyCode: keyCode
+                        }
+                    })
+                )
+            }
             return (
                 axios({
                     method: 'post',
@@ -117,6 +132,14 @@ const studentClientConnect = {
     //saveCode
     saveCode:
         (setting, config, preload, create, update, custom, keyCode, courseId) => {
+            if (NormalizeFunc.getCookie('adminId')) {
+                return (
+                    axios({
+                        url: '/admin/skip',
+                        method: 'post',
+                    })
+                )
+            }
             return (
                 axios({
                     url: '/student/savecode',
@@ -151,6 +174,24 @@ const studentClientConnect = {
     //demo-----------------------------------------
     launchDemo:
         (setting, config, preload, create, update, custom) => {
+            if (NormalizeFunc.getCookie('adminId')) {
+                return (
+                    axios({
+                        url: '/launch/launchdemo',
+                        method: 'post',
+                        data: {
+                            studentId: NormalizeFunc.getFrontEndCode("studentId"),
+                            setting: setting,
+                            config: config,
+                            preload: preload,
+                            create: create,
+                            update: update,
+                            custom: custom
+                        }
+
+                    })
+                )
+            }
             return (
                 axios({
                     url: '/launch/launchdemo',
@@ -168,6 +209,17 @@ const studentClientConnect = {
         },
     createDemo:
         () => {
+            if (NormalizeFunc.getCookie('adminId')) {
+                return (
+                    axios({
+                        url: '/launch/createdemo',
+                        method: 'post',
+                        data: {
+                            studentId: NormalizeFunc.getFrontEndCode("studentId"),
+                        }
+                    })
+                )
+            }
             return (
                 axios({
                     method: 'post',
@@ -434,6 +486,20 @@ const adminClientConnect = {
                     data: {
                         studentId: studentId,
                         studentClass: studentClass
+                    }
+                })
+            )
+        },
+    // 讀取學生課程預覽
+    readStudentCourse:
+        (courseId, studentId) => {
+            return (
+                axios({
+                    method: 'POST',
+                    url: '/admin/readstudentcourse',
+                    data: {
+                        courseId: courseId,
+                        studentId: studentId,
                     }
                 })
             )

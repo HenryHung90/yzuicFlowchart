@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid';
 const router = express.Router()
 
-import studentConifg from '../models/studentconfig.js'
+import studentConfig from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
 import adminConfig from '../models/adminconfig.js'
@@ -63,12 +63,12 @@ router.post('/addstudent', async (req, res) => {
         }
 
 
-        await studentConifg.findOne({ studentId: req.body.studentId, studentClass: req.body.studentClass }).then(response => {
+        await studentConfig.findOne({ studentId: req.body.studentId, studentClass: req.body.studentClass }).then(response => {
             if (response == null) {
                 bcrypt.hash(tempPassword, saltRound, async (err, hashedPassword) => {
                     if (err) throw 'bad hash'
 
-                    const newStudent = new studentConifg({
+                    const newStudent = new studentConfig({
                         studentClass: req.body.studentClass,
                         studentId: req.body.studentId,
                         studentPassword: hashedPassword,
@@ -228,7 +228,7 @@ router.post('/addchatroom', async (req, res) => {
             newChatRoom.save()
 
             for (let studentId of req.body.studentGroup) {
-                studentConifg.updateOne(
+                studentConfig.updateOne(
                     { studentAccess: true, studentClass: req.body.class, studentId: studentId },
                     { studentChatRoomId: chatRoomId }
                 ).then(response => {
@@ -251,7 +251,7 @@ router.post('/addchatroom', async (req, res) => {
                 { studentGroupId: req.body.studentGroupId }
             )
             for (let studentId of req.body.studentGroup) {
-                studentConifg.updateOne(
+                studentConfig.updateOne(
                     { studentAccess: true, studentClass: req.body.class, studentId: studentId },
                     { studentChatRoomId: req.body.chatRoomId }
                 ).then(response => {
@@ -328,7 +328,7 @@ router.post('/getallcourse', async (req, res) => {
 //Admin 取得所有學生
 router.post('/getallstudent', async (req, res) => {
     try {
-        const studentData = await studentConifg.find({})
+        const studentData = await studentConfig.find({})
 
         let returnStudentData = []
 
@@ -450,7 +450,7 @@ router.get('/:courseId', async (req, res) => {
 //Admin 取得學生GoList
 router.post("/getstudentcourse", async (req, res) => {
     try {
-        const studentData = await studentConifg.findOne({
+        const studentData = await studentConfig.findOne({
             studentId: req.body.studentId,
             studentClass: req.body.studentClass
         })
@@ -479,22 +479,29 @@ router.post("/getstudentcourse", async (req, res) => {
         })
     }
 })
-//Admin 讀取學生GoList頁面
-router.get("/:studentId/:courseId", async (req, res) => {
+//Admin 讀取學生GoList
+router.post('/readstudentcourse', async (req, res) => {
     try {
-        const courseData = await standardcontent.find({
-            _id: req.params.courseId
+        const studentData = await studentConfig.findOne({
+            studentId: req.body.studentId,
         })
 
-        res.render('./admin/golist_studentdemo', {
-            studentId: req.params.studentId,
-            courseTitle: courseData.goListTitle,
-            courseId: req.params.courseId
+        if (studentData.studentGoList[req.body.courseId] === undefined) {
+            res.json({
+                message: "學生資料為空！",
+                status: 500
+            })
+            return
+        }
+
+        res.json({
+            message: studentData.studentGoList[req.body.courseId],
+            status: 200
         })
     } catch (err) {
         console.log(err)
         res.json({
-            message: "無法讀取學生 GoList，請聯繫管理員(err)",
+            message: "讀取學生 GoList 失敗，請聯繫管理員(err)",
             status: 500,
         })
     }
@@ -589,6 +596,65 @@ router.post('/restartstandard', async (req, res) => {
     }
 })
 
+//Admin 讀取學生 Code
+router.post('/readcode', async (req, res) => {
+    try {
+        const returnData = {
+            code: "",
+            hint: "",
+            hintCode: "123",
+            status: 200,
+        }
+
+        await studentConfig
+            .findOne({
+                studentId: req.body.studentId,
+                studentAccess: true,
+            })
+            .then(response => {
+                if (
+                    response.studentCodeList === undefined ||
+                    response.studentCodeList === null
+                ) {
+                    returnData.code = ""
+                } else {
+                    if (response.studentCodeList[req.body.courseId] === null) {
+                        returnData.code = ""
+                    } else {
+                        returnData.code =
+                            response.studentCodeList[req.body.courseId][
+                            req.body.keyCode
+                            ]
+                    }
+                }
+            })
+
+        await standardcontent
+            .findOne({
+                _id: req.body.courseId,
+            })
+            .then(response => {
+                if (
+                    response.standardProgramming[req.body.keyCode] === undefined
+                ) {
+                    res.json(returnData)
+                } else {
+                    returnData.hint =
+                        response.standardProgramming[req.body.keyCode].hint
+                    returnData.hintCode =
+                        response.standardProgramming[req.body.keyCode].hintCode
+                    res.json(returnData)
+                }
+            })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "讀取 code 失敗，請聯絡管理員 (err)",
+            status: 500,
+        })
+    }
+})
+
 //Admin 新增 programming 中的 hint
 router.post('/updateprogramminghint', async (req, res) => {
     try {
@@ -626,5 +692,19 @@ router.post('/updateprogramminghint', async (req, res) => {
     }
 })
 
+//Admin 跳過路程（用於跳過預覽學生畫面時不必要的動作）
+router.post('/skip', async (req, res) => {
+    try {
+        res.json({
+            status: 501
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: '路由過程失敗，請聯繫管理員(err)',
+            status: 500
+        })
+    }
+})
 
 export default router

@@ -308,7 +308,8 @@ const renderStudentList = () => {
         // 監聽紀錄
         getListenerData:
             () => {
-
+                NormalizeFunc.loadingPage(true)
+                
             },
         // 監看 Golist
         watchingList:
@@ -361,7 +362,7 @@ const renderStudentList = () => {
                             }).appendTo(goListContainer)
 
                             const enterClass = (id) => {
-                                window.location.href = `/admin/${studentId}/${id}`
+                                window.location.href = `/${studentId}/${id}`
                             }
                         })
                         NormalizeFunc.loadingPage(false)

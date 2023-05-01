@@ -7,6 +7,7 @@ import morgan from 'morgan'
 //routes
 import launchroutes from './router/launchroutes.js'
 import adminroutes from './router/adminroutes.js'
+import adminlaunchroutes from './router/adminlaunchroutes.js'
 import studentroutes from './router/studentroutes.js'
 //用於解析json row txt URL-encoded格式
 import bodyParser from 'body-parser'
@@ -25,6 +26,9 @@ import { passport, signIn, signInAdmin } from './database/passportjwt.js'
 import socketServer from './socketServer.js'
 import { Server } from 'socket.io'
 import http from 'http'
+
+//mongodb
+import standardcontent from './models/standardcontent.js'
 
 //dlxvhg4vwiWYjjjU
 
@@ -208,7 +212,29 @@ admin.get('/home/:adminId', async (req, res) => {
 })
 
 admin.use('/admin', passport.authenticate('admin-token', { session: false }), adminroutes)
+admin.use('/launch', passport.authenticate('admin-token', { session: false }), adminlaunchroutes)
 admin.use('/student', passport.authenticate('admin-token', { session: false }), studentroutes)
+
+//Admin 讀取學生GoList頁面
+admin.get("/:studentId/:courseId", async (req, res) => {
+    try {
+        const courseData = await standardcontent.findOne({
+            _id: req.params.courseId
+        })
+
+        res.cookie('studentId', req.params.studentId, { maxAge: 60 * 60 * 1000 }).render('./admin/golist_studentdemo', {
+            studentId: req.params.studentId,
+            courseTitle: courseData.goListTitle,
+            courseId: req.params.courseId
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "無法讀取學生 GoList，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
 
 
 //404

@@ -25,7 +25,7 @@ const goListInit = () => {
     //event function
     myDiagram.addDiagramListener("ObjectDoubleClicked", e => {
         const part = e.subject.part;
-        if (!(part instanceof go.Link)) GoListFunc.adminContainer(part.ob);
+        if (!(part instanceof go.Link)) GoListFunc.showContainer(part.ob);
     });
     myDiagram.addDiagramListener('SelectionDeleting', function (e) {
         // the DiagramEvent.subject is the collection of Parts about to be deleted
@@ -374,38 +374,6 @@ const goListInit = () => {
     myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
     myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
 
-
-    // initialize the Palette that is on the left side of the page
-    let myPalette =
-        $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
-            {
-                // Instead of the default animation, use a custom fade-down
-                "animationManager.initialAnimationStyle": go.AnimationManager.None,
-                "InitialAnimationStarting": animateFadeDown, // Instead, animate with this function
-                //禁止縮放
-                allowZoom: false,
-
-                nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
-                model: new go.GraphLinksModel([  // specify the contents of the Palette
-                    { category: "Target", text: "成品展示" },
-                    { category: "Start", text: "Task" },
-                    { category: "Understanding", text: "探索理解" },
-                    { category: "Formulating", text: "表徵制定" },
-                    { category: "Programming", text: "計畫執行" },
-                    { category: "Reflection", text: "監控反思" },
-                    { category: "Completed-Understanding", text: "探索理解" },
-                    { category: "Completed-Formulating", text: "表徵制定" },
-                    { category: "Completed-Programming", text: "計畫執行" },
-                    { category: "Completed-Reflection", text: "監控反思" },
-                    { category: "Bonus-Understanding", text: "探索理解" },
-                    { category: "Bonus-Formulating", text: "表徵制定" },
-                    { category: "Bonus-Programming", text: "計畫執行" },
-                    { category: "Bonus-Reflection", text: "監控反思" },
-                    // { category: "Conditional", text: "自定義" },
-                    { category: "Comment", text: "筆記" },
-                ])
-            });
-
     // This is a re-implementation of the default animation, except it fades in from downwards, instead of upwards.
     function animateFadeDown(e) {
         let diagram = e.diagram;
@@ -446,8 +414,51 @@ const navButton = {
 }
 //load
 const load = async () => {
-    await adminClientConnect.readStandard(NormalizeFunc.getFrontEndCode('courseId'),NormalizeFunc.getFrontEndCode('studentId')).then(response => {
+    await adminClientConnect.readStudentCourse(NormalizeFunc.getFrontEndCode('courseId'), NormalizeFunc.getFrontEndCode('studentId')).then(response => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            const progress = parseInt(response.data.message.progress || 1)
+            let newNodeData = []
+            let newLinkData = []
+
+            for (const Node of response.data.message.nodeDataArray) {
+                //若是 Target 類型，則直接顯示
+                if (Node.category === 'Target') {
+                    newNodeData.push(Node)
+                }
+                //在 Progress 目標前的通通都顯示
+                if (Node.key == progress || Node.key.split("-")[0] <= progress) {
+                    // 若是已經歷過 則換成已完成樣式
+                    if (Node.key.split("-")[0] < progress) {
+                        switch (Node.category) {
+                            case 'Understanding':
+                                Node.category = "Completed-Understanding"
+                                break
+                            case 'Formulating':
+                                Node.category = "Completed-Formulating"
+                                break
+                            case 'Programming':
+                                Node.category = "Completed-Programming"
+                                break
+                            case 'Reflection':
+                                Node.category = "Completed-Reflection"
+                                break
+                        }
+                    }
+                    newNodeData.push(Node)
+                }
+            }
+
+            for (const Link of response.data.message.linkDataArray) {
+                if (Link.to.split("-")[0] <= progress) {
+                    newLinkData.push(Link)
+                }
+            }
+
+            response.data.message.nodeDataArray = newNodeData
+            response.data.message.linkDataArray = newLinkData
+
+
+
             myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
         }
     })

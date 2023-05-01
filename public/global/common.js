@@ -1177,6 +1177,9 @@ const CodeMirrorFunc = {
 }
 //------------------------------ Clicking Listening Function ------------------------------//
 function ClickListening(e, customClick) {
+    if (NormalizeFunc.getCookie("adminId")) {
+        return
+    }
     // /\s/g 是一個正則表達式，表示匹配所有空格字符。g 是全局匹配，會匹配到所有空格字符。
     // 把所有空格刪掉
     const courseTitle = $("#courseTitle").text().replace(/\s/g, "")
