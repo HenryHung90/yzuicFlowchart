@@ -148,10 +148,12 @@ const changeSelection = (target) => {
 
     $('.goListCourse').empty()
     if (target.id === 'titleCourse') {
-        renderGoList()
+        window.location.href = "#course"
     } else {
-        renderStudentList()
+        window.location.href = "#student"
     }
+
+    homRenderInit()
 }
 
 // 生成 Course 部分
@@ -201,7 +203,12 @@ const renderStudentList = () => {
     $('<button>').prop({
         className: 'btn btn-success',
         innerHTML: "下載所有事件紀錄"
-    }).click(e => { downloadAllListening() }).appendTo(operationButtonContainer)
+    }).click(downloadAllListening).appendTo(operationButtonContainer)
+
+    $('<button>').prop({
+        className: 'btn btn-success',
+        innerHTML: "下載所有"
+    }).click(downloadAllReflection).appendTo(operationButtonContainer)
 
 
 
@@ -290,13 +297,21 @@ const renderStudentList = () => {
 
 
     // 下載所有事件紀錄
-    const downloadAllListening = () => {
+    function downloadAllListening() {
         NormalizeFunc.loadingPage(true)
         adminClientConnect.getAllStudentListener().then(response => {
             if (NormalizeFunc.serverResponseErrorDetect(response)) {
                 downloadDatatoExcel("listenerData", response.data.message.sheetData, response.data.message.sheetName)
             }
             NormalizeFunc.loadingPage(false)
+        })
+    }
+
+    //下載所有回饋
+    function downloadAllReflection() {
+        NormalizeFunc.loadingPage(true)
+        adminClientConnect.getAllStudentReflection().then(response => {
+
         })
     }
 
@@ -411,4 +426,17 @@ const renderStudentList = () => {
     }
 }
 
-window.addEventListener('DOMContentLoaded', renderGoList)
+const homRenderInit = () => {
+    console.log(window.location.hash)
+    if (window.location.hash == '#student') {
+        $('.goListTitle_Selection').removeClass('title_selected')
+        $(`#titleStudent`).addClass('title_selected')
+        renderStudentList()
+    } else if (window.location.hash == '#course') {
+        $('.goListTitle_Selection').removeClass('title_selected')
+        $(`#titleCourse`).addClass('title_selected')
+        renderGoList()
+    }
+}
+
+window.addEventListener('DOMContentLoaded', homRenderInit)

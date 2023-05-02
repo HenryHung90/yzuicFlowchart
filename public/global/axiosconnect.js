@@ -522,6 +522,28 @@ const adminClientConnect = {
                 })
             )
         },
+    // 下載所有學生回饋
+    getAllStudentReflection:
+        () => {
+            axios({
+                method: 'post',
+                url: '/admin/getallstudentreflection'
+            })
+        },
+    // 讀取單一學生 Reflection
+    getSingleStudentReflection:
+        (studentClass, studentId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/getsinglestudentreflection',
+                    data: {
+                        studentClass: studentClass,
+                        studentId: studentId
+                    }
+                })
+            )
+        },
     // 取得學生課程
     getStudentCourse:
         (studentClass, studentId) => {
@@ -546,20 +568,6 @@ const adminClientConnect = {
                     data: {
                         courseId: courseId,
                         studentId: studentId,
-                    }
-                })
-            )
-        },
-    // 讀取學生 Reflection
-    getSingleStudentReflection:
-        (studentClass, studentId) => {
-            return (
-                axios({
-                    method: 'post',
-                    url: '/admin/getsinglestudentreflection',
-                    data: {
-                        studentClass: studentClass,
-                        studentId: studentId
                     }
                 })
             )

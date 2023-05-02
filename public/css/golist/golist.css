@@ -117,6 +117,18 @@ body {
 }
 
 /* diagram */
+.diagramContainer_mode{
+    position: absolute;
+    text-align: right;
+    width: 100vw;
+    padding:10px 20px;
+    height: 70px;
+    z-index:10;
+    user-select: none;
+    color:rgba(255,255,255,0.3);
+    font-size: 50px;
+}
+
 .diagramContainer {
     display: flex;
     justify-content: space-between;
