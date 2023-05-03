@@ -8,7 +8,6 @@ import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
 import adminConfig from '../models/adminconfig.js'
 import listenerConfig from '../models/listenerconfig.js'
-
 import reflectionconfig from '../models/reflectionconfig.js'
 
 const saltRound = 10
@@ -427,7 +426,25 @@ router.post('/getsinglestudentlistener', async (req, res) => {
 })
 //Admin 取得所有學生 reflection
 router.post('/getallstudentreflection', async (req, res) => {
+    try {
+        const reflectionData = await reflectionconfig.find({})
 
+        let sheetName = []
+        let sheetData = []
+
+        for (const { studentId, studentName, courseId, studentReflectionData } of reflectionData) {
+            const courseName = await standardcontent.findOne({ _id: courseId })
+
+            
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "讀取 reflection 失敗，請聯絡管理員 (err)",
+            status: 500,
+        })
+    }
 })
 //Admin 取得單一學生 refletion
 router.post('/getsinglestudentreflection', async (req, res) => {
