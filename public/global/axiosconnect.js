@@ -498,6 +498,20 @@ const adminClientConnect = {
                 })
             )
         },
+    // 透過 Course 取得學生
+    getAllStudentByCourseId:
+        (courseId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/getallstudentbylimit',
+                    data: {
+                        limit: 'course',
+                        courseId: courseId
+                    }
+                })
+            )
+        },
     // 下載所有學生監聽資料
     getAllStudentListener:
         () => {
@@ -522,13 +536,18 @@ const adminClientConnect = {
                 })
             )
         },
-    // 下載所有學生回饋
+    // 下載所有學生回饋(單一遊戲)
     getAllStudentReflection:
-        () => {
-            axios({
-                method: 'post',
-                url: '/admin/getallstudentreflection'
-            })
+        (courseId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/getallstudentreflection',
+                    data: {
+                        courseId: courseId
+                    }
+                })
+            )
         },
     // 讀取單一學生 Reflection
     getSingleStudentReflection:

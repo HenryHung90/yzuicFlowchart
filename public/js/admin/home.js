@@ -191,24 +191,48 @@ const renderGoList = () => {
     })
 }
 
+// 生成 Student 名單部分
 const renderStudentList = () => {
     NormalizeFunc.loadingPage(true)
 
     const courseContainer = $('.goListCourse')
 
     const operationButtonContainer = $('<div>').prop({
-        className: 'studentList_operationButtonContainer container-lg'
+        className: 'studentList_operationButtonContainer container-lg row'
     }).appendTo(courseContainer)
 
     $('<button>').prop({
-        className: 'btn btn-success',
+        className: 'btn btn-success studentList_operationButtonContainer_btn col-2',
         innerHTML: "下載所有事件紀錄"
     }).click(downloadAllListening).appendTo(operationButtonContainer)
 
+    const reflectionGroup = $('<div>').prop({ className: 'input-group' }).css({ 'width': '30%' }).appendTo(operationButtonContainer)
+
+    const relfectionCourse = $('<select>').prop({ className: 'form-select', id: 'reflectionCourse' }).appendTo(reflectionGroup)
+
+    adminClientConnect.getAllCourse().then(response => {
+        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (response.data.standardData === undefined || response.data.standardData === null) {
+                return
+            }
+
+            response.data.standardData.forEach((courseData, index) => {
+                const courseOption = $('<option>').prop({
+                    value: courseData._id,
+                    innerHTML: courseData.goListTitle
+                }).appendTo(relfectionCourse)
+
+                if (index === 0) {
+                    courseOption.attr('selected', true)
+                }
+            })
+        }
+    })
+
     $('<button>').prop({
         className: 'btn btn-success',
-        innerHTML: "下載所有"
-    }).click(downloadAllReflection).appendTo(operationButtonContainer)
+        innerHTML: "下載反思"
+    }).click(downloadAllReflection).appendTo(reflectionGroup)
 
 
 
@@ -309,9 +333,15 @@ const renderStudentList = () => {
 
     //下載所有回饋
     function downloadAllReflection() {
-        NormalizeFunc.loadingPage(true)
-        adminClientConnect.getAllStudentReflection().then(response => {
+        const courseId = $('#reflectionCourse').val()
+        const courseName = $('#reflectionCourse').find("option:selected").text()
 
+        NormalizeFunc.loadingPage(true)
+        adminClientConnect.getAllStudentReflection(courseId).then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                downloadDatatoExcel(courseName, response.data.message.sheetData, response.data.message.sheetName)
+            }
+            NormalizeFunc.loadingPage(false)
         })
     }
 
@@ -427,12 +457,16 @@ const renderStudentList = () => {
 }
 
 const homRenderInit = () => {
-    console.log(window.location.hash)
     if (window.location.hash == '#student') {
         $('.goListTitle_Selection').removeClass('title_selected')
         $(`#titleStudent`).addClass('title_selected')
         renderStudentList()
     } else if (window.location.hash == '#course') {
+        $('.goListTitle_Selection').removeClass('title_selected')
+        $(`#titleCourse`).addClass('title_selected')
+        renderGoList()
+    } else {
+        window.location.href = '#course'
         $('.goListTitle_Selection').removeClass('title_selected')
         $(`#titleCourse`).addClass('title_selected')
         renderGoList()

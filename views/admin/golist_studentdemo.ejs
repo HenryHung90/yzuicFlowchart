@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>預覽:<%= studentId %></title>
+    <title>預覽:<%= studentId %>
+    </title>
     <!-- go.js -->
     <script src="https://cdn.jsdelivr.net/npm/gojs@2.1/release/go.js"></script>
 
@@ -72,8 +73,20 @@
                     <%= studentId %>
                 </h5>
             </div>
-            <div class="col-2 offset-md-2 navBarOpen_content" id="logout" data-bs-toggle="tooltip" data-bs-placement="top"
-                title="退出">
+            <div class="col-4 offset-md-2 navBarOpen_content">
+                <div class="navBarOpen_studentSelector">
+                    <div class="input-group">
+                        <button class="btn btn-outline-secondary" type="button"
+                            id="studentSelector_forward">上一位</button>
+                        <select class="form-select" id="studentSelector">
+                            <option selected>請選擇學生...</option>
+                        </select>
+                        <button class="btn btn-outline-secondary" type="button" id="studentSelector_next">下一位</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2 offset-md-2 navBarOpen_content" id="logout" data-bs-toggle="tooltip"
+                data-bs-placement="top" title="退出">
                 <div class="navBarOpen_text">
                     <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="40px" viewBox="0 0 512 512">
                         <path

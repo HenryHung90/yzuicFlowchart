@@ -362,6 +362,52 @@ router.post('/getallstudent', async (req, res) => {
     }
 })
 
+//Admin 取得所有學生 from 特殊值
+router.post('/getallstudentbylimit', async (req, res) => {
+    try {
+        const studentData = await studentConfig.find({})
+
+        switch (req.body.limit) {
+            case 'course':
+                findByCourseId()
+                return
+        }
+
+        res.json({ status: 501 })
+
+        //透過 CourseId 進行查找
+        function findByCourseId() {
+            let selectName = []
+            let selectValue = []
+
+            for (const { studentId, studentName, studentGoList } of studentData) {
+                if (studentGoList) {
+                    if (studentGoList[req.body.courseId] !== null || studentGoList[req.body.courseId] !== undefined) {
+                        selectName.push(studentName)
+                        selectValue.push(studentId)
+                    }
+                }
+            }
+
+            res.json({
+                message: {
+                    selectName: selectName,
+                    selectValue: selectValue
+                },
+                status: 200,
+            })
+        }
+
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得學生時發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+
 //Admin 取得所有監聽
 router.post('/getallstudentlistener', async (req, res) => {
     try {
@@ -427,16 +473,44 @@ router.post('/getsinglestudentlistener', async (req, res) => {
 //Admin 取得所有學生 reflection
 router.post('/getallstudentreflection', async (req, res) => {
     try {
-        const reflectionData = await reflectionconfig.find({})
+        const reflectionData = await reflectionconfig.find({
+            courseId: req.body.courseId
+        })
 
         let sheetName = []
         let sheetData = []
 
-        for (const { studentId, studentName, courseId, studentReflectionData } of reflectionData) {
-            const courseName = await standardcontent.findOne({ _id: courseId })
+        for (const { studentId, studentName, studentReflectionData } of reflectionData) {
+            sheetName.push(`${studentId}_${studentName}`)
 
-            
+            for (const reflectionIndex of ["1-4", "2-4", "3-4", "4-4", "5-4", "6-4", "7-4"])
+                if (studentReflectionData[reflectionIndex] === undefined) {
+                    studentReflectionData[reflectionIndex] = {
+                        "learing": "",
+                        "workhard": "",
+                        "difficult": "",
+                        "scoring": ""
+                    }
+                }
+
+            sheetData.push(Object.values(studentReflectionData))
         }
+
+        if (sheetData.length === 0) {
+            res.json({
+                message: "目前尚未有任何該課程資料!",
+                status: 500,
+            })
+            return
+        }
+
+        res.json({
+            message: {
+                sheetName: sheetName,
+                sheetData: sheetData
+            },
+            status: 200
+        })
 
     } catch (err) {
         console.log(err)

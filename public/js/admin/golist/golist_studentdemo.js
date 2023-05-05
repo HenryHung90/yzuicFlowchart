@@ -401,16 +401,70 @@ const navInit = () => {
         navButton.logout()
     })
 
+
+    $('#studentSelector').change(e => {
+        navButton.changeStudent(e.currentTarget.value)
+    })
+    adminClientConnect.getAllStudentByCourseId(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
+        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            const selector = $('#studentSelector')
+
+            response.data.message.selectName.forEach((name, index) => {
+                $('<option>').prop({
+                    innerHTML: `${name} ${response.data.message.selectValue[index]}`,
+                    value: response.data.message.selectValue[index]
+                }).appendTo(selector)
+            });
+
+
+
+            $('#studentSelector_forward').click(e => {
+                navButton.changeStudentBtn(response.data.message.selectValue, 'forward')
+            })
+            $('#studentSelector_next').click(e => {
+                navButton.changeStudentBtn(response.data.message.selectValue, 'next')
+            })
+        }
+    })
     NormalizeFunc.loadingPage(false)
 }
 
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
-    //logout
+    // logout
     logout: () => {
         window.location.href = `/home/${NormalizeFunc.getCookie('adminId')}`
-    }
+    },
+    // Change Student
+    changeStudent: (value) => {
+        window.location.href = `/${value}/${NormalizeFunc.getFrontEndCode('courseId')}`
+    },
+    // Change Student
+    changeStudentBtn: (studentList, direction) => {
+        if (direction === 'forward') {
+            studentList.map((value, index) => {
+                if (value === NormalizeFunc.getFrontEndCode('studentId')) {
+                    if (studentList[index - 1] === undefined) {
+                        window.location.href = `/${studentList[studentList.length - 1]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                        return
+                    }
+                    window.location.href = `/${studentList[index - 1]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                }
+            })
+        } else {
+            studentList.map((value, index) => {
+                if (value === NormalizeFunc.getFrontEndCode('studentId')) {
+                    if (studentList[index + 1] === undefined) {
+                        window.location.href = `/${studentList[0]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                        return
+                    }
+                    window.location.href = `/${studentList[index + 1]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                }
+            })
+        }
+    },
+
 }
 //load
 const load = async () => {
