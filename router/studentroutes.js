@@ -206,45 +206,45 @@ router.post("/getmaterial", async (req, res) => {
         })
     }
 })
-// 學生取得 start 內容
-router.post("/getstarting", async (req, res) => {
-    try {
-        const materialData = await standardcontent.findOne({
-            _id: req.body.courseId,
-        })
+// // 學生取得 start 內容
+// router.post("/getstarting", async (req, res) => {
+//     try {
+//         const materialData = await standardcontent.findOne({
+//             _id: req.body.courseId,
+//         })
 
-        if (
-            materialData.standardStarting === undefined ||
-            materialData.standardStarting === null
-        ) {
-            res.json({
-                message: "查無此demo，請稍後再試",
-                status: 500,
-            })
-            return
-        }
-        res.json({
-            message: materialData.standardStarting[req.body.key],
-            status: 200,
-        })
-    } catch (err) {
-        console.log(err)
-        res.json({
-            message: "取得 start task 失敗，請聯繫管理員(err)",
-            status: 500,
-        })
-    }
-})
+//         if (
+//             materialData.standardStarting === undefined ||
+//             materialData.standardStarting === null
+//         ) {
+//             res.json({
+//                 message: "查無此demo，請稍後再試",
+//                 status: 500,
+//             })
+//             return
+//         }
+//         res.json({
+//             message: materialData.standardStarting[req.body.key],
+//             status: 200,
+//         })
+//     } catch (err) {
+//         console.log(err)
+//         res.json({
+//             message: "取得 start task 失敗，請聯繫管理員(err)",
+//             status: 500,
+//         })
+//     }
+// })
 // 學生取得 understanding 內容
 router.post("/getunderstanding", async (req, res) => {
     try {
-        const understandingData = await standardcontent.findOne({
+        const courseData = await standardcontent.findOne({
             _id: req.body.courseId,
         })
 
         if (
-            understandingData.standardUnderstanding === undefined ||
-            understandingData.standardUnderstanding === null
+            courseData.standardUnderstanding === undefined ||
+            courseData.standardUnderstanding === null
         ) {
             res.json({
                 message: "查無 探索理解，請稍後再試",
@@ -252,8 +252,12 @@ router.post("/getunderstanding", async (req, res) => {
             })
             return
         }
+        console.log(courseData.standardStarting[req.body.key])
         res.json({
-            message: understandingData.standardUnderstanding[req.body.key],
+            message: {
+                understandingData: courseData.standardUnderstanding[req.body.key],
+                startingData: courseData.standardStarting[req.body.key],
+            },
             status: 200,
         })
     } catch (err) {
@@ -318,7 +322,7 @@ router.post("/getwriteformulating", async (req, res) => {
         res.json({
             message:
                 formulatingData.formulatingData[req.body.courseId][
-                    req.body.key
+                req.body.key
                 ],
             status: 200,
         })
@@ -409,7 +413,7 @@ router.post("/readgolist", async (req, res) => {
             studentAccess: true,
         })
 
-        
+
         if (
             studentData.studentGoList === null ||
             studentData.studentGoList === undefined ||
@@ -627,7 +631,7 @@ router.post("/readcode", async (req, res) => {
                     } else {
                         returnData.code =
                             response.studentCodeList[req.body.courseId][
-                                req.body.keyCode
+                            req.body.keyCode
                             ]
                     }
                 }
@@ -683,9 +687,9 @@ router.post("/savecode", async (req, res) => {
             }
         } else {
             // 後續新增
-            if(studentData.studentCodeList[req.body.courseId] === null){
+            if (studentData.studentCodeList[req.body.courseId] === null) {
                 studentData.studentCodeList[req.body.courseId] = {
-                    [req.body.keyCode] :{
+                    [req.body.keyCode]: {
                         setting: req.body.setting,
                         config: req.body.config,
                         preload: req.body.preload,
@@ -694,7 +698,7 @@ router.post("/savecode", async (req, res) => {
                         custom: req.body.custom,
                     }
                 }
-            }else{
+            } else {
                 studentData.studentCodeList[req.body.courseId][req.body.keyCode] = {
                     setting: req.body.setting,
                     config: req.body.config,
@@ -704,7 +708,7 @@ router.post("/savecode", async (req, res) => {
                     custom: req.body.custom,
                 }
             }
-            
+
         }
 
         //存入 coding 檔案
@@ -907,7 +911,7 @@ router.post("/savereflection", async (req, res) => {
         studentData.studentGoList[req.body.courseId].progress > nextProgress
             ? null
             : (studentData.studentGoList[req.body.courseId].progress =
-                  nextProgress)
+                nextProgress)
 
         await studentConfig.updateOne(
             {
@@ -1052,12 +1056,13 @@ router.post("/listener", async (req, res) => {
                 studentId: req.user.studentId,
                 listenerData: [
                     {
-                        time: req.body.time,
-                        courseTitle: req.body.courseTitle,
-                        operation: req.body.operation,
-                        keyName: req.body.keyName,
-                        detail: req.body.detail,
-                        description: req.body.description,
+                        "時間": req.body.time,
+                        "遊戲標題": req.body.courseTitle,
+                        "操作": req.body.operation,
+                        "Task": req.body.task,
+                        "項目": req.body.keyName,
+                        "細節": req.body.detail,
+                        "簡易描述": req.body.description,
                     },
                 ],
             })
@@ -1070,12 +1075,13 @@ router.post("/listener", async (req, res) => {
             })
         } else {
             listenerData.listenerData.push({
-                time: req.body.time,
-                courseTitle: req.body.courseTitle,
-                operation: req.body.operation,
-                keyName: req.body.keyName,
-                detail: req.body.detail,
-                description: req.body.description,
+                "時間": req.body.time,
+                "遊戲標題": req.body.courseTitle,
+                "操作": req.body.operation,
+                "Task": req.body.task,
+                "項目": req.body.keyName,
+                "細節": req.body.detail,
+                "簡易描述": req.body.description,
             })
 
             await listenerconfig

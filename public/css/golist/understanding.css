@@ -30,3 +30,33 @@
     font-size: 20px;
 }
 
+/* start */
+.startBoxContainer{
+    height: 80%;
+    pointer-events: all;
+}
+.startDescription_container{
+    margin:20px 0;
+}
+.startDescription_container h3{
+    font-weight: bolder;
+}
+.codeTutorial_container{
+    height: 900px;
+}
+.codeTutorial_code{
+    width: 100%;
+}
+
+.startDemoFinish {
+    animation: startdemoloaded .3s steps(500);
+}
+
+@keyframes startdemoloaded {
+    from {
+        transform: translateY(-95vh);
+    }
+    to {
+        transform: translateY(-10vh);
+    }
+}

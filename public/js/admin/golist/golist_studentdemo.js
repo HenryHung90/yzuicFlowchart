@@ -410,10 +410,12 @@ const navInit = () => {
             const selector = $('#studentSelector')
 
             response.data.message.selectName.forEach((name, index) => {
-                $('<option>').prop({
+                const option = $('<option>').prop({
                     innerHTML: `${name} ${response.data.message.selectValue[index]}`,
                     value: response.data.message.selectValue[index]
                 }).appendTo(selector)
+
+                if (response.data.message.selectValue[index] === NormalizeFunc.getFrontEndCode('studentId')) option.attr("selected", true)
             });
 
 
@@ -434,7 +436,7 @@ const navInit = () => {
 const navButton = {
     // logout
     logout: () => {
-        window.location.href = `/home/${NormalizeFunc.getCookie('adminId')}`
+        window.location.href = `/home/${NormalizeFunc.getCookie('adminId')}#student`
     },
     // Change Student
     changeStudent: (value) => {

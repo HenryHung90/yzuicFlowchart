@@ -27,70 +27,22 @@ const TargetBox = () => {
 
     return contentDiv
 }
-//StartBox return function
-const StartBox = () => {
-    // 把 Sync 字樣刪除
-    $(".content_complete").remove()
-    // 把 收合 字樣刪除
-    $(".content_slide").remove()
-    // 把 Hint 刪除
-    $(".content_question").remove()
+// //StartBox return function
+// const StartBox = () => {
+//     // 把 Sync 字樣刪除
+//     $(".content_complete").remove()
+//     // 把 收合 字樣刪除
+//     $(".content_slide").remove()
+//     // 把 Hint 刪除
+//     $(".content_question").remove()
 
-    const startBoxContainer = $("<div>").prop({
-        className: "row justify-content-start startBoxContainer",
-    })
+//     const startBoxContainer = $("<div>").prop({
+//         className: "row justify-content-start startBoxContainer",
+//     })
 
-    //start description
-    const startDescriptionContainer = $("<div>")
-        .prop({
-            className: "row startDescription_container",
-        })
-        .appendTo($(".contentContainer"))
-
-    //descriptions
-    $("<div>")
-        .prop({
-            className: "col-10 startDescription_description",
-            id: "startDescription",
-        })
-        .appendTo(startDescriptionContainer)
-
-    //play button
-    //launch
-    $("<button>")
-        .prop({
-            className: "col-2 btn btn-success content_launchbtn",
-            id: "start_launchbtn",
-            innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
-        })
-        .appendTo(startDescriptionContainer)
-
-    //container
-    const content_codingContainer = $("<div>")
-        .prop({
-            className: "col-12 codeTutorial_container",
-        })
-        .appendTo(startBoxContainer)
-
-    $("<iframe>")
-        .prop({
-            className: "col-12",
-            id: "startIframe",
-        })
-        .css({
-            width: "100%",
-            height: "95%",
-            margin: "0 auto",
-            "margin-top": "5px",
-            border: "1px dashed black",
-            "border-radius": "20px",
-        })
-        .appendTo(content_codingContainer)
-
-    NormalizeFunc.loadingPage(false)
-    return startBoxContainer
-}
+//     NormalizeFunc.loadingPage(false)
+//     return startBoxContainer
+// }
 //CommentBox return function
 const CommentBox = () => {
     // 把 Sync 字樣刪除
@@ -327,23 +279,60 @@ const UnderstandingBox = () => {
     const contentDiv = $("<div>").prop({
         className: "justify-content-center UnderstandingContentDiv",
     })
-
     //----------------------------------------------------------
-    //understanding description
-    const understandingDescriptionContainer = $("<div>")
-        .prop({
-            className: "row understandingDescription_container",
-        })
-        .appendTo(contentDiv)
-
     //descriptions
     $("<div>")
         .prop({
             className: "col-12 understandingDescription_target",
             id: "understandingDescription",
         })
-        .appendTo(understandingDescriptionContainer)
+        .appendTo(contentDiv)
+    //starting demo 放置
+    const understandingDemoContainer = $("<div>")
+        .prop({
+            className: "row startDescription_container",
+        })
+        .appendTo(contentDiv)
+    // starting 移植部分----------------------------------
+    //play button
+    //launch
+    $("<button>")
+        .prop({
+            className: "col-2 btn btn-success content_launchbtn",
+            id: "start_launchbtn",
+            innerHTML:
+                '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
+        })
+        .appendTo(understandingDemoContainer)
 
+    //container
+    const content_codingContainer = $("<div>")
+        .prop({
+            className: "col-12 codeTutorial_container",
+        })
+        .appendTo(contentDiv)
+
+    $("<iframe>")
+        .prop({
+            className: "col-12",
+            id: "startIframe",
+        })
+        .css({
+            width: "100%",
+            height: "95%",
+            margin: "0 auto",
+            "margin-top": "5px",
+            border: "1px dashed black",
+            "border-radius": "20px",
+        })
+        .appendTo(content_codingContainer)
+    //---------------------------------------------------------------
+    //understanding description
+    const understandingDescriptionContainer = $("<div>")
+        .prop({
+            className: "row understandingDescription_container",
+        })
+        .appendTo(contentDiv)
     //operation
     $("<div>")
         .prop({
@@ -352,7 +341,6 @@ const UnderstandingBox = () => {
             innerHTML: "<h4>操作</h4>",
         })
         .appendTo(understandingDescriptionContainer)
-
     //limit
     $("<div>")
         .prop({
@@ -1592,7 +1580,7 @@ const ReflectionBox = reflectionKey => {
         }
 
         function submitFunc() {
-            ClickListening("", `送出-${reflectionKey.key} 監控反思 `)
+            ClickListening("", `送出-監控反思-${reflectionKey.key}`)
             NormalizeFunc.loadingPage(true)
             studentClientConnect
                 .saveReflection(
@@ -1637,7 +1625,6 @@ const ReflectionBox = reflectionKey => {
 
 export {
     TargetBox,
-    StartBox,
     CommentBox,
     UnderstandingBox,
     FormulatingBox,
