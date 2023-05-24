@@ -141,6 +141,7 @@
     min-width: 540px;
     padding: 1% 2%;
     overflow-y: auto;
+    display: inline-block;
 }
 
 .goListCourse_contentContainer {
@@ -153,9 +154,16 @@
     border-radius: 20px;
     box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.5);
 }
+
 .goListCourse_contentContainer:hover {
     transition-duration: 0.6s;
     transform: scale(1.1);
+}
+
+.goListCourse_addCourse {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .goListCourse_contentTitle {
@@ -171,8 +179,9 @@
 .studentList_operationButtonContainer {
     margin: 10px auto;
 }
+
 .studentList_operationButtonContainer_btn {
-    margin:0 15px;
+    margin: 0 15px;
 }
 
 /* studentList */

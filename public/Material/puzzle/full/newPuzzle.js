@@ -46,7 +46,7 @@ const puzzleInformation = {
 
 
 function preload() {
-    this.load.spritesheet('puzzle', '../media/img/Aus.jpg', {
+    this.load.spritesheet('puzzle', '../media/img/pokemon.jpeg', {
         frameHeight: puzzleInformation.scale.height,
         frameWidth: puzzleInformation.scale.width,
     })
