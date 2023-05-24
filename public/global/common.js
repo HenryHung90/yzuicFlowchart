@@ -1,6 +1,5 @@
 import {
     TargetBox,
-    StartBox,
     CommentBox,
     UnderstandingBox,
     FormulatingBox,
@@ -110,23 +109,11 @@ const categoryBox = {
             $("#startDescription").html(`<h3>Task undefined</h3>`)
             return
         }
-        // 設定 Iframe 跑的　demo
-        $("#startIframe").attr("src", `../Material${data.message.material}`)
-        // 設定 Target 字樣
-        $("#startDescription").html(
-            `<h3>Task ${key} : ${data.message.target}</h3>`
-        )
-        // 設定 button click 事件
-        $("#start_launchbtn").click(e => {
-            $("#startIframe").attr("src", `../Material${data.message.material}`)
-            $("#demoContent").addClass("startDemoFinish")
-            setTimeout(e => {
-                $("#demoContent").removeClass("startDemoFinish")
-            }, 800)
-        })
+
         return
     },
     Understanding: data => {
+        console.log(data)
         if (data.message === undefined) {
             $("#understandingDescription").html(
                 `<h3>任務目標 -</h3><h3> -- </h3>`
@@ -134,12 +121,25 @@ const categoryBox = {
             return
         }
         $("#understandingDescription").html(
-            `<h3>任務目標 -</h3><h3>⭐${data.message.target}⭐</h3>`
+            `<h3>任務目標 -</h3><h3>⭐${data.message.understandingData.target}⭐</h3>`
         )
 
+        //starting 移植部分
+        // 設定 Iframe 跑的　demo
+        $("#startIframe").attr("src", `../Material${data.message.startingData.material}`)
+        // 設定 button click 事件
+        $("#start_launchbtn").click(e => {
+            $("#startIframe").attr("src", `../Material${data.message.startingData.material}`)
+            $("#demoContent").addClass("startDemoFinish")
+            setTimeout(e => {
+                $("#demoContent").removeClass("startDemoFinish")
+            }, 800)
+        })
+        //----------------------------
+
         //operation
-        if (data.message.operation !== undefined) {
-            data.message.operation.split("\n").forEach(operation => {
+        if (data.message.understandingData.operation !== undefined) {
+            data.message.understandingData.operation.split("\n").forEach(operation => {
                 $("<p>")
                     .prop({
                         className: "understandingDescription_operationText",
@@ -150,8 +150,8 @@ const categoryBox = {
         }
 
         //limit
-        if (data.message.limit !== undefined) {
-            data.message.limit.split("\n").forEach(limit => {
+        if (data.message.understandingData.limit !== undefined) {
+            data.message.understandingData.limit.split("\n").forEach(limit => {
                 $("<p>")
                     .prop({
                         className: "understandingDescription_limitText",
@@ -519,7 +519,7 @@ const GoListFunc = {
     },
     //show Each Box
     showContainer: async (s, id) => {
-        ClickListening("", `打開-${s.key} ${s.text}`)
+        ClickListening("", `打開-Task ${s.key} ${s.text}`)
         //取得 Iframe 發出之 Error 警訊
         const reciveMessage = e => {
             e.preventDefault()
@@ -551,7 +551,7 @@ const GoListFunc = {
         }
         //click close function
         const closePage = () => {
-            ClickListening("", `離開-${s.key} ${s.text}`)
+            ClickListening("", `離開-${s.text}`)
             //關閉自動儲存
             //取得各階段程式碼
             if (
@@ -660,7 +660,7 @@ const GoListFunc = {
             // console.log(s.category)
             //Auto save For Reflection and Bonus-Reflection----------
             if (s.category === "Reflection" || s.category === "Bonus-Reflection" || s.category === "Completed-Reflection") {
-                ClickListening("", `暫存-${s.key} 監控反思 `)
+                ClickListening("", `暫存-監控反思`)
                 NormalizeFunc.loadingPage(true)
                 studentClientConnect.tempSaveReflection(
                     NormalizeFunc.getFrontEndCode("courseId"),
@@ -712,7 +712,7 @@ const GoListFunc = {
             ]
 
             if ($(".content_slide").attr("id") === "open") {
-                ClickListening("", `全部收合-${s.key} ${s.text}-Code`)
+                ClickListening("", `全部收合-${s.text}-Code`)
                 for (const codeContainer of content_codingContainer) {
                     if ($(codeContainer).attr("id") === "open") {
                         $(codeContainer).attr("id", "close").slideUp(300)
@@ -727,7 +727,7 @@ const GoListFunc = {
                     }
                 }
             } else {
-                ClickListening("", `全部展開-${s.key} ${s.text}-Code`)
+                ClickListening("", `全部展開-${s.text}-Code`)
                 for (const codeContainer of content_codingContainer) {
                     if ($(codeContainer).attr("id") === "close") {
                         $(codeContainer).attr("id", "open").slideDown(300)
@@ -754,17 +754,13 @@ const GoListFunc = {
         NormalizeFunc.loadingPage(true)
 
         //blocking
-        const block = $("<div>")
-            .prop({
-                className: "container-fluid block",
-            })
-            .css({
-                "margin-top": `calc(${window.pageYOffset}px - 15px)`,
-            })
-            .click(() => {
-                closePage()
-            })
-            .prependTo($("body"))
+        const block = $("<div>").prop({
+            className: "container-fluid block",
+        }).css({
+            "margin-top": `calc(${window.pageYOffset}px - 15px)`,
+        }).click(() => {
+            closePage()
+        }).prependTo($("body"))
 
         //contentDiv
         const contentDiv = $("<div>")
@@ -886,25 +882,6 @@ const GoListFunc = {
                                 )
                             ) {
                                 categoryBox.Target(response.data)
-                                NormalizeFunc.loadingPage(false)
-                            }
-                        })
-                    break
-                case "Start":
-                    StartBox().appendTo(contentContainer)
-
-                    await studentClientConnect
-                        .getStarting(
-                            NormalizeFunc.getFrontEndCode("courseId"),
-                            s.key
-                        )
-                        .then(response => {
-                            if (
-                                NormalizeFunc.serverResponseErrorDetect(
-                                    response
-                                )
-                            ) {
-                                categoryBox.Start(response.data, s.key)
                                 NormalizeFunc.loadingPage(false)
                             }
                         })
@@ -1196,9 +1173,9 @@ function ClickListening(e, customClick) {
         // Start //
         ["start_launchbtn", "重新執行-任務-範例"],
         // Understanding //
-        ["understandingDescription", "點擊-探索理解-之標題"],
-        ["understandingOperation", "點擊-探索理解-之操作"],
-        ["understandingLimit", "點擊-探索理解-之限制"],
+        ["understandingDescription", "點擊-探索理解-標題"],
+        ["understandingOperation", "點擊-探索理解-操作"],
+        ["understandingLimit", "點擊-探索理解-限制"],
         // Formulating //
         ["formulatingDescription", "點擊-表徵制定-標題"],
         ["formulatingContent", "點擊-表徵制定-內容"],
@@ -1235,9 +1212,9 @@ function ClickListening(e, customClick) {
         ["LS_reflectionDescription_difficult", "點擊-問題反思-遇到那些困難"],
         ["LS_reflectionDescription_scoring", "點擊-問題反思-自我評分"],
         ["scoringText", "點擊-問題反思-自我評分敘述"],
-        ["learningValue", "點擊-問題反思-之學到了甚麼輸入框"],
-        ["workhardValue", "點擊-問題反思-之還要努力甚麼輸入框"],
-        ["difficultValue", "點擊-問題反思-之遇到那些困難輸入框"],
+        ["learningValue", "點擊-問題反思-學到了甚麼輸入框"],
+        ["workhardValue", "點擊-問題反思-還要努力甚麼輸入框"],
+        ["difficultValue", "點擊-問題反思-遇到那些困難輸入框"],
         // ChatBox //
         ["chatBox_Close", "打開-聊天室"],
         ["chatBox_Open", "關閉-聊天室"],
@@ -1266,12 +1243,12 @@ function ClickListening(e, customClick) {
                 operation =
                     "點擊-計畫執行-第 " +
                     (parseInt(ProgrammingHintAry[1]) + 1) +
-                    " 之Hint"
+                    " 的Hint"
             } else if (ProgrammingHintAry[0] === "programmingHintCode") {
                 operation =
                     "打開-計畫執行-第 " +
                     (parseInt(ProgrammingHintAry[1]) + 1) +
-                    " 之HintCode"
+                    " 個Hint的Code"
             } else if (ProgrammingMediaAry[0] === "programmingFile") {
                 operation = `點擊-計畫執行-檔案之${ProgrammingMediaAry[1]}`
             } else {
@@ -1305,16 +1282,44 @@ function ClickListening(e, customClick) {
 
     // operation => [0]operation , [1]keyName , [2]detail
 
-    const description = `${NormalizeFunc.getCookie(
-        "studentId"
-    )} 在 ${time} ${courseTitle} ${operation}`
+    const description = `${NormalizeFunc.getCookie("studentId")} 在 ${time} ${courseTitle} ${operation}`
 
     const tempOperation = operation.split("-")
     operation = tempOperation[0]
-    const keyName = tempOperation[1] || courseTitle
-    const detail = tempOperation[2] || ""
 
-    // console.warn(`T:${time} O:${operation} K:${keyName} D:${detail}`)
+    console.log(tempOperation)
+    // 若傳入值的[1] 為 標示進入 Task 則儲存該 Task 至 sessionStorage 內
+    if (tempOperation[1].split(" ")[0] == "Task") {
+        sessionStorage.setItem("ListeningTask", tempOperation[1])
+    }
+
+    const task = sessionStorage.getItem("ListeningTask") || ''
+    const keyName = () => {
+        let keyName
+        if (tempOperation[1].split(" ")[0] == "Task") {
+            keyName = tempOperation[2]
+        } else {
+            keyName = tempOperation[1]
+        }
+        return keyName
+    }
+
+    const detail = () => {
+        let detail
+        if (keyName() === tempOperation[2]) {
+            detail = ""
+        } else {
+            detail = tempOperation[2]
+        }
+
+        return detail
+    }
+    // console.table({
+    //     "操作": operation,
+    //     "Task": task,
+    //     "keyName": keyName,
+    //     "detail": detail
+    // })
     // console.warn(description)
 
     studentClientConnect
@@ -1322,8 +1327,9 @@ function ClickListening(e, customClick) {
             time,
             courseTitle,
             operation,
-            keyName,
-            detail,
+            task,
+            keyName(),
+            detail(),
             description
         )
         .then(response => {
