@@ -2,8 +2,6 @@ import { GoListFunc, NormalizeFunc, ClickListening } from "../../global/common.j
 import { chatBoxInit } from "./chatbox.js";
 import { studentClientConnect } from "../../global/axiosconnect.js";
 
-
-
 //init Diagram varible
 let myDiagram
 
@@ -680,6 +678,6 @@ const deleteNode = (part) => {
   }
 }
 
-window.addEventListener('DOMContentLoaded', goListInit);
-window.addEventListener('DOMContentLoaded', navInit);
-window.addEventListener('DOMContentLoaded', chatBoxInit);
+window.addEventListener('DOMContentLoaded', goListInit)
+window.addEventListener('DOMContentLoaded', navInit)
+window.addEventListener('DOMContentLoaded', chatBoxInit)
