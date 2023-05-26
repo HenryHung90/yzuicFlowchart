@@ -159,6 +159,11 @@ const changeSelection = (target) => {
 // 生成 Course 部分
 const renderGoList = () => {
     NormalizeFunc.loadingPage(true)
+
+    const courseContainer = $('.goListCourse')
+
+    courseContainer.css({ 'display': 'flex' })
+    
     adminClientConnect.getAllCourse().then(response => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
             if (response.data.standardData === null || response.data.standardData === undefined) return
@@ -167,7 +172,7 @@ const renderGoList = () => {
                     className: 'goListCourse_contentContainer'
                 }).click(e => {
                     enterClass(value._id)
-                }).appendTo($('.goListCourse'))
+                }).appendTo(courseContainer)
 
                 //Image Box
                 $('<div>').prop({
@@ -180,11 +185,50 @@ const renderGoList = () => {
                     className: 'goListCourse_contentTitle',
                     innerHTML: value.goListTitle
                 }).appendTo(goListContainer)
-
-                const enterClass = (id) => {
-                    window.location.href = `/admin/${id}`
-                }
             })
+
+            $('<div>').prop({
+                className: 'goListCourse_contentContainer goListCourse_addCourse',
+                innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="80%" height="80%" fill="gray" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>'
+            }).click(e => {
+                addClass()
+            }).appendTo(courseContainer)
+
+
+
+            const enterClass = (id) => {
+                window.location.href = `/admin/${id}`
+            }
+
+            const addClass = () => {
+                const courseName = window.prompt("請輸入您的課程名稱", "")
+                const courseClass = window.prompt("請輸入適用屆數", "")
+
+                if (courseName !== "") {
+                    console.log('Create', courseName)
+                    adminClientConnect.createCourse(courseName, courseClass).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                            const goListContainer = $('<div>').prop({
+                                className: 'goListCourse_contentContainer'
+                            }).click(e => {
+                                enterClass(response.data.message._id)
+                            }).insertBefore($('.goListCourse_addCourse'))
+
+                            //Image Box
+                            $('<div>').prop({
+                                className: 'goListCourse_contentImageBox',
+                                innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:100%;height: 60%">'
+                            }).appendTo(goListContainer)
+
+                            //Title Detail
+                            $('<div>').prop({
+                                className: 'goListCourse_contentTitle',
+                                innerHTML: response.data.message.goListTitle
+                            }).appendTo(goListContainer)
+                        }
+                    })
+                }
+            }
 
         }
         NormalizeFunc.loadingPage(false)
@@ -196,6 +240,8 @@ const renderStudentList = () => {
     NormalizeFunc.loadingPage(true)
 
     const courseContainer = $('.goListCourse')
+
+    courseContainer.css({ 'display': 'inline-block' })
 
     const operationButtonContainer = $('<div>').prop({
         className: 'studentList_operationButtonContainer container-lg row'

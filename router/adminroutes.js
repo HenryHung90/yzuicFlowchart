@@ -326,6 +326,42 @@ router.post('/getallcourse', async (req, res) => {
         })
     }
 })
+//Admin 新增課程
+router.post('/createcourse', async (req, res) => {
+    try {
+        const checkData = await standardcontent.findOne({ goListTitle: req.body.courseName })
+
+        if (checkData !== null) {
+            res.json({
+                message: "該名字已存在，請輸入別的名字",
+                status: 500
+            })
+            return
+        }
+
+        const newCourse = new standardcontent({
+            class: req.body.courseClass,
+            goListTitle: req.body.courseName,
+            access: true
+        })
+
+        newCourse.save().then(response => {
+            res.json({
+                message: {
+                    _id: response._id,
+                    goListTitle: response.goListTitle
+                },
+                status: 200
+            })
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "創建遊戲失敗，請聯繫管理員(err)",
+            status: 500
+        })
+    }
+})
 //Admin 取得所有學生
 router.post('/getallstudent', async (req, res) => {
     try {

@@ -499,6 +499,20 @@ const adminClientConnect = {
                 })
             )
         },
+    // 創建新的課程:
+    createCourse:
+        (courseName, courseClass) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/createcourse',
+                    data: {
+                        courseName: courseName,
+                        courseClass: courseClass
+                    }
+                })
+            )
+        },
     // 透過 Course 取得學生
     getAllStudentByCourseId:
         (courseId) => {
