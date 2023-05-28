@@ -103,7 +103,7 @@ const goListInit = () => {
 
     // define the Node templates for regular nodes
     const standardSetting =
-        $(go.Node, "Table", nodeStyle(),
+        $(go.Node, "Table", nodeStyle(),{ deletable: true },
             // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
             $(go.Panel, "Auto",
                 $(go.Shape, "RoundedRectangle",
