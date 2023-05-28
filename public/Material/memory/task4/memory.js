@@ -1,8 +1,5 @@
 // 階段四:點擊兩張卡牌後程式會做比對，正確會保持正面，錯誤則會翻回卡背 並且在比對時鎖定牌面，不能點擊其他卡牌
 // => 程式邏輯
-// 階段五:程式能夠判斷是否完成遊戲，並且讓翻牌具有動畫
-// => 程式規劃、程式邏輯、Phaser timeline
-
 
 let game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -13,6 +10,10 @@ let game = new Phaser.Game({
         preload: preload,
         create: create,
         update: update
+    },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     parent: "container",
 });
@@ -80,9 +81,6 @@ function create() {
         46, 46, 50, 50
     ])
 
-    //初始化勝利的 Match 數量（兩兩一對只要完成 row * col / 2 次配對，代表已完成）
-    cardInformation.winMatch = boardInformation.row * boardInformation.col / 2
-
     // 建立翻牌 依照設定的順序建立 row * col 的牌組陣列
     for (let i = 0; i < boardInformation.row; i++) {
         for (let j = 0; j < boardInformation.col; j++) {
@@ -101,15 +99,6 @@ function create() {
             card.on("pointerup", () => flipCard(card, this.tweens))
         }
     }
-
-    // 列出所有牌組
-    // 每組牌共有 13 張，因此每列 0 ~ 12 共 13 張
-    // 四花色 + Joker 等特殊牌組共 5 行
-    // for (let row = 0; row < 13; i++) {
-    //     for (let col = 0; col < 5; j++) {
-    //         cards.create(100 + i * 100, 100 + j * 140, "Cards", i + j * 13).setScale(0.25, 0.25);
-    //     }
-    // }
 }
 
 // 更新遊戲狀態
@@ -277,10 +266,4 @@ function checkCard(firstCard, secondCard, Tweens) {
             boardInformation.lockBoard = false
         }
     })
-
-    // 如果已經完成所有匹配，顯示遊戲結束訊息
-    if (cardInformation.match === cardInformation.winMatch) {
-        window.alert("遊戲結束！您用了 " + cardInformation.moves + " 次移動完成所有匹配。");
-    }
-
 }

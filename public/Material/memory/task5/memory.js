@@ -1,14 +1,5 @@
-// 階段一:列印出所有卡牌並整齊排列
-// => sprite 圖片使用、scale 使用
-// 階段二:利用預設 array 生成隨機 4*4 的卡牌(兩兩成對的8副牌)
-// => Phaser Shuffle 使用、程式邏輯 
-// 階段三:讓生成的 4*4 卡牌皆為卡背，點擊時會變成正面
-// => Phaser setFrame 使用、Phaser Interactive 使用
-// 階段四:點擊兩張卡牌後程式會做比對，正確會保持正面，錯誤則會翻回卡背 並且在比對時鎖定牌面，不能點擊其他卡牌
-// => 程式邏輯
 // 階段五:程式能夠判斷是否完成遊戲，並且讓翻牌具有動畫
 // => 程式規劃、程式邏輯、Phaser timeline
-
 
 let game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -72,7 +63,7 @@ function preload() {
     // 53、54 為 Joker
     // 55 白卡
     // 56 卡背
-    this.load.spritesheet('Cards', './media/img/PockerCard.png', {
+    this.load.spritesheet('Cards', '../media/img/PockerCard.png', {
         frameWidth: 389.5,
         frameHeight: 569.6
     })

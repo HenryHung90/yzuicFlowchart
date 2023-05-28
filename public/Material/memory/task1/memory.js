@@ -10,6 +10,10 @@ let game = new Phaser.Game({
         create: create,
         update: update
     },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     parent: "container",
 });
 
@@ -43,7 +47,7 @@ function create() {
     // 四花色 + Joker 等特殊牌組共 5 行
     for (let row = 0; row < 13; row++) {
         for (let col = 0; col < 5; col++) {
-            cardInformation.cards.create(100 + row * 100, 100 + col * 140, "Cards", row + col * 13).setScale(0.25, 0.25);
+            cardInformation.cards.create(100 + row * 50, 100 + col * 80, "Cards", row + col * 13).setScale(0.25, 0.25);
         }
     }
 }
