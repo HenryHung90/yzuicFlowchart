@@ -1287,7 +1287,7 @@ function ClickListening(e, customClick) {
     const tempOperation = operation.split("-")
     operation = tempOperation[0]
 
-    console.log(tempOperation)
+    // console.log(tempOperation)
     // 若傳入值的[1] 為 標示進入 Task 則儲存該 Task 至 sessionStorage 內
     if (tempOperation[1].split(" ")[0] == "Task") {
         sessionStorage.setItem("ListeningTask", tempOperation[1])
