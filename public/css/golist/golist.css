@@ -1,8 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
+
 body {
     margin: 0;
     overflow: hidden;
 }
+
 /*common */
 .block {
     height: 150vh;
@@ -97,6 +99,7 @@ body {
     user-select: none;
     font-weight: bolder;
 }
+
 #studentId {
     border-right: 2px solid rgba(0, 0, 0, 0.5);
 }
@@ -126,6 +129,59 @@ body {
     transition-duration: 0.3s;
     user-select: none;
     cursor: pointer;
+}
+
+/* leaderBoardBar */
+.leaderBoardBarContainer {
+    overflow: hidden;
+    display: flex;
+    pointer-events: none;
+    align-items: flex-start;
+    justify-content: right;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding: 24px;
+    padding-top: 5%;
+    z-index: 999;
+}
+
+.leaderBoardBar {
+    pointer-events: all;
+    background-color: white;
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.7);
+    transition-duration: 0.3s;
+    border-radius: 40px;
+    transform: translateX(500px);
+    width: 40%;
+    height: 65vh;
+    padding: 15px 2px;
+}
+
+.leaderBoardBar_taskContent {
+    width: 100%;
+    height: 18%;
+    border-radius: 10px;
+    margin: 10px 0;
+    padding: 5px 10px;
+}
+
+.task_title {
+    height: 100%;
+    text-align: center;
+}
+
+.task_member {
+    border-radius: 10px;
+    box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.5);
+}
+
+.taskMemberIcon {
+    user-select: none;
+    height: 20px;
+    width: 10px;
+    display: inline;
+    font-size: 20px;
 }
 
 /* diagram */
@@ -281,13 +337,16 @@ body {
         transform: translateY(-10px);
     }
 }
+
 @keyframes demoloaded {
     from {
         transform: translateY(-95vh);
     }
+
     50% {
         transform: translateY(-90vh);
     }
+
     to {
         transform: translateY(-95vh);
     }

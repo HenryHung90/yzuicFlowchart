@@ -483,6 +483,45 @@ const navInit = () => {
   document.addEventListener('mousedown', ClickListening, false)
 }
 
+const leaderBoardInit = () => {
+  studentClientConnect.getAllStudentProgress(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
+    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+      let taskCount = 1
+
+      for (const { count, member } of response.data.message) {
+        $(`#task_${taskCount}_count`).html(count)
+
+
+        for (let i = 0; i < member.length; i++) {
+          $('<div>').prop({
+            className: 'taskMemberIcon',
+            innerHTML: '🧍'
+          }).appendTo($(`#task_${taskCount}_member`))
+        }
+       
+        $(`#task_${taskCount}_member`).attr("data-bs-original-title", member.join("、"))
+        taskCount++
+      }
+    }
+  })
+
+
+  // 控制開關
+  $('.leaderBoardBar').click(e => openAndCloseLeaderBoard(e))
+  function openAndCloseLeaderBoard(e) {
+    e.stopPropagation()
+    if (e.currentTarget.id === 'leaderBoard_Close') {
+      $('.leaderBoardBar')
+        .attr("id", "leaderBoard_Open")
+        .css({ transform: "translateX(0)" })
+    } else {
+      $('.leaderBoardBar')
+        .attr("id", "leaderBoard_Close")
+        .css({ transform: "translateX(500px)" })
+    }
+  }
+}
+
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
@@ -564,7 +603,7 @@ const navButton = {
   leave: () => {
     if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
       ClickListening('', '退出-List')
-      window.location.href = `/home/${NormalizeFunc.getCookie('studentId')}`
+      window.location.href = `/ home / ${NormalizeFunc.getCookie('studentId')}`
     }
   }
 }
@@ -644,16 +683,16 @@ const deleteNode = (part) => {
 
   switch (part.ob.category) {
     case 'Target':
-      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請自重!`)
+      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生 / 小姐請自重!`)
       break
     case 'Start':
       window.alert('此為必須結構，禁止刪除！')
       break
     case 'Understanding':
-      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請住手!`)
+      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生 / 小姐請住手!`)
       break
     case 'Formulating':
-      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐我要報警囉!`)
+      window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生 / 小姐我要報警囉!`)
       break
     case 'Programming':
       if (window.confirm('確定是否刪除 計畫與執行？\n這將導致該內容全部遭到刪除')) {
@@ -680,4 +719,5 @@ const deleteNode = (part) => {
 
 window.addEventListener('DOMContentLoaded', goListInit)
 window.addEventListener('DOMContentLoaded', navInit)
-window.addEventListener('DOMContentLoaded', chatBoxInit)
+window.addEventListener('DOMContentLoaded', leaderBoardInit)
+// window.addEventListener('DOMContentLoaded', chatBoxInit)

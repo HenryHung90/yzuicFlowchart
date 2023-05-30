@@ -104,6 +104,19 @@ const studentClientConnect = {
                 })
             )
         },
+    //取得所有人的Progress
+    getAllStudentProgress:
+        (courseId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/getallstudentprogress',
+                    data: {
+                        courseId: courseId,
+                    }
+                })
+            )
+        },
     //code-----------------------------------------
     //readCode
     readCode:

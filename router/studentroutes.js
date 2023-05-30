@@ -991,6 +991,44 @@ router.post("/readreflection", async (req, res) => {
     }
 })
 
+//學生讀取所有人的 Progress 以及各 Progress 總人數
+router.post("/getallstudentprogress", async (req, res) => {
+    try {
+        const studentConfigs = await studentConfig.find({ studentClass: req.user.studentClass })
+
+        const returnData = []
+
+        for (const { studentName, studentGoList } of studentConfigs) {
+            if (studentGoList !== undefined) {
+                if (studentGoList[req.body.courseId] !== undefined) {
+                    const studentProgress = studentGoList[req.body.courseId].progress || 0
+
+                    if (studentProgress > returnData.length) {
+                        for (let i = returnData.length; i <= studentProgress; i++) {
+                            returnData.push({ count: 0, member: [] })
+                        }
+                    }
+
+                    if (studentProgress !== 0) {
+                        returnData[studentProgress - 1].count++
+                        returnData[studentProgress - 1].member.push(studentName)
+                    }
+                }
+            }
+        }
+        res.json({
+            message: returnData,
+            status: 200
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得 Progress 失敗，請聯繫管理員(err)",
+            status: 500
+        })
+    }
+})
+
 //學生取得訊息紀錄
 router.post("/getmessagehistory", async (req, res) => {
     try {
