@@ -1292,7 +1292,7 @@ function ClickListening(e, customClick) {
     if (tempOperation[1].split(" ")[0] == "Task") {
         sessionStorage.setItem("ListeningTask", tempOperation[1])
     }
-
+    
     const task = sessionStorage.getItem("ListeningTask") || ''
     const keyName = () => {
         let keyName

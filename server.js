@@ -198,6 +198,13 @@ admin.get('/', async (req, res) => {
         res.redirect(`./home/${req.cookies.adminId}`)
     }
 })
+// admin.post("/testing", (req, res) => {
+//     res.set('Access-Control-Allow-Origin', 'http://localhost:3000')
+//     res.json({
+//         message: "Success",
+//         status: 200
+//     })
+// })
 admin.post('/login', passport.authenticate('admin-login', { session: false }), signInAdmin)
 admin.post('/logout', async (req, res) => {
     res.clearCookie('tokenADMIN').clearCookie('adminId')
