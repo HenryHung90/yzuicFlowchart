@@ -18,7 +18,7 @@ const chatroomconfig = new mongoose.Schema({
     },
     // 學生群組
     studentGroup: {
-        type: 'array',
+        type: 'array', //[1082020,1082022]
         required: true,
     },
     // 訊息紀錄

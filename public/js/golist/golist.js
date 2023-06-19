@@ -720,4 +720,4 @@ const deleteNode = (part) => {
 window.addEventListener('DOMContentLoaded', goListInit)
 window.addEventListener('DOMContentLoaded', navInit)
 window.addEventListener('DOMContentLoaded', leaderBoardInit)
-// window.addEventListener('DOMContentLoaded', chatBoxInit)
+window.addEventListener('DOMContentLoaded', chatBoxInit)

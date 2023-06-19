@@ -474,7 +474,7 @@ const studentClientConnect = {
                     }
                 })
             )
-        }
+        },
 }
 
 const adminClientConnect = {
