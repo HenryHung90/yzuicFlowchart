@@ -4,6 +4,7 @@ import { studentClientConnect } from '../global/axiosconnect.js'
 $('#formSubmit').click((e) => {
     login(e)
 })
+// 偵測鍵盤的 Enter 如果Enter 會 Login
 $(document).keydown((e) => {
     if (e.keyCode == 13) {
         login(e)

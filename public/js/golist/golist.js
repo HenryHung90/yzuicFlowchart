@@ -517,7 +517,7 @@ const leaderBoardInit = () => {
     } else {
       $('.leaderBoardBar')
         .attr("id", "leaderBoard_Close")
-        .css({ transform: "translateX(500px)" })
+        .css({ transform: "translateX(36vw)" })
     }
   }
 }
