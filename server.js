@@ -125,6 +125,14 @@ app.use(express.json())
 app.use(express.static('public'))
 app.use(express.static(path.join(__dirname, 'public')))
 
+//cors
+app.use(cors(
+    {
+        origin: [process.env.CORS_ALLOW_CAST_TEST, process.env.CORS_ALLOW_CAST_MAIN],
+        methods: ['GET']
+    }
+))
+
 app.get('/', async (req, res) => {
     if (req.cookies['token'] == undefined) {
         res.render('./index')
