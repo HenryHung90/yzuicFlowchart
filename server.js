@@ -1,5 +1,6 @@
 //express
 import express from 'express'
+import cors from 'cors'
 //.env環境檔案
 import dotenv from 'dotenv'
 //morgan
