@@ -3,12 +3,14 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid';
 const router = express.Router()
 
+// import adminConfig from '../models/adminconfig.js'
 import studentConfig from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
-import adminConfig from '../models/adminconfig.js'
 import listenerConfig from '../models/listenerconfig.js'
 import reflectionconfig from '../models/reflectionconfig.js'
+import coworkconfig from '../models/coworkconfig.js'
+import coworkcontent from '../models/coworkcontent.js';
 
 
 const saltRound = 10
@@ -213,65 +215,55 @@ router.post('/updatestandardformulating', async (req, res) => {
     }
 })
 
-//新增 chatroom (加入 studentId)
+//新增 chatroom
 router.post('/addchatroom', async (req, res) => {
     try {
         const chatRoomId = uuidv4()
+        // 創造新的聊天室
+        await new chatroomconfig({
+            class: req.body.studentClass,
+            access: true,
+            chatRoomId: chatRoomId,
+            studentGroup: req.body.studentGroup,
+            messageHistory: []
+        }).save()
 
-        if (req.body.chatRoomId === '') {
-            const newChatRoom = new chatroomconfig({
-                class: req.body.class,
-                access: true,
-                chatRoomId: chatRoomId,
-                studentGroup: req.body.studentGroup,
-                messageHistory: []
-            })
-
-            newChatRoom.save()
-
-            for (let studentId of req.body.studentGroup) {
-                studentConfig.updateOne(
-                    { studentAccess: true, studentClass: req.body.class, studentId: studentId },
-                    { studentChatRoomId: chatRoomId }
-                ).then(response => {
-                    if (!response.acknowledged) {
-                        res.json({
-                            message: studentId + "加入房間失敗",
-                            status: 500
-                        })
-                        return
-                    }
-                })
-            }
-            res.json({
-                message: `創建成功!\n房間ID:${chatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
-                status: 200,
-            })
-        } else {
-            await chatroomconfig.updateOne(
-                { class: req.body.class, chatRoomId: req.body.chatRoomId },
-                { studentGroupId: req.body.studentGroupId }
-            )
-            for (let studentId of req.body.studentGroup) {
-                studentConfig.updateOne(
-                    { studentAccess: true, studentClass: req.body.class, studentId: studentId },
-                    { studentChatRoomId: req.body.chatRoomId }
-                ).then(response => {
-                    if (!response.acknowledged) {
-                        res.json({
-                            message: studentId + "加入房間失敗",
-                            status: 500
-                        })
-                        return
-                    }
-                })
-            }
-            res.json({
-                message: `加入成功!\n房間ID:${chatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
-                status: 200,
+        for (const studentId of req.body.studentGroup) {
+            studentConfig.updateOne(
+                { studentAccess: true, studentClass: req.body.studentClass, studentId: studentId },
+                { studentChatRoomId: chatRoomId }
+            ).then(response => {
+                if (!response.acknowledged) {
+                    res.json({
+                        message: studentId + " 加入房間失敗",
+                        status: 500
+                    })
+                    return
+                }
             })
         }
 
+        //尋找共編教材
+        const coworkContentData = await coworkcontent.find({ class: req.body.studentClass })
+        if (coworkContentData !== null) {
+            for (const [_id] of coworkContentData) {
+                await new coworkconfig({
+                    class: req.body.studentClass,
+                    coworkContentId: _id,
+                    coworkStatus: { process: 0, completeVote: new Array(studentGroup.length).fill(false), Iscomplete: false },
+                    groupId: chatRoomId,
+                    studentGroup: req.body.studentGroup,
+                    coworkContent: {},
+                    coworkTimesheet: { time: getNowTime("FullTime"), student: "Admin", coworkContent: "initialzed" }
+                }).save()
+            }
+        }
+
+
+        res.json({
+            message: `創建成功!\n房間ID:${chatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
+            status: 200,
+        })
     }
     catch (err) {
         console.log(err)
@@ -282,7 +274,7 @@ router.post('/addchatroom', async (req, res) => {
     }
 })
 //取得目前所有 chatroom
-router.post('/getchatroom', async (req, res) => {
+router.get('/getallchatroom', async (req, res) => {
     try {
         const chatRoomData = await chatroomconfig.find({})
 
@@ -293,8 +285,11 @@ router.post('/getchatroom', async (req, res) => {
             })
             return
         }
+
         res.json({
-            message: { chatRoomId: chatRoomData.chatRoomId, studentGroup: chatRoomData.studentGroup },
+            message: {
+                chatRoom: chatRoomData
+            },
             status: 200
         })
 
@@ -305,12 +300,76 @@ router.post('/getchatroom', async (req, res) => {
             status: 500,
         })
     }
+})
+//取得單一 chatroom
+router.post('/getchatroom', async (req, res) => {
+    try {
+        const chatRoomData = await chatroomconfig.findOne({ chatRoomId: req.body.chatRoomId })
 
+        if (chatRoomData === null) {
+            res.json({
+                message: 'empty',
+                status: 501
+            })
+            return
+        }
 
+        res.json({
+            message: chatRoomData,
+            status: 200
+        })
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得聊天室失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//更新 chatroom
+router.post('/updatechatroom', async (req, res) => {
+    try {
+        // 更新 Chatroom 部分
+        await chatroomconfig.updateOne(
+            { chatRoomId: req.body.chatRoomId },
+            { studentGroup: req.body.studentGroup }
+        )
+        for (const studentId of req.body.studentGroup) {
+            await studentConfig.updateOne(
+                { studentClass: req.body.studentClass, studentId: studentId },
+                { studentChatRoomId: req.body.chatRoomId }
+            ).then(response => {
+                if (!response.acknowledged) {
+                    res.json({
+                        message: studentId + "加入房間失敗",
+                        status: 500
+                    })
+                    return
+                }
+            })
+        }
+        // 更新共編部分
+        await coworkconfig.updateOne(
+            { groupId: req.body.chatRoomId },
+            { studentGroup: req.body.studentGroup }
+        )
+        res.json({
+            message: `加入成功!\n房間ID:${req.body.chatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
+            status: 200,
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "更新聊天室失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
 })
 
-//Admin 取得所有課程
-router.post('/getallcourse', async (req, res) => {
+// Admin 取得所有課程
+router.get('/getallcourse', async (req, res) => {
     try {
         const standardData = await standardcontent.find({})
 
@@ -327,7 +386,7 @@ router.post('/getallcourse', async (req, res) => {
         })
     }
 })
-//Admin 新增課程
+// Admin 新增課程
 router.post('/createcourse', async (req, res) => {
     try {
         const checkData = await standardcontent.findOne({ goListTitle: req.body.courseName })
@@ -363,13 +422,83 @@ router.post('/createcourse', async (req, res) => {
         })
     }
 })
+// Admin 取得所有協作課程
+router.get('/getallcoworkcourse', async (req, res) => {
+    try {
+        const coworkData = await coworkcontent.find({})
+
+        res.json({
+            coworkData: coworkData,
+            status: 200
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得協作課程失敗，請聯繫管理員(err)",
+            status: 500
+        })
+    }
+})
+// Admin 新增協作課程
+router.post('/createcoworkcourse', async (req, res) => {
+    try {
+        // 新增課程內容
+        await new coworkcontent({
+            class: req.body.class,
+            access: true,
+            coworkTitle: req.body.coworkTitle,
+            standardMaterial: req.body.standardMaterial || '',
+            standardStarting: req.body.standardStarting || { 1: { target: "", material: "" } },
+            standardUnderstanding: req.body.standardUnderstanding || { 1: { target: "", operation: "", limit: "" } },
+            standardFormulating: req.body.standardFormulating || { 1: { content: [], hint: "" } },
+            standardProgramming: req.body.standardProgramming || { 1: { hint: "" } },
+        }).save()
+
+        const coworkContentId = await coworkcontent.findOne({ class: req.body.class, coworkTitle: req.body.coworkTitle })
+        // 搜尋所有的 Group 並將其加入一份共編課程的初始介面
+        const groupData = await chatroomconfig.find({})
+        const groupId = []
+        for (const { chatRoomId, studentGroup } of groupData) {
+            await new coworkconfig({
+                class: req.body.class,
+                coworkContentId: coworkContentId._id,
+                coworkStatus: { process: 0, completeVote: new Array(studentGroup.length).fill(false), Iscomplete: false },
+                groupId: chatRoomId,
+                studentGroup: studentGroup,
+                coworkContent: {},
+                coworkTimesheet: [
+                    { time: getNowTime("FullTime"), student: "Admin", coworkContent: "initialzed" }
+                ],
+            }).save()
+
+            groupId.push({
+                chatRoomId: chatRoomId,
+                studentGroup: studentGroup,
+                currentCoworkContentId: coworkContentId._id
+            })
+        }
+        res.json({
+            message: groupId,
+            status: 200
+        })
+
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "創建協作課程失敗，請聯繫管理員(err)",
+            status: 500
+        })
+    }
+})
+
 //Admin 取得所有學生
-router.post('/getallstudent', async (req, res) => {
+router.get('/getallstudent', async (req, res) => {
     try {
         const studentData = await studentConfig.find({})
 
         let returnStudentData = []
-
 
         for (let i = 0; i < studentData.length; i++) {
             returnStudentData.push(
@@ -394,6 +523,38 @@ router.post('/getallstudent', async (req, res) => {
         console.log(err)
         res.json({
             message: "取得學生時發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+//Admin 修改學生
+router.post('/updatestudent', async (req, res) => {
+    try {
+        //刪除群組功能
+        if (req.body.type === 'removeChatRoom') {
+            await studentConfig.updateOne(
+                { studentId: req.body.studentId, studentClass: req.body.studentClass },
+                { studentChatRoomId: "" }
+            ).then(response => {
+                if (!response.acknowledged) {
+                    res.json({
+                        message: "刪除失敗",
+                        status: 500
+                    })
+                    return
+                }
+                res.json({
+                    message: "success",
+                    status: 200
+                })
+            })
+            return
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "修改學生時發生錯誤，請聯繫管理員(err)",
             status: 500,
         })
     }
@@ -623,7 +784,7 @@ router.post("/getstudentcourse", async (req, res) => {
 
         const courseData = await standardcontent.find({})
 
-        if (studentData.studentGoList === {} || studentData.studentGoList === undefined) {
+        if (studentData.studentGoList === null || studentData.studentGoList === undefined) {
             res.json({
                 status: 501
             })
@@ -908,5 +1069,33 @@ router.post('/skip', async (req, res) => {
         })
     }
 })
+
+//取得 當前時間
+function getNowTime(type) {
+    const date = new Date()
+    let hour = date.getHours()
+    let minute = date.getMinutes()
+    let second = date.getSeconds()
+
+    if (hour.toString().length === 1) {
+        hour = "0" + hour
+    }
+    if (minute.toString().length === 1) {
+        minute = "0" + minute
+    }
+    if (second.toString().length === 1) {
+        second = "0" + second
+    }
+
+    switch (type) {
+        case "SimpleTime":
+            return hour + ":" + minute
+        case "SecondTime":
+            return hour + ":" + minute + ":" + second
+        case "FullTime":
+            return `${date.getFullYear()}/${date.getMonth() + 1
+                }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+    }
+}
 
 export default router

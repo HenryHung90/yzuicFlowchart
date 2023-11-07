@@ -45,8 +45,18 @@ const studentClientConnect = {
         () => {
             return (
                 axios({
-                    method: 'POST',
+                    method: 'GET',
                     url: '/student/getallcourse',
+                })
+            )
+        },
+    // 取得所有共編教材
+    getAllCoworkCourse:
+        () => {
+            return (
+                axios({
+                    method: 'GET',
+                    url: '/student/getallcoworkcourse',
                 })
             )
         },
@@ -497,7 +507,7 @@ const adminClientConnect = {
         () => {
             return (
                 axios({
-                    method: 'POST',
+                    method: 'GET',
                     url: '/admin/getallcourse',
                 })
             )
@@ -507,8 +517,25 @@ const adminClientConnect = {
         () => {
             return (
                 axios({
-                    method: 'POST',
+                    method: 'get',
                     url: '/admin/getallstudent'
+                })
+            )
+        },
+    // 更新學生資料
+    updateStudent:
+        (type, studentId, studentClass) => {
+            // type
+            // removeChatRoom => 刪除 Group
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/updateStudent',
+                    data: {
+                        type: type,
+                        studentId: studentId,
+                        studentClass: studentClass
+                    }
                 })
             )
         },
@@ -587,6 +614,44 @@ const adminClientConnect = {
                     data: {
                         studentClass: studentClass,
                         studentId: studentId
+                    }
+                })
+            )
+        },
+    // 更新單一 Group
+    updateStudentGroup:
+        (chatRoomId, studentGroup, studentClass) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/updatechatroom',
+                    data: {
+                        chatRoomId: chatRoomId,
+                        studentGroup: studentGroup,
+                        studentClass: studentClass
+                    }
+                })
+            )
+        },
+    // 取得所有 Group
+    getAllStudentGroup:
+        () => {
+            return (
+                axios({
+                    method: 'get',
+                    url: '/admin/getallchatroom'
+                })
+            )
+        },
+    // 取得 Group 聊天紀錄
+    getStudentGroup:
+        (chatRoomId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/getchatroom',
+                    data: {
+                        chatRoomId: chatRoomId
                     }
                 })
             )

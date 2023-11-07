@@ -2,24 +2,10 @@ import { NormalizeFunc, ClickListening } from '../global/common.js'
 import { studentClientConnect } from '../global/axiosconnect.js'
 NormalizeFunc.loadingPage(true)
 
-const homeInit = async () => {
-    studentClientConnect.getAllCourse().then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
-            if (response.data.standardData !== null || response.data.standardData !== undefined) {
-                renderGoList(response.data.standardData)
-            }
-        }
-    })
-
-    document.addEventListener('mousedown', ClickListening, false)
-
-    NormalizeFunc.loadingPage(false)
-}
-
-
 //----click function----//
 $('#logout').click(e => logout())
 $('#changePassword').click(e => changePassword())
+$('.goListTitle_Selection').click(e => changeSelection(e.currentTarget))
 
 
 const logout = () => {
@@ -147,32 +133,79 @@ const changePassword = () => {
 
 }
 
-const renderGoList = (standardData) => {
-    standardData.forEach((value, index) => {
-        const goListContainer = $('<div>').prop({
-            className: 'goListCourse_contentContainer',
-        }).click(e => {
-            enterClass(value._id)
-            // 進入課程LS
-            ClickListening('', `進入課程-${value.goListTitle}`)
-        }).appendTo($('.goListCourse'))
+const changeSelection = (target) => {
+    // 變換文字選擇狀態
+    $('.goListTitle_Selection').removeClass('title_selected')
+    $(`#${target.id}`).addClass('title_selected')
 
-        //Image Box
-        $('<div>').prop({
-            className: 'goListCourse_contentImageBox',
-            innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:100%;height: 60%">'
-        }).appendTo(goListContainer)
+    $('.goListCourse').empty()
+    if (target.id === 'titleCoWorker') {
+        window.location.href = "#cowork"
+    } else {
+        window.location.href = "#student"
+    }
 
-        //Title Detail
-        $('<div>').prop({
-            className: 'goListCourse_contentTitle',
-            innerHTML: value.goListTitle
-        }).appendTo(goListContainer)
-
-        const enterClass = (id) => {
-            window.location.href = `/student/${id}`
-        }
-    })
+    homRenderInit()
 }
 
-window.addEventListener('DOMContentLoaded', homeInit)
+const homeInit = () => {
+    studentClientConnect.getAllCourse().then(response => {
+        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (response.data.standardData !== null || response.data.standardData !== undefined) {
+                response.data.standardData.forEach((value, index) => {
+                    const goListContainer = $('<div>').prop({
+                        className: 'goListCourse_contentContainer',
+                    }).click(e => {
+                        enterClass(value._id)
+                        // 進入課程LS
+                        ClickListening('', `進入課程-${value.goListTitle}`)
+                    }).appendTo($('.goListCourse'))
+
+                    //Image Box
+                    $('<div>').prop({
+                        className: 'goListCourse_contentImageBox',
+                        innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:100%;height: 60%">'
+                    }).appendTo(goListContainer)
+
+                    //Title Detail
+                    $('<div>').prop({
+                        className: 'goListCourse_contentTitle',
+                        innerHTML: value.goListTitle
+                    }).appendTo(goListContainer)
+
+                    const enterClass = (id) => {
+                        window.location.href = `/student/${id}`
+                    }
+                })
+            }
+        }
+    })
+
+    document.addEventListener('mousedown', ClickListening, false)
+
+    NormalizeFunc.loadingPage(false)
+}
+
+const renderCoWorkList = () => {
+    studentClientConnect.getAllCoworkCourse().then((response)=>{
+        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            console.log(response.data)
+        }
+    })
+    NormalizeFunc.loadingPage(false)
+}
+
+const homRenderInit = () => {
+    if (window.location.hash == '#cowork') {
+        $('.goListTitle_Selection').removeClass('title_selected')
+        $(`#titleCoWorker`).addClass('title_selected')
+        renderCoWorkList()
+    } else {
+        window.location.href = '#course'
+        $('.goListTitle_Selection').removeClass('title_selected')
+        $(`#titleCourse`).addClass('title_selected')
+        homeInit()
+    }
+}
+
+window.addEventListener('DOMContentLoaded', homRenderInit)

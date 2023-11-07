@@ -10,6 +10,7 @@ const DOMPurify = createDOMPurify(window)
 
 import studentConfig from "../models/studentconfig.js"
 import standardcontent from "../models/standardcontent.js"
+import coworkconfig from "../models/coworkconfig.js"
 import chatroomconfig from "../models/chatroomconfig.js"
 import reflectionconfig from "../models/reflectionconfig.js"
 import listenerconfig from "../models/listenerconfig.js"
@@ -37,7 +38,7 @@ function converDangerString(string) {
 
 const saltRound = 10
 
-//學生修改密碼
+// 學生修改密碼
 router.post("/changepassword", async (req, res) => {
     try {
         let result = false
@@ -94,8 +95,8 @@ router.post("/changepassword", async (req, res) => {
         })
     }
 })
-//學生取得所有教學資料
-router.post("/getallcourse", async (req, res) => {
+// 學生取得所有教學資料
+router.get("/getallcourse", async (req, res) => {
     try {
         const standardData = await standardcontent.find({
             class: req.user.studentClass,
@@ -109,12 +110,35 @@ router.post("/getallcourse", async (req, res) => {
     } catch (err) {
         console.log(err)
         res.json({
-            message: "取得教材時發生錯誤，請聯繫管理員(err)",
+            message: "取得學生教材時發生錯誤，請聯繫管理員(err)",
             status: 500,
         })
     }
 })
-//學生進入教程
+// 學生取得所有共編資料
+router.get('/getallcoworkcourse', async (req, res) => {
+    try {
+        if (req.user.studentChatRoomId == undefined) {
+            res.json({
+                message: "您尚未擁有群組, 請通知管理員新增群組",
+                status: 500,
+            })
+            return
+        }
+        const coworkData = await coworkconfig.find({ groupId: req.user.studentChatRoomId })
+        res.json({
+            coworkData: coworkData,
+            status: 200
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得共編教材時發生錯誤，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
+// 學生進入教程
 router.get("/:courseId", async (req, res) => {
     try {
         const courseData = await standardcontent.findOne({
@@ -175,6 +199,10 @@ router.get("/:courseId", async (req, res) => {
             status: 500,
         })
     }
+})
+// 學生進入共編教材
+router.get("/co/:courseId", async (req, res) => {
+
 })
 
 // 學生取得 demo 位置
@@ -452,7 +480,7 @@ router.post("/savegolist", async (req, res) => {
 
         if (
             studentData.studentGoList === undefined ||
-            studentData.studentGoList === {}
+            studentData.studentGoList === null
         ) {
             studentData.studentGoList = {
                 [req.body.courseId]: req.body.goList,

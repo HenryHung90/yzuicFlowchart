@@ -72,7 +72,7 @@ function preload() {
     // 53、54 為 Joker
     // 55 白卡
     // 56 卡背
-    this.load.spritesheet('Cards', './media/img/PockerCard.png', {
+    this.load.spritesheet('Cards', '../media/img/PockerCard.png', {
         frameWidth: 389.5,
         frameHeight: 569.6
     })

@@ -2,3 +2,70 @@
     background-color: rgb(248, 70, 70, 0.4) !important;
     border-radius: 20px !important;
 }
+/* operationField */
+.studentList_operationButtonContainer {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+
+.studentList_operationButtonContainer_btn {
+    margin: 0 15px;
+    padding: 5px 5px;
+}
+
+/* studentList */
+.studentList_studentContainer {
+    text-align: center;
+    justify-content: space-around;
+}
+.studentList_studentTable {
+    background-color: white;
+    padding: 10px 10px;
+}
+.studentList_studentTable th {
+    border-bottom: 2px solid black;
+}
+.studentList_studentTable td {
+    font-size: 18px;
+}
+.studentList_studentNum {
+    font-weight: bolder;
+}
+/* GroupList */
+.groupList_GroupContainer {
+    text-align: center;
+    justify-content: space-around;
+}
+.groupList_GroupTable {
+    background-color: white;
+    padding: 10px 10px;
+}
+.groupList_studentId {
+    border-left: 0.5px solid;
+    border-right: 0.5px solid;
+}
+
+/* course Container */
+.studentList_courseContainer {
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding: 15vh 10vw;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s steps(100);
+}
+
+.studentList_courseDiv {
+    background-color: white;
+    box-shadow: 0 0 5px 2px rgba(0, 233, 233, 0.8);
+    padding: 20px 20px;
+    border-radius: 20px;
+    width: 80vw;
+    height: 70vh;
+}

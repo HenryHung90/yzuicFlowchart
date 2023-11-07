@@ -95,6 +95,21 @@ const NormalizeFunc = {
         //MB -> KB -> Byte
         return Byte * 1024 * 1024
     },
+    //return Download xlsx
+    downloadDatatoExcel: async (workbookTitle, worksheetData, worksheetName) => {
+        console.log(workbookTitle, worksheetData, worksheetName)
+        const workbook = XLSX.utils.book_new();
+        worksheetData.map((dataValue, dataIndex) => {
+            XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
+            //Binary string
+            // XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
+            if (dataIndex == worksheetData.length - 1) {
+                const Month = new Date().getMonth();
+                const Today = new Date().getDate();
+                XLSX.writeFile(workbook, `${workbookTitle}_${Month}\/${Today}.xls`);
+            }
+        })
+    }
 }
 //------------------------------ category Box Function -----------------------------------//
 const categoryBox = {
@@ -1292,7 +1307,7 @@ function ClickListening(e, customClick) {
     if (tempOperation[1].split(" ")[0] == "Task") {
         sessionStorage.setItem("ListeningTask", tempOperation[1])
     }
-    
+
     const task = sessionStorage.getItem("ListeningTask") || ''
     const keyName = () => {
         let keyName

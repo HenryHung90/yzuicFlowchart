@@ -389,7 +389,7 @@ const goListInit = () => {
 
 
   // initialize the Palette that is on the left side of the page
-  if (NormalizeFunc.getCookie('adminId')) {
+  if (NormalizeFunc.getCookie('adminId') && !NormalizeFunc.getCookie('studentId')) {
     let myPalette =
       $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
         {
@@ -603,7 +603,7 @@ const navButton = {
   leave: () => {
     if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
       ClickListening('', '退出-List')
-      window.location.href = `/ home / ${NormalizeFunc.getCookie('studentId')}`
+      window.location.href = `/home/${NormalizeFunc.getCookie('studentId')}`
     }
   }
 }
