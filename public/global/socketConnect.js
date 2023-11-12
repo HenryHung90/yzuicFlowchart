@@ -4,13 +4,13 @@ import { NormalizeFunc } from './common.js'
 
 const socket = io()
 const socketConnect = {
-    chatRoomId: NormalizeFunc.getFrontEndCode('studentChatRoomId'),
+    chatRoomId: NormalizeFunc.getFrontEndCode('chatRoomId'),
     // 傳送進入房間訊息
     enterRoom: () => {
         const emitMessage = {
             studentId: NormalizeFunc.getCookie("studentId"),
             sendTime: NormalizeFunc.getNowTime('SimpleTime'),
-            studentChatRoomId: socketConnect.chatRoomId,
+            chatRoomId: socketConnect.chatRoomId,
         }
         socket.emit('enterRoom', JSON.stringify(emitMessage))
     },
@@ -19,10 +19,10 @@ const socketConnect = {
     receiveEnterRoom: () => {
         socket.on('re-enterRoom', (message) => {
             const receiveMessage = JSON.parse(message)
-            if (receiveMessage.studentChatRoomId === socketConnect.chatRoomId) {
+            if (receiveMessage.chatRoomId === socketConnect.chatRoomId) {
                 MessageType.enterRoom(receiveMessage)
             }
-            if (receiveMessage.studentChatRoomId === undefined) {
+            if (receiveMessage.chatRoomId === undefined) {
                 for (let message of receiveMessage) {
                     if (message.studentId === NormalizeFunc.getCookie("studentId")) {
                         MessageType.sendMessage(message)
@@ -42,7 +42,7 @@ const socketConnect = {
             studentId: NormalizeFunc.getCookie("studentId"),
             sendTime: NormalizeFunc.getNowTime('SecondTime'),
             message: message,
-            studentChatRoomId: socketConnect.chatRoomId,
+            chatRoomId: socketConnect.chatRoomId,
         }
         socket.emit('sendMessage', JSON.stringify(emitMessage))
     },
@@ -51,7 +51,7 @@ const socketConnect = {
     receiveMessage: () => {
         socket.on('re-sendMessage', (message) => {
             const receiveMessage = JSON.parse(message)
-            if (receiveMessage.studentChatRoomId === socketConnect.chatRoomId) {
+            if (receiveMessage.chatRoomId === socketConnect.chatRoomId) {
                 //若自己傳的，顯示自己傳送的模型
                 if (receiveMessage.studentId === NormalizeFunc.getCookie("studentId")) {
                     MessageType.sendMessage(receiveMessage)
@@ -126,7 +126,7 @@ const MessageType = {
 
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
     },
-    sendMessage_History: (message) =>{
+    sendMessage_History: (message) => {
         const sendMessageBox = $('<div>').prop({
             className: 'chatBox_sendMessageBox'
         }).prependTo($('.chatBox_MessageContent'))

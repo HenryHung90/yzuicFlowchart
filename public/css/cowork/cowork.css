@@ -1,0 +1,83 @@
+/* NavBar */
+.navBarContainer {
+    overflow: hidden;
+    display: flex;
+    pointer-events: none;
+    align-items: flex-end;
+    justify-content: center;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding: 24px;
+    z-index: 999;
+}
+
+/* NavBar Open */
+#content_title {
+    height: 40px;
+}
+
+.navBarOpen {
+    pointer-events: all;
+    background-color: white;
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.7);
+    transform: translateY(100px);
+    transition-duration: 0.3s;
+    border-radius: 40px;
+    width: 50%;
+    height: 150px;
+}
+
+.navBarOpen:hover {
+    transition-duration: 0.3s;
+    transform: translateY(30px);
+}
+
+.navBarOpen_content {
+    height: 80px;
+}
+
+.navBarOpen_title {
+    font-family: "Ubuntu", sans-serif;
+    font-weight: bold;
+    line-height: 80px;
+    text-align: center;
+    user-select: none;
+    font-weight: bolder;
+}
+
+#studentId {
+    border-right: 2px solid rgba(0, 0, 0, 0.5);
+}
+
+.navBarOpen_text {
+    line-height: 80px;
+    text-align: center;
+    transition-duration: 0.3s;
+    user-select: none;
+    cursor: pointer;
+}
+
+.navBarOpen_text:hover {
+    transition-duration: 0.3s;
+    color: white;
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.navBarOpen_studentSelector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition-duration: 0.3s;
+    user-select: none;
+    cursor: pointer;
+}
+
+#courseId,
+#chatRoomId {
+    display: none;
+}

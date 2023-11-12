@@ -3,7 +3,7 @@ import { ClickListening, NormalizeFunc } from "../../global/common.js"
 import { studentClientConnect } from "../../global/axiosconnect.js"
 
 const chatBoxInit = () => {
-    if (NormalizeFunc.getFrontEndCode("studentChatRoomId")) {
+    if (NormalizeFunc.getFrontEndCode("chatRoomId")) {
         // 傳送進入房間訊息
         socketConnect.enterRoom()
         // 監聽是否有人進入
@@ -129,7 +129,7 @@ const chatBoxInit = () => {
                 studentClientConnect
                     .getMessageHistory(
                         freshCount,
-                        NormalizeFunc.getFrontEndCode("studentChatRoomId")
+                        NormalizeFunc.getFrontEndCode("chatRoomId")
                     )
                     .then(response => {
                         if (NormalizeFunc.serverResponseErrorDetect(response)) {

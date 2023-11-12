@@ -512,6 +512,15 @@ const adminClientConnect = {
                 })
             )
         },
+    getAllCoworkCourse:
+        () => {
+            return (
+                axios({
+                    method: 'GET',
+                    url: '/admin/getallcoworkcourse',
+                })
+            )
+        },
     // 取得所有學生
     getAllStudent:
         () => {
@@ -614,6 +623,20 @@ const adminClientConnect = {
                     data: {
                         studentClass: studentClass,
                         studentId: studentId
+                    }
+                })
+            )
+        },
+    // 新增Group
+    addNewStudentGroup:
+        (studentClass, studentGroup) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/addchatroom',
+                    data: {
+                        studentClass: studentClass,
+                        studentGroup: studentGroup
                     }
                 })
             )

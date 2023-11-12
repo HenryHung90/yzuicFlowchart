@@ -76,7 +76,7 @@
 
 .CPDesktop {
     border-radius: 20px;
-    height:100%;
+    height: 100%;
     z-index: 1001;
 }
 
@@ -156,8 +156,6 @@
     transform: scale(1.1);
 }
 
-
-
 .goListCourse_contentTitle {
     width: 90%;
     padding: 5px 5px;
@@ -166,7 +164,6 @@
     white-space: nowrap;
     overflow: hidden;
 }
-
 
 @keyframes FadeInAndDown {
     from {

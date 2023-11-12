@@ -288,7 +288,7 @@ body {
 }
 
 #courseId,
-#studentChatRoomId {
+#chatRoomId {
     display: none;
 }
 

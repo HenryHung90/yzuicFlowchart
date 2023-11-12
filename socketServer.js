@@ -27,11 +27,11 @@ function converDangerString(string) {
 
 const socketServer = (io) => {
     io.on('connection', (socket) => {
+        // 收到進入房間資資訊
         socket.on('enterRoom', async (message) => {
             const messageData = JSON.parse(message)
 
-            const chatData = await chatroomconfig.findOne({ access: true, studentChatRoomId: messageData.studentChatRoomId })
-
+            const chatData = await chatroomconfig.findOne({ access: true, chatRoomId: messageData.chatRoomId })
             //發給自己最近 10 則訊息
             const chatHistory = chatData.messageHistory.slice(chatData.messageHistory.length - 11, chatData.messageHistory.length - 1)
             socket.emit('re-enterRoom', JSON.stringify(chatHistory))
@@ -40,13 +40,14 @@ const socketServer = (io) => {
             io.emit('re-enterRoom', message)
         })
 
+        // 收到訊息
         socket.on('sendMessage', async (message) => {
             const messageData = JSON.parse(message)
 
             // 將訊息內藏的危險字詞轉換
             messageData.message = converDangerString(messageData.message)
 
-            const chatData = await chatroomconfig.findOne({ access: true, studentChatRoomId: messageData.studentChatRoomId })
+            const chatData = await chatroomconfig.findOne({ access: true, chatRoomId: messageData.chatRoomId })
 
             chatData.messageHistory.push({
                 studentId: messageData.studentId,
@@ -55,7 +56,7 @@ const socketServer = (io) => {
             })
 
             await chatroomconfig.updateOne({
-                access: true, studentChatRoomId: messageData.studentChatRoomId
+                access: true, chatRoomId: messageData.chatRoomId
             }, {
                 messageHistory: chatData.messageHistory
             })

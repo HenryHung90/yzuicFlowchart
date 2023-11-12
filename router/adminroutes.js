@@ -229,7 +229,7 @@ router.post('/addchatroom', async (req, res) => {
         }).save()
 
         for (const studentId of req.body.studentGroup) {
-            studentConfig.updateOne(
+            await studentConfig.updateOne(
                 { studentAccess: true, studentClass: req.body.studentClass, studentId: studentId },
                 { studentChatRoomId: chatRoomId }
             ).then(response => {
@@ -246,11 +246,12 @@ router.post('/addchatroom', async (req, res) => {
         //尋找共編教材
         const coworkContentData = await coworkcontent.find({ class: req.body.studentClass })
         if (coworkContentData !== null) {
-            for (const [_id] of coworkContentData) {
+            for (const { _id, coworkTitle } of coworkContentData) {
                 await new coworkconfig({
                     class: req.body.studentClass,
+                    coworkTitle: coworkTitle,
                     coworkContentId: _id,
-                    coworkStatus: { process: 0, completeVote: new Array(studentGroup.length).fill(false), Iscomplete: false },
+                    coworkStatus: { process: 0, completeVote: new Array(req.body.studentGroup.length).fill(false), Iscomplete: false },
                     groupId: chatRoomId,
                     studentGroup: req.body.studentGroup,
                     coworkContent: {},
@@ -462,6 +463,7 @@ router.post('/createcoworkcourse', async (req, res) => {
         for (const { chatRoomId, studentGroup } of groupData) {
             await new coworkconfig({
                 class: req.body.class,
+                coworkTitle: req.body.coworkTitle,
                 coworkContentId: coworkContentId._id,
                 coworkStatus: { process: 0, completeVote: new Array(studentGroup.length).fill(false), Iscomplete: false },
                 groupId: chatRoomId,
@@ -506,6 +508,7 @@ router.get('/getallstudent', async (req, res) => {
                     studentClass: studentData[i].studentClass,
                     studentId: studentData[i].studentId,
                     studentName: studentData[i].studentName,
+                    studentChatRoomId: studentData[i].studentChatRoomId,
                 }
             )
         }
@@ -772,6 +775,10 @@ router.get('/:courseId', async (req, res) => {
             status: 500,
         })
     }
+})
+//Admin 進入共編課程
+router.get('/co/:courseId', async (req, res) => {
+
 })
 
 //Admin 取得學生GoList

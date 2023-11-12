@@ -7,6 +7,11 @@ const coworkconfig = new mongoose.Schema({
         type: 'string',
         required: true,
     },
+    // 協作課程名稱
+    coworkTitle: {
+        type: 'string',
+        required: true,
+    },
     // 協作課程ID
     coworkContentId: {
         type: 'string',

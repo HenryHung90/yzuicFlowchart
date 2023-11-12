@@ -153,95 +153,117 @@ const changeSelection = (target) => {
 }
 
 // 生成 Course 部分
-const renderGoList = () => {
+const renderGoList = async () => {
     NormalizeFunc.loadingPage(true)
-
     const courseContainer = $('.goListCourse')
 
-    adminClientConnect.getAllCourse().then(response => {
+    //一般課程區-------------------------------------------------------
+    $('<h2>').prop({
+        className: "goListCourse_contentTitle",
+        innerHTML: "一般課程"
+    }).appendTo(courseContainer)
+
+    await adminClientConnect.getAllCourse().then(response => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
             if (response.data.standardData === null || response.data.standardData === undefined) return
-            response.data.standardData.forEach((value, index) => {
-                const goListContainer = $('<div>').prop({
-                    className: 'goListCourse_contentContainer'
-                }).click(e => {
-                    enterClass(value._id)
-                }).appendTo(courseContainer)
+            renderCourse(response.data.standardData, 'course')
+        }
+        NormalizeFunc.loadingPage(false)
+    })
 
-                //Image Box
-                $('<div>').prop({
-                    className: 'goListCourse_contentImageBox',
-                    innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:170px;height: 180px">'
-                }).appendTo(goListContainer)
+    //共編課程區-------------------------------------------------------
+    $('<h2>').prop({
+        className: "goListCourse_contentTitle",
+        innerHTML: "共編課程"
+    }).appendTo(courseContainer)
 
-                //Title Detail
-                $('<div>').prop({
-                    className: 'goListCourse_contentTitle',
-                    innerHTML: value.goListTitle
-                }).appendTo(goListContainer)
-            })
+    await adminClientConnect.getAllCoworkCourse().then(response => {
+        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (response.data.coworkData === null || response.data.coworkData === undefined) return
+            renderCourse(response.data.coworkData, 'cowork')
+        }
+    })
 
-            const goListAddButton = $('<div>').prop({
+    function renderCourse(courseList, type) {
+        courseList.forEach((value, index) => {
+            const goListContainer = $('<div>').prop({
                 className: 'goListCourse_contentContainer'
             }).click(e => {
-                addClass()
+                type == 'cowork' ? null : enterClass(value._id)
             }).appendTo(courseContainer)
+
             //Image Box
             $('<div>').prop({
                 className: 'goListCourse_contentImageBox',
-                // innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="60%" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>'
-                innerHTML: '<img src="../media/img/add.svg" alt="home" style="width:170px;height: 180px">'
-            }).appendTo(goListAddButton)
+                innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:170px;height: 180px">'
+            }).appendTo(goListContainer)
 
             //Title Detail
             $('<div>').prop({
                 className: 'goListCourse_contentTitle',
-                innerHTML: '新增課程'
-            }).appendTo(goListAddButton)
+                innerHTML: type == 'cowork' ? value.coworkTitle : value.goListTitle
+            }).appendTo(goListContainer)
+        })
 
+        const AddButton = $('<div>').prop({
+            className: 'goListCourse_contentContainer'
+        }).click(e => {
+            type == 'cowork' ? null : addClass()
+        }).appendTo(courseContainer)
+        //Image Box
+        $('<div>').prop({
+            className: 'goListCourse_contentImageBox',
+            // innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="60%" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>'
+            innerHTML: '<img src="../media/img/add.svg" alt="home" style="width:170px;height: 180px">'
+        }).appendTo(AddButton)
 
+        //Title Detail
+        $('<div>').prop({
+            className: 'goListCourse_contentTitle',
+            innerHTML: '新增課程'
+        }).appendTo(AddButton)
 
-            const enterClass = (id) => {
-                window.location.href = `/admin/${id}`
-            }
-
-            const addClass = () => {
-                const courseName = window.prompt("請輸入您的課程名稱", "")
-                const courseClass = window.prompt("請輸入適用屆數", "")
-
-                if (courseName !== null) {
-                    console.log('Create', courseName)
-                    adminClientConnect.createCourse(courseName, courseClass).then(response => {
-                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                            const goListContainer = $('<div>').prop({
-                                className: 'goListCourse_contentContainer'
-                            }).click(e => {
-                                enterClass(response.data.message._id)
-                            }).insertBefore($('.goListCourse_addCourse'))
-
-                            //Image Box
-                            $('<div>').prop({
-                                className: 'goListCourse_contentImageBox',
-                                innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:100%;height: 60%">'
-                            }).appendTo(goListContainer)
-
-                            //Title Detail
-                            $('<div>').prop({
-                                className: 'goListCourse_contentTitle',
-                                innerHTML: response.data.message.goListTitle
-                            }).appendTo(goListContainer)
-                        }
-                    })
-                }
-            }
-
+        const enterClass = (id) => {
+            window.location.href = `/admin/${id}`
         }
-        NormalizeFunc.loadingPage(false)
-    })
+
+        const addClass = () => {
+            const courseName = window.prompt("請輸入您的課程名稱", "")
+            const courseClass = window.prompt("請輸入適用屆數", "")
+
+            if (courseName !== null) {
+                adminClientConnect.createCourse(courseName, courseClass).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        const goListContainer = $('<div>').prop({
+                            className: 'goListCourse_contentContainer'
+                        }).click(e => {
+                            enterClass(response.data.message._id)
+                        }).insertBefore($('.goListCourse_addCourse'))
+
+                        //Image Box
+                        $('<div>').prop({
+                            className: 'goListCourse_contentImageBox',
+                            innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:100%;height: 60%">'
+                        }).appendTo(goListContainer)
+
+                        //Title Detail
+                        $('<div>').prop({
+                            className: 'goListCourse_contentTitle',
+                            innerHTML: response.data.message.goListTitle
+                        }).appendTo(goListContainer)
+                    }
+                })
+            }
+        }
+
+        const enterCourse = (id) => {
+            window.location.href = ''
+        }
+    }
 }
 
 // 生成 Student 名單部分
-const renderStudentList = () => {
+const renderStudentList = async () => {
     NormalizeFunc.loadingPage(true)
 
     const courseContainer = $('.goListCourse')
@@ -284,6 +306,18 @@ const renderStudentList = () => {
         className: 'btn btn-info studentList_operationButtonContainer_btn',
         innerHTML: "下載反思"
     }).click(downloadAllReflection).appendTo(reflectionGroup)
+    //選擇屆數-----------------------------------------------------------------------
+    const studentClassContainer = $('<div>').prop({
+        className: 'studentList_studentClassContainer container-lg row'
+    }).appendTo(courseContainer)
+    const classGroup = $('<div>').prop({ className: 'input-group col-4' }).css('width', '250px').appendTo(studentClassContainer)
+    const classSelector = $('<select>').prop({ className: 'form-select', id: 'classSelector' }).appendTo(classGroup)
+    $('<button>').prop({
+        className: 'btn btn-info studentList_operationButtonContainer_btn',
+        innerHTML: "屆數選擇"
+    })
+        .attr('disabled', 'disabled')
+        .appendTo(classGroup)
     //Table 標頭---------------------------------------------------------------------
     const studentList_Container = $('<div>').prop({
         className: 'studentList_studentContainer container-lg'
@@ -304,84 +338,41 @@ const renderStudentList = () => {
         }).appendTo(studentList_Table_tr)
     })
     const studentList_tbody = $('<tbody>').appendTo(studentList_Table)
-
     //-----------------------------------------------------------------------------
     //學生名單-----------------------------------------------------------------------------
+    const studentList = {}
     adminClientConnect.getAllStudent().then(response => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
             if (response.data.studentData === null || response.data.studentData === undefined) return
 
-            let index = 0;
-            for (const { studentClass, studentId, studentName } of response.data.studentData) {
-                const studentTr = $('<tr>').appendTo(studentList_tbody)
-                // Number
-                $('<td>').prop({
-                    className: 'studentList_studentNum',
-                    innerHTML: index
-                }).appendTo(studentTr)
-
-                // studentId
-                $('<td>').prop({
-                    className: 'studentList_studentId',
-                    innerHTML: studentId
-                }).appendTo(studentTr)
-
-                // studentName
-                $('<td>').prop({
-                    className: 'studentList_studentName',
-                    innerHTML: studentName
-                }).appendTo(studentTr)
-
-                //----------------------------------------------------
-                // student controller
-                const studentControllerContainer = $('<td>').prop({
-                    className: 'studentList_studentController'
-                }).appendTo(studentTr)
-
-                $('<button>').prop({
-                    className: 'btn btn-outline-primary',
-                    id: `studentController_${index}`,
-                    innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><style>svg{fill:#000000}</style><path d="M0 416c0 17.7 14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384c-17.7 0-32 14.3-32 32zm128 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM320 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm32-80c-32.8 0-61 19.7-73.3 48L32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48zM192 128a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm73.3-64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64z" /></svg>',
-                }).attr({
-                    'data-bs-toggle': 'dropdown',
-                    'aria-expanded': 'false',
-                }).appendTo(studentControllerContainer)
-
-                const studentControllerUL = $('<ul>').prop({
-                    className: "dropdown-menu dropdown-menu-dark dropdown-menu-end",
-                }).attr({
-                    'aria-lebelledby': `studentController_${index}`
-                }).appendTo(studentControllerContainer)
-
-                // dropdown Title
-                $('<li>').prop({
-                    innerHTML: '<h6 class="dropdown-header">學生設定</h6>'
-                }).appendTo(studentControllerUL)
-
-                const dropDownList = [
-                    { name: "修改密碼", clickFunc: () => controllerFunc.changePassword() },
-                    { name: "刪除學生", clickFunc: () => controllerFunc.deleteStudent() },
-                    { name: "下載事件紀錄", clickFunc: () => controllerFunc.getListenerData(studentClass, studentId) },
-                    { name: "觀看心智圖", clickFunc: () => controllerFunc.watchingList(studentClass, studentId) },
-                    { name: "下載所有反思", clickFunc: () => controller.downloadReflection(studentClass, studentId) }
-                ]
-
-                dropDownList.forEach(value => {
-                    $('<li>').prop({
-                        className: 'dropdown-item',
-                        innerHTML: value.name
-                    }).click(value.clickFunc).appendTo(studentControllerUL)
-                })
-                //----------------------------------------------------
-                index++;
-            }
-
-            NormalizeFunc.loadingPage(false)
+            // 學生屆數分類
+            response.data.studentData.forEach((student, index) => {
+                if (studentList[student.studentClass] === undefined) {
+                    studentList[student.studentClass] = [student]
+                } else {
+                    studentList[student.studentClass].push(student)
+                }
+            })
         }
+        // 將屆數載入選擇器中
+        Object.keys(studentList).forEach((value, index) => {
+            const courseOption = $('<option>').prop({
+                value: value,
+                innerHTML: value
+            }).appendTo(classSelector)
 
+            if (index === 0) {
+                courseOption.attr('selected', true)
+            }
+        })
+        classSelector.on('change', (e) => {
+            renderStudentList(studentList[e.target.value])
+        })
+        // 產生名單
+        renderStudentList(studentList[classSelector.val()])
+        NormalizeFunc.loadingPage(false)
     })
-
-
+    //----------------------------------------------------
     // 下載所有事件紀錄
     function downloadAllListening() {
         NormalizeFunc.loadingPage(true)
@@ -404,6 +395,73 @@ const renderStudentList = () => {
                 NormalizeFunc.downloadDatatoExcel(courseName, response.data.message.sheetData, response.data.message.sheetName)
             }
             NormalizeFunc.loadingPage(false)
+        })
+    }
+
+    //產生學生名單
+    function renderStudentList(studentList) {
+        studentList_tbody.empty()
+        studentList.forEach((student, index) => {
+            const studentTr = $('<tr>').appendTo(studentList_tbody)
+            // 檢查屆數
+            // Number
+            $('<td>').prop({
+                className: 'studentList_studentNum',
+                innerHTML: index
+            }).appendTo(studentTr)
+
+            // studentId
+            $('<td>').prop({
+                className: 'studentList_studentId',
+                innerHTML: student.studentId
+            }).appendTo(studentTr)
+
+            // studentName
+            $('<td>').prop({
+                className: 'studentList_studentName',
+                innerHTML: student.studentName
+            }).appendTo(studentTr)
+
+            //----------------------------------------------------
+            // student controller
+            const studentControllerContainer = $('<td>').prop({
+                className: 'studentList_studentController'
+            }).appendTo(studentTr)
+
+            $('<button>').prop({
+                className: 'btn btn-outline-primary',
+                id: `studentController_${index}`,
+                innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><style>svg{fill:#000000}</style><path d="M0 416c0 17.7 14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384c-17.7 0-32 14.3-32 32zm128 0a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zM320 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm32-80c-32.8 0-61 19.7-73.3 48L32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48zM192 128a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm73.3-64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64z" /></svg>',
+            }).attr({
+                'data-bs-toggle': 'dropdown',
+                'aria-expanded': 'false',
+            }).appendTo(studentControllerContainer)
+
+            const studentControllerUL = $('<ul>').prop({
+                className: "dropdown-menu dropdown-menu-dark dropdown-menu-end",
+            }).attr({
+                'aria-lebelledby': `studentController_${index}`
+            }).appendTo(studentControllerContainer)
+
+            // dropdown Title
+            $('<li>').prop({
+                innerHTML: '<h6 class="dropdown-header">學生設定</h6>'
+            }).appendTo(studentControllerUL)
+
+            const dropDownList = [
+                { name: "修改密碼", clickFunc: () => controllerFunc.changePassword() },
+                { name: "刪除學生", clickFunc: () => controllerFunc.deleteStudent() },
+                { name: "下載事件紀錄", clickFunc: () => controllerFunc.getListenerData(student.studentClass, student.studentId) },
+                { name: "觀看心智圖", clickFunc: () => controllerFunc.watchingList(student.studentClass, student.studentId) },
+                { name: "下載所有反思", clickFunc: () => controller.downloadReflection(student.studentClass, student.studentId) }
+            ]
+
+            dropDownList.forEach(value => {
+                $('<li>').prop({
+                    className: 'dropdown-item',
+                    innerHTML: value.name
+                }).click(value.clickFunc).appendTo(studentControllerUL)
+            })
         })
     }
 
@@ -508,7 +566,15 @@ const renderGroup = async () => {
     NormalizeFunc.loadingPage(true)
 
     const courseContainer = $('.goListCourse')
+    // Operation Button--------------------------------------------------------------
+    const operationButtonContainer = $('<div>').prop({
+        className: 'groupList_operationButtonContainer container-lg row'
+    }).appendTo(courseContainer)
 
+    $('<button>').prop({
+        className: 'btn btn-success groupList_operationButtonContainer_btn col-2',
+        innerHTML: "新增群組"
+    }).click(addNewGroup).appendTo(operationButtonContainer)
     //Table 標頭---------------------------------------------------------------------
     const GroupList_Container = $('<div>').prop({
         className: 'groupList_GroupContainer container-lg'
@@ -533,8 +599,13 @@ const renderGroup = async () => {
 
     //學生名單(比對名稱用)
     const studentList = await adminClientConnect.getAllStudent().then(response => { if (NormalizeFunc.serverResponseErrorDetect(response)) return response.data.studentData })
+    console.log(studentList)
     const studentName = new Map()
-    studentList.forEach(student => { studentName.set(student.studentId, student.studentName) })
+    const studentChatRoomId = new Map()
+    studentList.forEach(student => {
+        studentName.set(student.studentId, student.studentName)
+        studentChatRoomId.set(student.studentId, student.studentChatRoomId)
+    })
     //生成 Group 名單---------------------------------------------------------------
     adminClientConnect.getAllStudentGroup().then((response) => {
         if (NormalizeFunc.serverResponseErrorDetect(response)) {
@@ -620,6 +691,59 @@ const renderGroup = async () => {
             })
         }
     })
+
+    function addNewGroup() {
+        const studentClass = prompt("請輸入學年度(ex:108)")
+        const studentId = prompt("請輸入學號(以','分割學生學號)")
+
+        NormalizeFunc.loadingPage(true)
+        if (studentClass === "" || studentClass === null || studentId === "" || studentId === null) {
+            alert("Cancel")
+            NormalizeFunc.loadingPage(false)
+            return
+        }
+
+        // 切割字串
+        let studentGroup = []
+        let temp = ""
+        for (const index in studentId) {
+            if (studentId[index] == ',') {
+                studentGroup.push(temp)
+                temp = ""
+            } else if (index == studentId.length - 1) {
+                temp += studentId[index]
+                studentGroup.push(temp)
+            } else {
+                temp += studentId[index]
+            }
+        }
+
+        let isAllExist = true
+        //檢閱該 Ary 中之學生 Id 是否存在
+        studentGroup.forEach(studentId => {
+            // 如果學生名單沒有此人
+            if (!studentName.get(studentId)) {
+                alert("查無此學號:" + studentId)
+                isAllExist = false
+            }
+            // 如果學生已經有群組
+            if (studentChatRoomId.get(studentId)) {
+                alert("此學生已有群組:" + studentId)
+                isAllExist = false
+            }
+        })
+
+        //檢閱通過才新增 Group
+        if (isAllExist) {
+            adminClientConnect.addNewStudentGroup(studentClass, studentGroup).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    alert(response.data.message)
+                    window.location.reload()
+                }
+            })
+        }
+        NormalizeFunc.loadingPage(false)
+    }
 
     const controllerFunc = {
         //修改組別成員

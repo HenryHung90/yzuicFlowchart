@@ -15,6 +15,7 @@ import chatroomconfig from "../models/chatroomconfig.js"
 import reflectionconfig from "../models/reflectionconfig.js"
 import listenerconfig from "../models/listenerconfig.js"
 import formulatingconfig from "../models/formulatingconfig.js"
+import coworkcontent from "../models/coworkcontent.js"
 
 function converDangerString(string) {
     let clean = DOMPurify.sanitize(string)
@@ -190,7 +191,7 @@ router.get("/:courseId", async (req, res) => {
             studentId: req.user.studentId,
             courseId: req.params.courseId,
             courseTitle: courseData.goListTitle,
-            studentChatRoomId: req.user.studentChatRoomId,
+            chatRoomId: req.user.studentChatRoomId,
         })
     } catch (err) {
         console.log(err)
@@ -202,7 +203,32 @@ router.get("/:courseId", async (req, res) => {
 })
 // 學生進入共編教材
 router.get("/co/:courseId", async (req, res) => {
+    try {
+        const coworkData = await coworkconfig.findOne({
+            _id: req.params.courseId,
+        })
+        if (
+            coworkData === null ||
+            coworkData === undefined ||
+            coworkData.length === 0
+        ) {
+            res.redirect(`/home/${req.user.studentId}`)
+            return
+        }
 
+        res.render("./cowork", {
+            studentId: req.user.studentId,
+            courseId: req.params.courseId,
+            courseTitle: coworkData.coworkTitle,
+            chatRoomId: req.user.studentChatRoomId,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "錯誤開啟，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
 })
 
 // 學生取得 demo 位置
