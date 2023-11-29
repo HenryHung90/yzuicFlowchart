@@ -127,6 +127,21 @@ const studentClientConnect = {
                 })
             )
         },
+    //cowork-----------------------------------------
+    //讀取 cowork
+    readCowork:
+        (courseId, groupId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/readcowork',
+                    data: {
+                        courseId: courseId,
+                        groupId: groupId
+                    }
+                })
+            )
+        },
     //code-----------------------------------------
     //readCode
     readCode:
@@ -301,7 +316,7 @@ const studentClientConnect = {
                 })
             )
         },
-    //page--------------------------------
+    //page--------------------------------------------
     // 取得教材成果展示
     getMaterial:
         (courseId) => {
@@ -465,7 +480,6 @@ const studentClientConnect = {
                 })
             )
         },
-
     //listener---------------------------------
     listenerUpload:
         (time, courseTitle, operation, task, keyName, detail, description) => {
@@ -512,6 +526,7 @@ const adminClientConnect = {
                 })
             )
         },
+    // 取得所有合作課程
     getAllCoworkCourse:
         () => {
             return (
@@ -533,9 +548,10 @@ const adminClientConnect = {
         },
     // 更新學生資料
     updateStudent:
-        (type, studentId, studentClass) => {
+        (type, studentId, studentClass, switchConfirm) => {
             // type
             // removeChatRoom => 刪除 Group
+            // switchCowork => 合作功能開啟關閉
             return (
                 axios({
                     method: 'post',
@@ -543,7 +559,22 @@ const adminClientConnect = {
                     data: {
                         type: type,
                         studentId: studentId,
-                        studentClass: studentClass
+                        studentClass: studentClass,
+                        switchConfirm: switchConfirm || null
+                    }
+                })
+            )
+        },
+    // 上傳學生名單
+    updateStudentList:
+        (studentList, studentClass) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/updatestudentlist',
+                    data: {
+                        studentList: studentList,
+                        studentClass: studentClass,
                     }
                 })
             )
@@ -743,6 +774,33 @@ const adminClientConnect = {
                     method: 'post',
                     url: '/admin/restartstandard',
                     data: {
+                        courseId: courseId
+                    }
+                })
+            )
+        },
+    //cowork-----------------------------------------
+    //讀取 cowork
+    readCowork:
+        (courseId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/readcowork',
+                    data: {
+                        courseId: courseId
+                    }
+                })
+            )
+        },
+    saveCowork:
+        (goData, courseId) => {
+            return (
+                axios({
+                    method: "post",
+                    url: '/admin/savecowork',
+                    data: {
+                        goList: goData,
                         courseId: courseId
                     }
                 })

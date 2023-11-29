@@ -26,24 +26,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
     <!-- CodeMirror-->
     <!-- 必要引入 -->
-    <link href="../codemirror-5.65.9/lib/codemirror.css" rel="stylesheet" />
-    <script src="../codemirror-5.65.9/lib/codemirror.js"></script>
+    <link href="../../codemirror-5.65.9/lib/codemirror.css" rel="stylesheet" />
+    <script src="../../codemirror-5.65.9/lib/codemirror.js"></script>
     <!-- 主題引入 -->
-    <link href="../codemirror-5.65.9/theme/blackboard.css" rel="stylesheet" />
+    <link href="../../codemirror-5.65.9/theme/blackboard.css" rel="stylesheet" />
     <!-- JavaScript高亮 -->
-    <script src="../codemirror-5.65.9/mode/javascript/javascript.js"></script>
+    <script src="../../codemirror-5.65.9/mode/javascript/javascript.js"></script>
     <!-- 支持代碼折疊 -->
-    <link rel="stylesheet" href="../codemirror-5.65.9/addon/fold/foldgutter.css" />
-    <script src="../codemirror-5.65.9/addon/fold/foldcode.js"></script>
-    <script src="../codemirror-5.65.9/addon/fold/foldgutter.js"></script>
-    <script src="../codemirror-5.65.9/addon/fold/brace-fold.js"></script>
-    <script src="../codemirror-5.65.9/addon/fold/comment-fold.js"></script>
+    <link rel="stylesheet" href="../../codemirror-5.65.9/addon/fold/foldgutter.css" />
+    <script src="../../codemirror-5.65.9/addon/fold/foldcode.js"></script>
+    <script src="../../codemirror-5.65.9/addon/fold/foldgutter.js"></script>
+    <script src="../../codemirror-5.65.9/addon/fold/brace-fold.js"></script>
+    <script src="../../codemirror-5.65.9/addon/fold/comment-fold.js"></script>
     <!-- 提供Hint -->
-    <link rel="stylesheet" href="../codemirror-5.65.9/addon/hint/show-hint.css" />
-    <script src="../codemirror-5.65.9/keymap/sublime.js"></script>
-    <script src="../codemirror-5.65.9/addon/hint/show-hint.js"></script>
-    <script src="../codemirror-5.65.9/addon/hint/anyword-hint.js"></script>
-    <script src="../codemirror-5.65.9/addon/hint/javascript-hint.js"></script>
+    <link rel="stylesheet" href="../../codemirror-5.65.9/addon/hint/show-hint.css" />
+    <script src="../../codemirror-5.65.9/keymap/sublime.js"></script>
+    <script src="../../codemirror-5.65.9/addon/hint/show-hint.js"></script>
+    <script src="../../codemirror-5.65.9/addon/hint/anyword-hint.js"></script>
+    <script src="../../codemirror-5.65.9/addon/hint/javascript-hint.js"></script>
     <!-- Socket.io Client -->
     <!-- <script src="
   https://cdn.jsdelivr.net/npm/socket.io-client@4.5.4/build/cjs/index.min.js
@@ -72,14 +72,15 @@
                     <%= adminId %>
                 </h5>
             </div>
-                <div class="col-2 navBarOpen_content" id="save" data-bs-toggle="tooltip" data-bs-placement="top" title="儲存資料(ctrl+S)">
-                    <div class="navBarOpen_text">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="80%" height="40px" viewBox="0 0 448 512">
-                            <path
-                                d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 416c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z" />
-                        </svg>
-                    </div>
+            <div class="col-2 navBarOpen_content" id="save" data-bs-toggle="tooltip" data-bs-placement="top"
+                title="儲存資料(ctrl+S)">
+                <div class="navBarOpen_text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80%" height="40px" viewBox="0 0 448 512">
+                        <path
+                            d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 416c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z" />
+                    </svg>
                 </div>
+            </div>
             <div class="col-2 navBarOpen_content" id="restart" data-bs-toggle="tooltip" data-bs-placement="top"
                 title="初始化(將刪除所有已儲存資料)">
                 <div class="navBarOpen_text">
@@ -139,17 +140,17 @@
         <%= coworkStatus %>
     </p>
 </body>
-<script type="module" src="../js/admin/golist/golist.js"></script>
-<link rel="stylesheet" href="../css/golist/golist.css" type="text/css" />
-<link rel="stylesheet" href="../css/golist/target.css" type="text/css" />
-<link rel="stylesheet" href="../css/golist/understanding.css" type="text/css" />
-<link rel="stylesheet" href="../css/golist/formulating.css" type="text/css" />
-<link rel="stylesheet" href="../css/golist/programming.css" type="text/css" />
-<link rel="stylesheet" href="../css/golist/reflection.css" type="text/css" />
-<link rel="stylesheet" href="../css/golist/comment.css" type="text/css" />
-<link rel="stylesheet" href="../global/chatbox.css" type="text/css" />
-<link rel="stylesheet" href="../global/loader.css" type="text/css">
+<script type="module" src="../../js/admin/golist/golist.js"></script>
+<link rel="stylesheet" href="../../css/golist/golist.css" type="text/css" />
+<link rel="stylesheet" href="../../css/golist/target.css" type="text/css" />
+<link rel="stylesheet" href="../../css/golist/understanding.css" type="text/css" />
+<link rel="stylesheet" href="../../css/golist/formulating.css" type="text/css" />
+<link rel="stylesheet" href="../../css/golist/programming.css" type="text/css" />
+<link rel="stylesheet" href="../../css/golist/reflection.css" type="text/css" />
+<link rel="stylesheet" href="../../css/golist/comment.css" type="text/css" />
+<link rel="stylesheet" href="../../global/chatbox.css" type="text/css" />
+<link rel="stylesheet" href="../../global/loader.css" type="text/css">
 <!-- admin css -->
-<link rel="stylesheet" href="../css/admin/golist.css" type="text/css">
+<link rel="stylesheet" href="../../css/admin/golist.css" type="text/css">
 
 </html>

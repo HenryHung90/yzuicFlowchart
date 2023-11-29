@@ -1,5 +1,5 @@
 /* loadingContainer */
-.loadingContainer{
+.loadingContainer {
     display: none;
     position: absolute;
     height: 100vh;
@@ -9,12 +9,12 @@
     z-index: 100000000000;
     user-select: none;
 }
-.loadingDiv{
+.loadingDiv {
     position: relative;
     justify-content: center;
     width: 20em;
     margin: 0 auto;
-    margin-top:25vh;
+    margin-top: 25vh;
 }
 .loader {
     position: relative;
@@ -30,7 +30,7 @@
 
 .loader::before,
 .loader::after {
-    content: '';
+    content: "";
     position: absolute;
     width: inherit;
     height: inherit;
@@ -71,8 +71,8 @@
     }
 }
 
-@media (max-width:1439px) {
-    .loadingDiv{
+@media (max-width: 1439px) {
+    .loadingDiv {
         width: 15em;
     }
 }

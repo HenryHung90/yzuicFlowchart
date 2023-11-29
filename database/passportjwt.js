@@ -43,7 +43,7 @@ const date = new Date()
 const Time = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
 passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordField: 'studentPassword' }, (username, password, done) => {
-    studentConfig.findOne({ studentId: username, studentAccess: true })
+    studentConfig.findOne({ studentId: username })
         .then(async (user) => {
             if (user == null) {
                 done(null, { message: '無此用戶' })
@@ -65,7 +65,6 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                         {
                             studentId: user.studentId,
                             studentClass: user.studentClass,
-                            Access: true
                         })
 
                     if (listenerData == null) {
@@ -93,7 +92,6 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                         await listenerconfig.updateOne({
                             studentId: user.studentId,
                             studentClass: user.studentClass,
-                            Access: true
                         }, {
                             listenerData: listenerData.listenerData
                         })
@@ -106,6 +104,7 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                         studentId: user.studentId,
                         studentName: user.studentName,
                         studentChatRoomId: user.studentChatRoomId,
+                        studentAccess: user.studentAccess
                     }
                     done(null, returnUser)
                 }
@@ -156,7 +155,6 @@ const cookieExtractorAdmin = (req) => {
 }
 
 
-
 passport.use('token', new JWTStrategy({
     jwtFromRequest: cookieExtractor,
     secretOrKey: secret_key,
@@ -172,6 +170,7 @@ passport.use('token', new JWTStrategy({
                     studentId: user.studentId,
                     studentName: user.studentName,
                     studentChatRoomId: user.studentChatRoomId,
+                    studentAccess: user.studentAccess
                 }
                 done(null, returnUser)
             })
@@ -193,7 +192,6 @@ passport.use('admin-token', new JWTStrategy(
                     _id: user._id,
                     adminId: user.adminId,
                     adminName: user.adminName,
-
                 }
                 done(null, returnUser)
             })

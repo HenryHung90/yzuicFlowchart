@@ -288,7 +288,8 @@ body {
 }
 
 #courseId,
-#chatRoomId {
+#chatRoomId,
+#coworkStatus {
     display: none;
 }
 

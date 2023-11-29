@@ -22,6 +22,7 @@ const NormalizeFunc = {
     //loading Page
     loadingPage: state => {
         if (state) {
+            $(".loadingContainer").css('top', $(document).scrollTop())
             $(".loadingContainer").fadeIn(200)
         } else {
             $(".loadingContainer").fadeOut(200)
@@ -96,8 +97,8 @@ const NormalizeFunc = {
         return Byte * 1024 * 1024
     },
     //return Download xlsx
-    downloadDatatoExcel: async (workbookTitle, worksheetData, worksheetName) => {
-        console.log(workbookTitle, worksheetData, worksheetName)
+    downloadDataToExcel: async (workbookTitle, worksheetData, worksheetName) => {
+        // console.log(workbookTitle, worksheetData, worksheetName)
         const workbook = XLSX.utils.book_new();
         worksheetData.map((dataValue, dataIndex) => {
             XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);

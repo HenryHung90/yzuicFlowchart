@@ -160,10 +160,11 @@ app.use((req, res, next) => {
     next()
 })
 app.get('/home/:studentId', passport.authenticate('token', { session: false }), async (req, res) => {
+    console.log(req.user)
     if (req.user.studentId != req.params.studentId) {
         res.redirect('/')
     } else {
-        res.render('./home', { studentId: req.params.studentId })
+        res.render('./home', { studentId: req.params.studentId, coworkStatus: req.user.studentAccess ? 'Y' : 'N' })
     }
 })
 

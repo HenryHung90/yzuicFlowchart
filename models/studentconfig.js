@@ -21,7 +21,7 @@ const studentsConfig = new mongoose.Schema({
         type: 'string',
         required: true,
     },
-    // 學生帳號是否啟用
+    // 學生帳號是否啟用合作功能
     studentAccess: {
         type: 'boolean',
         required: true,

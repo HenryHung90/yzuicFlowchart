@@ -46,7 +46,6 @@ router.post("/changepassword", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentId: req.user.studentId,
             studentClass: req.user.studentClass,
-            studentAccess: true,
         })
 
         await bcrypt
@@ -68,7 +67,6 @@ router.post("/changepassword", async (req, res) => {
                     {
                         studentId: req.user.studentId,
                         studentClass: req.user.studentClass,
-                        studentAccess: true,
                     },
                     {
                         studentPassword: hashed,
@@ -192,6 +190,7 @@ router.get("/:courseId", async (req, res) => {
             courseId: req.params.courseId,
             courseTitle: courseData.goListTitle,
             chatRoomId: req.user.studentChatRoomId,
+            coworkStatus: 'N',
         })
     } catch (err) {
         console.log(err)
@@ -218,9 +217,10 @@ router.get("/co/:courseId", async (req, res) => {
 
         res.render("./cowork", {
             studentId: req.user.studentId,
-            courseId: req.params.courseId,
+            courseId: coworkData.coworkContentId,
             courseTitle: coworkData.coworkTitle,
             chatRoomId: req.user.studentChatRoomId,
+            coworkStatus: 'Y',
         })
     } catch (err) {
         console.log(err)
@@ -464,7 +464,6 @@ router.post("/readgolist", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentClass: req.user.studentClass,
             studentId: req.user.studentId,
-            studentAccess: true,
         })
 
 
@@ -501,7 +500,6 @@ router.post("/savegolist", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentClass: req.user.studentClass,
             studentId: req.user.studentId,
-            studentAccess: true,
         })
 
         if (
@@ -520,7 +518,6 @@ router.post("/savegolist", async (req, res) => {
                 {
                     studentClass: req.user.studentClass,
                     studentId: req.user.studentId,
-                    studentAccess: true,
                 },
                 {
                     studentGoList: studentData.studentGoList,
@@ -559,7 +556,7 @@ router.post("/restartgolist", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentClass: req.user.studentClass,
             studentId: req.user.studentId,
-            studentAccess: true,
+
         })
         // GoList
         if (studentData.studentGoList !== undefined) {
@@ -577,7 +574,6 @@ router.post("/restartgolist", async (req, res) => {
                 {
                     studentClass: req.user.studentClass,
                     studentId: req.user.studentId,
-                    studentAccess: true,
                 },
                 {
                     studentGoList: studentData.studentGoList,
@@ -616,7 +612,6 @@ router.post("/downloadgolist", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentClass: req.user.studentClass,
             studentId: req.user.studentId,
-            studentAccess: true,
         })
         // GoList
         if (studentData.studentGoList[req.body.courseId] !== undefined) {
@@ -629,7 +624,6 @@ router.post("/downloadgolist", async (req, res) => {
                 {
                     studentClass: req.user.studentClass,
                     studentId: req.user.studentId,
-                    studentAccess: true,
                 },
                 {
                     studentGoList: studentData.studentGoList,
@@ -657,6 +651,34 @@ router.post("/downloadgolist", async (req, res) => {
     }
 })
 
+//學生讀取 cowork
+router.post("/readcowork", async (req, res) => {
+    try {
+        const coworkData = await coworkcontent.findOne({ _id: req.body.courseId })
+
+        const coworkStatus = await coworkconfig.findOne({ groupId: req.body.groupId })
+
+        res.json(
+            {
+                message: {
+                    coworkData: coworkData.standardGoList,
+                    coworkStatus: {
+                        process: coworkStatus.coworkStatus.process,
+                        studentGroup: coworkStatus.studentGroup
+                    }
+                },
+                status: 200
+            }
+        )
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "讀取存檔失敗，請重新整理",
+            status: 500,
+        })
+    }
+})
+
 //學生讀取 code
 router.post("/readcode", async (req, res) => {
     try {
@@ -671,7 +693,6 @@ router.post("/readcode", async (req, res) => {
             .findOne({
                 studentClass: req.user.studentClass,
                 studentId: req.user.studentId,
-                studentAccess: true,
             })
             .then(response => {
                 if (
@@ -722,7 +743,6 @@ router.post("/savecode", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentClass: req.user.studentClass,
             studentId: req.user.studentId,
-            studentAccess: true,
         })
 
         if (studentData.studentCodeList === undefined) {
@@ -771,7 +791,6 @@ router.post("/savecode", async (req, res) => {
                 {
                     studentClass: req.user.studentClass,
                     studentId: req.user.studentId,
-                    studentAccess: true,
                 },
                 { studentCodeList: studentData.studentCodeList }
             )
@@ -803,14 +822,13 @@ router.post("/deletecode", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentClass: req.user.studentClass,
             studentId: req.user.studentId,
-            studentAccess: true,
         })
 
         delete studentData.studentCodeList[req.body.courseId]
 
         await studentConfig
             .updateOne(
-                { studentId: req.user.studentId, studentAccess: true },
+                { studentId: req.user.studentId },
                 { studentCodeList: studentData.studentCodeList }
             )
             .then(response => {
@@ -955,7 +973,6 @@ router.post("/savereflection", async (req, res) => {
         const studentData = await studentConfig.findOne({
             studentId: req.user.studentId,
             studentClass: req.user.studentClass,
-            studentAccess: true,
         })
 
         const nextProgress = parseInt(req.body.key.split("-")[0]) + 1
@@ -971,7 +988,6 @@ router.post("/savereflection", async (req, res) => {
             {
                 studentId: req.user.studentId,
                 studentClass: req.user.studentClass,
-                studentAccess: true,
             },
             {
                 studentGoList: studentData.studentGoList,

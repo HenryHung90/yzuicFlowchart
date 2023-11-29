@@ -3,6 +3,10 @@ import { ClickListening, NormalizeFunc } from "../../global/common.js"
 import { studentClientConnect } from "../../global/axiosconnect.js"
 
 const chatBoxInit = () => {
+    if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        $('.chatBox').remove()
+        return
+    }
     if (NormalizeFunc.getFrontEndCode("chatRoomId")) {
         // 傳送進入房間訊息
         socketConnect.enterRoom()
@@ -156,8 +160,8 @@ const chatBoxInit = () => {
                             }
                             $(".chatBox_MessageContent").scrollTop(
                                 $(".chatBox_MessageContent")[0].scrollHeight -
-                                    OffsetScrollTop -
-                                    100
+                                OffsetScrollTop -
+                                100
                             )
                             freshCount++
                         }

@@ -62,9 +62,6 @@ router.post('/addstudent', async (req, res) => {
         if (req.body.studentName == null) {
             throw 'studentname require'
         }
-        if (req.body.studentAccess == null) {
-            throw 'studentaccess require'
-        }
 
 
         await studentConfig.findOne({ studentId: req.body.studentId, studentClass: req.body.studentClass }).then(response => {
@@ -77,7 +74,7 @@ router.post('/addstudent', async (req, res) => {
                         studentId: req.body.studentId,
                         studentPassword: hashedPassword,
                         studentName: req.body.studentName,
-                        studentAccess: req.body.studentAccess,
+                        studentAccess: true,
                         studentGoList: {},
                         studentCodeList: {}
                     })
@@ -101,6 +98,64 @@ router.post('/addstudent', async (req, res) => {
         })
     }
 
+})
+// 批量新增學生
+router.post('/updatestudentlist', async (req, res) => {
+    try {
+        if (req.body.studentList !== null || req.body.studentList !== undefined) {
+            const studentData = await studentConfig.find({ studentClass: req.body.studentClass })
+
+            const studentCheckMap = new Map()
+            studentData.forEach(student => {
+                studentCheckMap.set(student.studentId, student.studentName)
+            })
+
+            //檢測是否有錯
+            let errorStudentId = []
+            req.body.studentList.forEach(student => {
+                console.log(student.studentId)
+                if (studentCheckMap.has(student.studentId)) {
+                    errorStudentId.push(student.studentId)
+                }
+            })
+            if (errorStudentId.length > 0) {
+                res.json({
+                    message: `${errorStudentId.join(",")} 學生已存在`,
+                    status: 501
+                })
+                return
+            }
+
+            //批量新增學生
+            req.body.studentList.forEach(student => {
+                if (student.studentPassword == "" || student.studentPassword == null) student.studentPassword = student.studentId
+
+                bcrypt.hash(student.studentPassword, saltRound, async (err, hashedPassword) => {
+                    if (err) throw 'bad hash'
+
+                    await new studentConfig({
+                        studentClass: student.studentClass,
+                        studentId: student.studentId,
+                        studentPassword: hashedPassword,
+                        studentName: student.studentName,
+                        studentAccess: true,
+                        studentGoList: {},
+                        studentCodeList: {}
+                    }).save()
+                })
+            })
+            res.json({
+                message: 'success',
+                status: 200
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: '批量上傳學生錯誤，請聯繫管理員(err)',
+            status: 500
+        })
+    }
 })
 
 //新增 goList Standard 各項內容
@@ -230,7 +285,7 @@ router.post('/addchatroom', async (req, res) => {
 
         for (const studentId of req.body.studentGroup) {
             await studentConfig.updateOne(
-                { studentAccess: true, studentClass: req.body.studentClass, studentId: studentId },
+                { studentClass: req.body.studentClass, studentId: studentId },
                 { studentChatRoomId: chatRoomId }
             ).then(response => {
                 if (!response.acknowledged) {
@@ -465,7 +520,7 @@ router.post('/createcoworkcourse', async (req, res) => {
                 class: req.body.class,
                 coworkTitle: req.body.coworkTitle,
                 coworkContentId: coworkContentId._id,
-                coworkStatus: { process: 0, completeVote: new Array(studentGroup.length).fill(false), Iscomplete: false },
+                coworkStatus: { process: 1, completeVote: new Array(studentGroup.length).fill(false), Iscomplete: false },
                 groupId: chatRoomId,
                 studentGroup: studentGroup,
                 coworkContent: {},
@@ -495,7 +550,7 @@ router.post('/createcoworkcourse', async (req, res) => {
     }
 })
 
-//Admin 取得所有學生
+// Admin 取得所有學生
 router.get('/getallstudent', async (req, res) => {
     try {
         const studentData = await studentConfig.find({})
@@ -509,6 +564,7 @@ router.get('/getallstudent', async (req, res) => {
                     studentId: studentData[i].studentId,
                     studentName: studentData[i].studentName,
                     studentChatRoomId: studentData[i].studentChatRoomId,
+                    studentAccess: studentData[i].studentAccess
                 }
             )
         }
@@ -530,10 +586,10 @@ router.get('/getallstudent', async (req, res) => {
         })
     }
 })
-//Admin 修改學生
+// Admin 修改學生
 router.post('/updatestudent', async (req, res) => {
     try {
-        //刪除群組功能
+        //刪除群組功能 removeChatRoom
         if (req.body.type === 'removeChatRoom') {
             await studentConfig.updateOne(
                 { studentId: req.body.studentId, studentClass: req.body.studentClass },
@@ -551,9 +607,29 @@ router.post('/updatestudent', async (req, res) => {
                     status: 200
                 })
             })
-            return
         }
-
+        // 合作功能開啟/關閉 switchCowork
+        if (req.body.type === 'switchCowork') {
+            req.body.studentId.forEach(async (studentId, index) => {
+                await studentConfig.updateOne(
+                    { studentId: studentId, studentClass: req.body.studentClass },
+                    { studentAccess: !req.body.switchConfirm[index] }
+                ).then(response => {
+                    if (!response.acknowledged) {
+                        console.log(studentId, response)
+                        res.json({
+                            message: "更改失敗",
+                            status: 500
+                        })
+                        return
+                    }
+                })
+            })
+            res.json({
+                message: "success",
+                status: 200
+            })
+        }
     } catch (err) {
         console.log(err)
         res.json({
@@ -766,6 +842,7 @@ router.get('/:courseId', async (req, res) => {
             courseId: req.params.courseId,
             courseTitle: courseData.goListTitle,
             adminId: req.user.adminId,
+            coworkStatus: 'N',
         })
     }
     catch (err) {
@@ -778,7 +855,26 @@ router.get('/:courseId', async (req, res) => {
 })
 //Admin 進入共編課程
 router.get('/co/:courseId', async (req, res) => {
-
+    try {
+        const courseData = await coworkcontent.findOne({ _id: req.params.courseId })
+        if (courseData === null || courseData === undefined || courseData.length === 0) {
+            res.redirect(`/home/${req.user.adminId}`)
+            return
+        }
+        res.render('./admin/cowork', {
+            courseId: req.params.courseId,
+            courseTitle: courseData.coworkTitle,
+            adminId: req.user.adminId,
+            coworkStatus: 'Y',
+        })
+    }
+    catch (err) {
+        console.log(err)
+        res.json({
+            message: "錯誤開啟，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
 })
 
 //Admin 取得學生GoList
@@ -930,6 +1026,84 @@ router.post('/restartstandard', async (req, res) => {
     }
 })
 
+//Admin 讀取 Cowork
+router.post('/readcowork', async (req, res) => {
+    try {
+        const coworkData = await coworkcontent.findOne({ _id: req.body.courseId })
+
+        res.json(
+            {
+                message: coworkData.standardGoList,
+                status: 200
+            }
+        )
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '讀取存檔失敗，請重新整理',
+                status: 500,
+            }
+        )
+    }
+})
+//Admin 儲存 Cowork
+router.post('/savecowork', async (req, res) => {
+    try {
+        await coworkcontent.updateOne({ _id: req.body.courseId, }, { standardGoList: req.body.goList })
+            .then(response => {
+                if (response.acknowledged) {
+                    res.json(
+                        {
+                            message: 'success',
+                            status: 200
+                        }
+                    )
+                } else {
+                    res.json(
+                        {
+                            message: '儲存失敗，請再試一次',
+                            status: 500
+                        }
+                    )
+                }
+
+            })
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '儲存失敗，請聯繫管理員(err)',
+                status: 500,
+            }
+        )
+    }
+})
+//Admin 重整 Cowork
+router.post('/restartcowork', async (req, res) => {
+    try {
+        const coworkData = await coworkcontent.findOne({ _id: req.body.courseId })
+
+        res.json(
+            {
+                message: coworkData.standardGoList,
+                status: 200
+            }
+        )
+    }
+    catch (err) {
+        console.log(err)
+        res.json(
+            {
+                message: '讀取存檔失敗，請重新整理',
+                status: 500,
+            }
+        )
+    }
+})
+
 //Admin 讀取學生 Code
 router.post('/readcode', async (req, res) => {
     try {
@@ -943,7 +1117,6 @@ router.post('/readcode', async (req, res) => {
         await studentConfig
             .findOne({
                 studentId: req.body.studentId,
-                studentAccess: true,
             })
             .then(response => {
                 if (

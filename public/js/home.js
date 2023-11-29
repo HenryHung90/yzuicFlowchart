@@ -153,14 +153,15 @@ const homeInit = async () => {
         className: "goListCourse_contentTitle",
         innerHTML: "共編課程"
     }).appendTo(courseContainer)
-    await studentClientConnect.getAllCoworkCourse().then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
-            if (response.data.coworkData !== null || response.data.coworkData !== undefined) {
-                renderCourse(response.data.coworkData, 'cowork')
+    if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'Y') {
+        await studentClientConnect.getAllCoworkCourse().then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                if (response.data.coworkData !== null || response.data.coworkData !== undefined) {
+                    renderCourse(response.data.coworkData, 'cowork')
+                }
             }
-        }
-    })
-
+        })
+    }
 
     function renderCourse(courseList, type) {
         courseList.forEach((value, index) => {
@@ -195,15 +196,6 @@ const homeInit = async () => {
     }
 
     document.addEventListener('mousedown', ClickListening, false)
-    NormalizeFunc.loadingPage(false)
-}
-
-const renderCoWorkList = () => {
-    studentClientConnect.getAllCoworkCourse().then((response) => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
-            console.log(response.data)
-        }
-    })
     NormalizeFunc.loadingPage(false)
 }
 

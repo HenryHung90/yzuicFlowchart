@@ -103,7 +103,7 @@ const goListInit = () => {
 
     // define the Node templates for regular nodes
     const standardSetting =
-        $(go.Node, "Table", nodeStyle(),{ deletable: true },
+        $(go.Node, "Table", nodeStyle(), { deletable: true },
             // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
             $(go.Panel, "Auto",
                 $(go.Shape, "RoundedRectangle",
@@ -446,9 +446,6 @@ const navInit = () => {
     })
 
     //nav
-    $('#print').click((e) => {
-        navButton.printList()
-    })
     $('#save').click((e) => {
         navButton.save()
     })
@@ -476,6 +473,8 @@ const navInit = () => {
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
+    coworkStatus: NormalizeFunc.getFrontEndCode('coworkStatus'),
+    courseId: NormalizeFunc.getFrontEndCode('courseId'),
     //save
     save: async () => {
         NormalizeFunc.loadingPage(true)
@@ -486,35 +485,23 @@ const navButton = {
         if (idx !== -1) {
             document.title = document.title.slice(0, idx);
             //存入資料庫
-            await adminClientConnect.saveStandard(goData, NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                    NormalizeFunc.loadingPage(false)
-                }
-            })
-
+            if (navButton.coworkStatus == 'Y') {
+                await adminClientConnect.saveCowork(goData, navButton.courseId).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
+            } else {
+                await adminClientConnect.saveStandard(goData, navButton.courseId).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
+            }
             myDiagram.isModified = false;
         } else {
             NormalizeFunc.loadingPage(false)
         }
-    },
-    //print
-    printList: () => {
-        let svgWindow = window.open();
-        if (!svgWindow) return;  // failure to open a new Window
-        let printSize = new go.Size(700, 960);
-        let bnds = myDiagram.documentBounds;
-        let x = bnds.x;
-        let y = bnds.y;
-        while (y < bnds.bottom) {
-            while (x < bnds.right) {
-                let svg = myDiagram.makeSvg({ scale: 1.0, position: new go.Point(x, y), size: printSize });
-                svgWindow.document.body.appendChild(svg);
-                x += printSize.width;
-            }
-            x = bnds.x;
-            y += printSize.height;
-        }
-        setTimeout(() => svgWindow.print(), 1);
     },
     //restart code & golist
     restart: async () => {
@@ -539,11 +526,21 @@ const navButton = {
 }
 //load
 const load = async () => {
-    await adminClientConnect.readStandard(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
-            myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
-        }
-    })
+    const checkCoworkStatus = NormalizeFunc.getFrontEndCode("coworkStatus")
+    const courseId = NormalizeFunc.getFrontEndCode('courseId')
+    if (checkCoworkStatus == 'Y') {
+        await adminClientConnect.readCowork(courseId).then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
+            }
+        })
+    } else {
+        await adminClientConnect.readStandard(courseId).then(response => {
+            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
+            }
+        })
+    }
     // myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
 }
 //----------------------------------------------------------------------------------------
