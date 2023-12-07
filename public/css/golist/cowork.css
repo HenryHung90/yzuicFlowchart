@@ -1,0 +1,23 @@
+.mouseMovingContainer {
+    position: absolute;
+    height: 100vh;
+    justify-content: center;
+    user-select: none;
+    pointer-events: none;
+    z-index: 999999;
+}
+
+/* Icon Container */
+.mouseMoveContainer_mouseIconContainer {
+    position: absolute;
+    height: 20px;
+    width: 70px;
+}
+
+.mouseMoveContainer_mouseStudentId {
+    color: white;
+    font-size: 10px;
+    text-align: center;
+    background-color: black;
+    border-radius: 5px;
+}

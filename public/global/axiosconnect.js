@@ -284,7 +284,7 @@ const studentClientConnect = {
         () => {
             return (
                 axios({
-                    method: 'post',
+                    method: 'get',
                     url: '/launch/searchmedia'
                 })
             )
@@ -318,6 +318,110 @@ const studentClientConnect = {
         },
     //page--------------------------------------------
     // 取得教材成果展示
+    cowork: {
+        getMaterial: (courseId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/cowork/getmaterial',
+                    data: {
+                        courseId: courseId
+                    }
+                })
+            )
+        },
+        //取得探索理解
+        getUnderstanding: (courseId, key) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/cowork/getUnderstanding',
+                    data: {
+                        courseId: courseId,
+                        key: key
+                    }
+                })
+            )
+        },
+        //取得表徵制定
+        getFormulating: (courseId, key) => {
+            return (
+                axios({
+                    method: "post",
+                    url: '/student/cowork/getformulating',
+                    data: {
+                        courseId: courseId,
+                        key: key
+                    }
+                })
+            )
+        },
+        //確認資料夾
+        createDemo: () => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/launch/cowork/createdemo',
+                })
+            )
+        },
+        //執行程式碼
+        launchDemo: (coworkArea) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/launch/cowork/launchdemo',
+                    data: {
+                        coworkArea: coworkArea
+                    }
+                })
+            )
+        },
+        //取得共編程式
+        readCode: (courseId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/cowork/readcode',
+                    data: {
+                        courseId: courseId
+                    }
+                })
+            )
+        },
+        //儲存共編程式
+        saveCode: (courseId, coworkContent) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/student/cowork/savecode',
+                    data: {
+                        courseId: courseId,
+                        coworkContent: coworkContent
+                    }
+                })
+            )
+        },
+        //尋找共編 Media 檔案
+        searchFile: () => {
+            return (
+                axios({
+                    method: 'get',
+                    url: '/launch/cowork/searchmedia',
+                })
+            )
+        },
+        //上傳共編 Media 檔案
+        uploadFile: (uploadFile) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/launch/cowork/uploadimg',
+                    data: uploadFile
+                })
+            )
+        },
+    },
     getMaterial:
         (courseId) => {
             return (

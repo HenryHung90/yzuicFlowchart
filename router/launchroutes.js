@@ -14,14 +14,6 @@ const directName = __dirname.substring(0, __dirname.length - 7)
 //------------------------------------------------------
 //multer
 import multer from "multer"
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, `${directName}/public/Access/${req.user.studentId}/media`)
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname)
-    },
-})
 
 const fileFilter = (req, file, cb) => {
     // reject a file
@@ -37,8 +29,35 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-const upload = multer({
-    storage: storage,
+const personalStorageImg = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, `${directName}/public/Access/${req.user.studentId}/media`)
+    },
+    filename: function (req, file, cb) {
+        cb(null, Buffer.from(file.originalname, 'latin1').toString('utf8'))
+    },
+})
+const coworkStorageImg = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, `${directName}/public/Cowork/${req.user.studentChatRoomId}/media`)
+    },
+    filename: function (req, file, cb) {
+        cb(null, Buffer.from(file.originalname, 'latin1').toString('utf8'))
+    },
+})
+
+
+
+const personalUploadImg = multer({
+    storage: personalStorageImg,
+    limits: {
+        //後端限制最大 25 MB 之圖片
+        fileSize: 25 * 1024 * 1024,
+    },
+    fileFilter: fileFilter,
+})
+const coworkUploadImg = multer({
+    storage: coworkStorageImg,
     limits: {
         //後端限制最大 25 MB 之圖片
         fileSize: 25 * 1024 * 1024,
@@ -46,16 +65,15 @@ const upload = multer({
     fileFilter: fileFilter,
 })
 //------------------------------------------------------
-
 //Access File
 const detectCreatingError = (res, errorObj, fileId) => {
     for (let value of Object.values(errorObj)) {
         if (value.status == "失敗") {
             res.json({
                 message:
-                    `${fileWritingStatus[0].name}:${fileWritingStatus[0].status}\n` +
-                    `${fileWritingStatus[1].name}:${fileWritingStatus[1].status}\n` +
-                    `${fileWritingStatus[2].name}:${fileWritingStatus[2].status}`,
+                    `${errorObj[0].name}:${errorObj[0].status}\n` +
+                    `${errorObj[1].name}:${errorObj[1].status}\n` +
+                    `${errorObj[2].name}:${errorObj[2].status}`,
                 status: 500,
             })
             break
@@ -205,11 +223,139 @@ ${req.body.custom}
     }
 })
 
-//--------------------------------------------------------------
 
+//建立共編 Access file
+router.post('/cowork/createdemo', async (req, res) => {
+    try {
+        // console.log(req.user)
+        //檢測進度是否正常
+        const fileWritingStatus = [{ name: "建立資料夾", status: "成功" }]
+        //write file
+        //user ID file
+        if (
+            fs.existsSync(`${directName}/public/Cowork/${req.user.studentChatRoomId}`)
+        ) {
+            res.json({
+                message: "success",
+                status: 200,
+            })
+        } else {
+            fs.mkdirSync(
+                `${directName}/public/Cowork/${req.user.studentChatRoomId}`,
+                err => {
+                    if (err) {
+                        console.log(err)
+                        fileWritingStatus[0].status = "失敗"
+                    }
+                }
+            )
+            //user media file
+            fs.mkdirSync(
+                `${directName}/public/Cowork/${req.user.studentChatRoomId}/media`,
+                err => {
+                    if (err) {
+                        fileWritingStatus[0].status = "失敗"
+                    }
+                }
+            )
+
+            //res wirte in this function
+            detectCreatingError(res, fileWritingStatus, "")
+        }
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "建立 Access 失敗，請聯絡管理員 (err)",
+            status: 500,
+        })
+    }
+})
+router.post('/cowork/launchdemo', async (req, res) => {
+    try {
+        // console.log(req.user)
+        //建立程式隨機碼
+        const fileId = uuidv4()
+        //檢測進度是否正常
+        const fileWritingStatus = [
+            { name: "建立資料夾", status: "成功" },
+            { name: "建立html檔案", status: "成功" },
+            { name: "建立js檔案", status: "成功" },
+        ]
+
+        //write file
+        //user ID file
+        fs.mkdirSync(
+            `${directName}/public/Cowork/${req.user.studentChatRoomId}/${fileId}`,
+            err => {
+                if (err) {
+                    fileWritingStatus[0].status = "失敗"
+                }
+            }
+        )
+        //js file write
+        console.log(req.body.coworkArea)
+        const jsFileName = `${directName}/public/Cowork/${req.user.studentChatRoomId}/${fileId}/${fileId}.js`
+        const jsFileContent = `try{console.log("Game Launcher...")
+${req.body.coworkArea}
+            }catch(err){
+                if (err instanceof TypeError) {
+                    console.error("TypeError",err.stack)
+                  } else if (err instanceof RangeError) {
+                    console.error("RangeError",err.stack)
+                  } else if (err instanceof EvalError) {
+                    console.error("EvalError",err.stack)
+                  } else if (err instanceof SyntaxError) {
+                    console.error("SyntaxError",err.stack)
+                  }else{
+                    console.error("Else",err.stack)
+                  }
+            }
+            `
+        fs.writeFileSync(jsFileName, jsFileContent, err => {
+            if (err) {
+                fileWritingStatus[2].status = "失敗"
+            }
+        })
+
+        //html file write
+        const htmlFileName = `${directName}/public/Cowork/${req.user.studentChatRoomId}/${fileId}/${fileId}.html`
+        const htmlFileContent = `<!DOCTYPE html>
+         <html lang="en" class=''>
+         <head>
+             <meta charset="UTF-8">
+             <title>Demo</title>
+             <!-- jQuery -->
+             <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+             integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+         </head>
+         <body>
+             <div id="container"></div>
+         </body>
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
+         <script src="./${fileId}.js" defer></script>
+         </html>
+         `
+        fs.writeFileSync(htmlFileName, htmlFileContent, err => {
+            if (err) {
+                fileWritingStatus[1].status = "失敗"
+            }
+        })
+
+        //res wirte in this function
+        detectCreatingError(res, fileWritingStatus, fileId)
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "建立 access 失敗，請聯絡管理員 (err)",
+            status: 500,
+        })
+    }
+})
+
+//--------------------------------------------------------------
 //media
 //輸入img file
-router.post("/uploadimg", upload.array("image", 5), async (req, res) => {
+router.post("/uploadimg", personalUploadImg.array("image", 5), async (req, res) => {
     try {
         res.json({
             message: "success",
@@ -224,7 +370,7 @@ router.post("/uploadimg", upload.array("image", 5), async (req, res) => {
     }
 })
 //讀取media file
-router.post("/searchmedia", async (req, res) => {
+router.get("/searchmedia", async (req, res) => {
     try {
         let fileList = []
 
@@ -289,5 +435,59 @@ router.post("/deletemedia", async (req, res) => {
     }
 })
 
+
+//共編尋找 media file
+router.get('/cowork/searchmedia', async (req, res) => {
+    try {
+        let fileList = []
+
+        //若新增 Media 失敗之備案
+        if (
+            !fs.existsSync(
+                `${directName}/public/Cowork/${req.user.studentChatRoomId}/media`
+            )
+        ) {
+            //user media file
+            fs.mkdirSync(
+                `${directName}/public/Cowork/${req.user.studentChatRoomId}/media`
+            )
+        }
+
+        fs.readdirSync(
+            `${directName}/public/Cowork/${req.user.studentChatRoomId}/media`
+        ).forEach(filename => {
+            fileList.push({
+                src: `../../Cowork/${req.user.studentChatRoomId}/media/${filename}`,
+                name: filename,
+            })
+        })
+
+        res.json({
+            files: fileList,
+            status: 200,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "讀取 Cowork/Media 失敗，請聯繫管理員 (err)",
+            status: 500,
+        })
+    }
+})
+//輸入img file
+router.post('/cowork/uploadimg', coworkUploadImg.array("image", 5), async (req, res) => {
+    try {
+        res.json({
+            message: "success",
+            status: 200,
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "上傳凸面失敗，請聯繫管理員 (err)",
+            status: 500,
+        })
+    }
+})
 //--------------------------------------------------------------
 export default router

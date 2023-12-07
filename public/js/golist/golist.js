@@ -1,5 +1,6 @@
 import { GoListFunc, NormalizeFunc, ClickListening } from "../../global/common.js";
 import { chatBoxInit } from "../../global/chatbox.js";
+import { coworkInit } from "../../global/cowork.js";
 import { studentClientConnect } from "../../global/axiosconnect.js";
 
 //init Diagram varible
@@ -769,3 +770,4 @@ window.addEventListener('DOMContentLoaded', goListInit)
 window.addEventListener('DOMContentLoaded', navInit)
 window.addEventListener('DOMContentLoaded', leaderBoardInit)
 window.addEventListener('DOMContentLoaded', chatBoxInit)
+window.addEventListener('DOMContentLoaded', coworkInit)

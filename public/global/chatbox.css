@@ -28,7 +28,7 @@
 .chatBox_MessageContainer {
     pointer-events: all;
     width: 400px;
-    height: 80%;
+    height: 650px;
     margin-bottom: 80px;
     overflow: auto;
     background-color: white;
@@ -42,7 +42,7 @@
     height: 7%;
     font-size: 2rem;
     width: 100%;
-    padding: 10px 20px;
+    padding: 10px 10px;
     color: white;
     position: sticky;
     font-weight: bolder;
@@ -53,14 +53,17 @@
     height: 93%;
 }
 .chatBox_MessageContent {
-    height: 93%;
+    height: 92%;
     overflow-y: auto;
 }
 
 .chatBox_MessageEnterBox {
-    height: 7%;
+    height: 8%;
     position: sticky;
     align-self: flex-end;
+}
+.chatBox_MessageEnterBox_Input {
+    font-size: 15px;
 }
 
 .chatBox_enterMessage {

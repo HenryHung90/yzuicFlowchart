@@ -16,6 +16,7 @@ import {
     adminReflectionBox,
 } from "../js/admin/golist/gogrammingPage.js"
 import { adminClientConnect, studentClientConnect } from "./axiosconnect.js"
+import { socketConnect } from "./socketConnect.js"
 
 //------------------------------ normal function ------------------------------//]
 const NormalizeFunc = {
@@ -115,10 +116,18 @@ const NormalizeFunc = {
 //------------------------------ category Box Function -----------------------------------//
 const categoryBox = {
     Target: data => {
-        $(".targetIframe").attr(
-            "src",
-            `../Material/${data.message}/full/index.html`
-        )
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            $(".targetIframe").attr(
+                "src",
+                `../Material/${data.message}/full/index.html`
+            )
+        } else {
+            $(".targetIframe").attr(
+                "src",
+                `../../Material/${data.message}/full/index.html`
+            )
+        }
+
     },
     Start: (data, key) => {
         if (data.message === undefined) {
@@ -129,7 +138,6 @@ const categoryBox = {
         return
     },
     Understanding: data => {
-        console.log(data)
         if (data.message === undefined) {
             $("#understandingDescription").html(
                 `<h3>任務目標 -</h3><h3> -- </h3>`
@@ -142,15 +150,28 @@ const categoryBox = {
 
         //starting 移植部分
         // 設定 Iframe 跑的　demo
-        $("#startIframe").attr("src", `../Material${data.message.startingData.material}`)
-        // 設定 button click 事件
-        $("#start_launchbtn").click(e => {
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
             $("#startIframe").attr("src", `../Material${data.message.startingData.material}`)
-            $("#demoContent").addClass("startDemoFinish")
-            setTimeout(e => {
-                $("#demoContent").removeClass("startDemoFinish")
-            }, 800)
-        })
+            // 設定 button click 事件
+            $("#start_launchbtn").click(e => {
+                $("#startIframe").attr("src", `../Material${data.message.startingData.material}`)
+                $("#demoContent").addClass("startDemoFinish")
+                setTimeout(e => {
+                    $("#demoContent").removeClass("startDemoFinish")
+                }, 800)
+            })
+        } else {
+            $("#startIframe").attr("src", `../../Material${data.message.startingData.material}`)
+            // 設定 button click 事件
+            $("#start_launchbtn").click(e => {
+                $("#startIframe").attr("src", `../../Material${data.message.startingData.material}`)
+                $("#demoContent").addClass("startDemoFinish")
+                setTimeout(e => {
+                    $("#demoContent").removeClass("startDemoFinish")
+                }, 800)
+            })
+        }
+
         //----------------------------
 
         //operation
@@ -311,136 +332,139 @@ const categoryBox = {
         }
     },
     Programming: (data, key) => {
-        let codeData = [
-            { name: "setting", data: "" },
-            { name: "config", data: "" },
-            { name: "preload", data: "" },
-            { name: "create", data: "" },
-            { name: "update", data: "" },
-            { name: "custom", data: "" },
-        ]
-        // 塞入紀錄的程式內容----------------------------------
-        if (data.code !== undefined) {
-            codeData = [
-                { name: "setting", data: data.code.setting || "" },
-                { name: "config", data: data.code.config || "" },
-                { name: "preload", data: data.code.preload || "" },
-                { name: "create", data: data.code.create || "" },
-                { name: "update", data: data.code.update || "" },
-                { name: "custom", data: data.code.custom || "" },
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            let codeData = [
+                { name: "setting", data: "" },
+                { name: "config", data: "" },
+                { name: "preload", data: "" },
+                { name: "create", data: "" },
+                { name: "update", data: "" },
+                { name: "custom", data: "" },
             ]
-        }
+            // 塞入紀錄的程式內容----------------------------------
+            if (data.code !== undefined) {
+                codeData = [
+                    { name: "setting", data: data.code.setting || "" },
+                    { name: "config", data: data.code.config || "" },
+                    { name: "preload", data: data.code.preload || "" },
+                    { name: "create", data: data.code.create || "" },
+                    { name: "update", data: data.code.update || "" },
+                    { name: "custom", data: data.code.custom || "" },
+                ]
+            }
 
-        for (const CodeMirror of codeData) {
-            CodeMirrorFunc.codeMirrorProgram(
-                CodeMirror.name,
-                CodeMirror.data,
-                false
-            )
-            $(`#${CodeMirror.name}`).data("CodeMirror").setSize("auto", "auto")
-        }
-        //-----------------------------------------------------
+            for (const CodeMirror of codeData) {
+                CodeMirrorFunc.codeMirrorProgram(
+                    CodeMirror.name,
+                    CodeMirror.data,
+                    false
+                )
+                $(`#${CodeMirror.name}`).data("CodeMirror").setSize("auto", "auto")
+            }
+            //-----------------------------------------------------
 
-        //hint
-        if (data.hint !== undefined) {
-            data.hint.split("\n").forEach((hint, index) => {
-                if (index !== 0) {
+            //hint
+            if (data.hint !== undefined) {
+                data.hint.split("\n").forEach((hint, index) => {
+                    if (index !== 0) {
+                        $("<div>")
+                            .prop({
+                                className: "programmingDescription_hintArrow",
+                                innerHTML:
+                                    '<img src="../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg); user-select:none"></img>',
+                            })
+                            .appendTo($("#programmingHint"))
+                    }
+
                     $("<div>")
                         .prop({
-                            className: "programmingDescription_hintArrow",
-                            innerHTML:
-                                '<img src="../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg); user-select:none"></img>',
+                            className: "programmingDescription_hintText",
+                            innerHTML: `<p>👊step ${index + 1}</p>` + hint,
+                            id: `programmingHint_${index}`,
                         })
                         .appendTo($("#programmingHint"))
-                }
 
-                $("<div>")
-                    .prop({
-                        className: "programmingDescription_hintText",
-                        innerHTML: `<p>👊step ${index + 1}</p>` + hint,
-                        id: `programmingHint_${index}`,
-                    })
-                    .appendTo($("#programmingHint"))
+                    $("<div>")
+                        .prop({
+                            className: "programmingDescription_hintCode",
+                            innerHTML:
+                                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="100%" fill="orange"><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>',
+                            id: `programmingHintCode_${index}`,
+                        })
+                        .attr({
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "right",
+                            "data-container": "body",
+                            "data-bs-html": "true",
+                            name: "hint",
+                            title: "<h3>程式碼參考</h3>若無顯示請重新點擊",
+                        })
+                        .appendTo($(`#programmingHint_${index}`))
+                })
+            }
 
-                $("<div>")
-                    .prop({
-                        className: "programmingDescription_hintCode",
-                        innerHTML:
-                            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="100%" fill="orange"><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>',
-                        id: `programmingHintCode_${index}`,
-                    })
-                    .attr({
-                        "data-bs-toggle": "tooltip",
-                        "data-bs-placement": "right",
-                        "data-container": "body",
-                        "data-bs-html": "true",
-                        name: "hint",
-                        title: "<h3>程式碼參考</h3>若無顯示請重新點擊",
-                    })
-                    .appendTo($(`#programmingHint_${index}`))
+            //初始化 boostrap Tooltip
+            $('[data-bs-toggle="tooltip"]').tooltip({
+                trigger: "click",
             })
+
+            //點擊時將其他 tooltip 關閉
+            $('[data-bs-toggle="tooltip"]').click(function () {
+                if ($(this).attr("name") === "hint") {
+                    $('[data-bs-toggle="tooltip"]').not(this).tooltip("hide")
+                }
+            })
+
+            //Hint tooltip 內容
+            $('[data-bs-toggle="tooltip"]').on("shown.bs.tooltip", function () {
+
+                const hintTooltip = $(this)
+
+                if (hintTooltip.attr("name") === "hint") {
+                    //Code 展示區
+                    $("<textarea>")
+                        .prop({
+                            id: "hint",
+                        })
+                        .css({
+                            resize: "none",
+                        })
+                        .appendTo($(".tooltip-inner"))
+
+                    if (data.hintCode !== undefined) {
+                        CodeMirrorFunc.codeMirrorProgram(
+                            "hint",
+                            data.hintCode[hintTooltip.attr("id").split("_")[1]] ||
+                            "no data",
+                            true
+                        )
+                    } else {
+                        CodeMirrorFunc.codeMirrorProgram("hint", "no data", true)
+                    }
+                    $("#hint").data("CodeMirror").setSize("auto", "auto")
+
+                    //Code 複製 button
+                    $("<button>")
+                        .prop({
+                            id: "hintCopy",
+                            className: "btn btn-primary",
+                            innerHTML: "Copy",
+                        })
+                        .click(e => {
+                            e.stopPropagation()
+                            // console.log(data.hintCode[hintTooltip.attr("id").split("_")[1]])
+                            navigator.clipboard.writeText(
+                                data.hintCode[hintTooltip.attr("id").split("_")[1]]
+                            )
+                        })
+                        .appendTo($(".tooltip-inner"))
+                }
+            })
+        } else {
+            CodeMirrorFunc.codeMirrorProgram('coworkArea', data, false)
+            $('#coworkArea').data("CodeMirror").setSize("auto", 680)
         }
 
-        //初始化 boostrap Tooltip
-        $('[data-bs-toggle="tooltip"]').tooltip({
-            trigger: "click",
-        })
-
-        //點擊時將其他 tooltip 關閉
-        $('[data-bs-toggle="tooltip"]').click(function () {
-            if ($(this).attr("name") === "hint") {
-                $('[data-bs-toggle="tooltip"]').not(this).tooltip("hide")
-            }
-        })
-        // $('[data-bs-toggle="tooltip"]').on('show.bs.tooltip', function () {
-
-        // })
-
-        //Hint tooltip 內容
-        $('[data-bs-toggle="tooltip"]').on("shown.bs.tooltip", function () {
-
-            const hintTooltip = $(this)
-
-            if (hintTooltip.attr("name") === "hint") {
-                //Code 展示區
-                $("<textarea>")
-                    .prop({
-                        id: "hint",
-                    })
-                    .css({
-                        resize: "none",
-                    })
-                    .appendTo($(".tooltip-inner"))
-
-                if (data.hintCode !== undefined) {
-                    CodeMirrorFunc.codeMirrorProgram(
-                        "hint",
-                        data.hintCode[hintTooltip.attr("id").split("_")[1]] ||
-                        "no data",
-                        true
-                    )
-                } else {
-                    CodeMirrorFunc.codeMirrorProgram("hint", "no data", true)
-                }
-                $("#hint").data("CodeMirror").setSize("auto", "auto")
-
-                //Code 複製 button
-                $("<button>")
-                    .prop({
-                        id: "hintCopy",
-                        className: "btn btn-primary",
-                        innerHTML: "Copy",
-                    })
-                    .click(e => {
-                        e.stopPropagation()
-                        // console.log(data.hintCode[hintTooltip.attr("id").split("_")[1]])
-                        navigator.clipboard.writeText(
-                            data.hintCode[hintTooltip.attr("id").split("_")[1]]
-                        )
-                    })
-                    .appendTo($(".tooltip-inner"))
-            }
-        })
     },
     Reflection: data => {
         if (data == undefined) {
@@ -517,7 +541,7 @@ const GoListFunc = {
                     "font-weight": "normal",
                     opacity: "0.3",
                 },
-                200
+                500
             )
         } else {
             $(".content_status").fadeOut(200)
@@ -529,76 +553,97 @@ const GoListFunc = {
                     "font-weight": "bolder",
                     opacity: "1",
                 },
-                200
+                500
             )
         }
     },
     //show Each Box
     showContainer: async (s, id) => {
         ClickListening("", `打開-Task ${s.key} ${s.text}`)
-        //取得 Iframe 發出之 Error 警訊
-        const reciveMessage = e => {
-            e.preventDefault()
-            const sendPort = e.origin
-            const sendMessage = e.data.data.arguments.join()
-            const sendStatus = e.data.data.function
-            // console.log(e.data.data.function)
-            if (sendPort == "http://localhost:3000") {
-                let logger = document.getElementById("testingCode")
-                if (sendStatus == "log") {
-                    logger.innerHTML +=
-                        '<div class="consoleErrorArea_logCode">' +
-                        sendMessage +
-                        "</div>"
-                } else if (sendStatus == "error") {
-                    logger.innerHTML +=
-                        '<div class="consoleErrorArea_errorCode">' +
-                        sendMessage +
-                        "</div>"
-                }
-            }
+        // 設定共編進入區域
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === "Y") {
+            socketConnect.cowork.selectionArea = s.key
         }
-        //listen Message from iframe
-        const listenMessageBind = () => {
-            window.addEventListener("message", reciveMessage, false)
-        }
-        const listenMessageUnbind = () => {
-            window.removeEventListener("message", reciveMessage, false)
-        }
+        // //取得 Iframe 發出之 Error 警訊
+        // const reciveMessage = e => {
+        //     e.preventDefault()
+        //     const sendPort = e.origin
+        //     const sendMessage = e.data.data.arguments.join()
+        //     const sendStatus = e.data.data.function
+        //     // console.log(e.data.data.function)
+        //     if (sendPort == "http://localhost:3000") {
+        //         let logger = document.getElementById("testingCode")
+        //         if (sendStatus == "log") {
+        //             logger.innerHTML +=
+        //                 '<div class="consoleErrorArea_logCode">' +
+        //                 sendMessage +
+        //                 "</div>"
+        //         } else if (sendStatus == "error") {
+        //             logger.innerHTML +=
+        //                 '<div class="consoleErrorArea_errorCode">' +
+        //                 sendMessage +
+        //                 "</div>"
+        //         }
+        //     }
+        // }
+        // //listen Message from iframe
+        // const listenMessageBind = () => {
+        //     window.addEventListener("message", reciveMessage, false)
+        // }
+        // const listenMessageUnbind = () => {
+        //     window.removeEventListener("message", reciveMessage, false)
+        // }
         //click close function
         const closePage = () => {
             ClickListening("", `離開-${s.text}`)
+            // 設定共編進入區域
+            if (NormalizeFunc.getFrontEndCode('coworkStatus') === "Y") {
+                socketConnect.cowork.selectionArea = 'golist'
+            }
             //關閉自動儲存
             //取得各階段程式碼
             if (
                 s.category === "Programming" ||
-                s.category === "Completed-Programming"
+                s.category === "Completed-Programming" ||
+                s.category === "Bonus-Programming"
             ) {
                 NormalizeFunc.loadingPage(true)
-                const settingCode = $("#setting").data("CodeMirror")
-                const configCode = $("#config").data("CodeMirror")
-                const preloadCode = $("#preload").data("CodeMirror")
-                const createCode = $("#create").data("CodeMirror")
-                const updateCode = $("#update").data("CodeMirror")
-                const customCode = $("#custom").data("CodeMirror")
-                const keyCode = s.key
+                if (NormalizeFunc.getFrontEndCode('coworkStatus') === "N") {
+                    const settingCode = $("#setting").data("CodeMirror")
+                    const configCode = $("#config").data("CodeMirror")
+                    const preloadCode = $("#preload").data("CodeMirror")
+                    const createCode = $("#create").data("CodeMirror")
+                    const updateCode = $("#update").data("CodeMirror")
+                    const customCode = $("#custom").data("CodeMirror")
+                    const keyCode = s.key
 
-                studentClientConnect
-                    .saveCode(
-                        settingCode.getValue(),
-                        configCode.getValue(),
-                        preloadCode.getValue(),
-                        createCode.getValue(),
-                        updateCode.getValue(),
-                        customCode.getValue(),
-                        keyCode,
-                        NormalizeFunc.getFrontEndCode("courseId")
-                    )
-                    .then(response => {
-                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                            NormalizeFunc.loadingPage(false)
-                        }
+                    studentClientConnect
+                        .saveCode(
+                            settingCode.getValue(),
+                            configCode.getValue(),
+                            preloadCode.getValue(),
+                            createCode.getValue(),
+                            updateCode.getValue(),
+                            customCode.getValue(),
+                            keyCode,
+                            NormalizeFunc.getFrontEndCode("courseId")
+                        )
+                        .then(response => {
+                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                                NormalizeFunc.loadingPage(false)
+                            }
+                        })
+                } else {
+                    const coworkCode = $('#coworkArea').data("CodeMirror")
+
+                    studentClientConnect.cowork.saveCode(
+                        NormalizeFunc.getFrontEndCode("courseId"),
+                        coworkCode.getValue()
+                    ).then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) NormalizeFunc.loadingPage(false)
                     })
+                }
+
             }
 
             //Auto save For Bonus-Formulating---------------------
@@ -700,7 +745,7 @@ const GoListFunc = {
             $(".content_dataVisualizationArea").fadeOut(200)
             $(".content_consoleErrorArea").fadeOut(200)
             //unbind listenEvent
-            listenMessageUnbind()
+            // listenMessageUnbind()
             setTimeout(() => {
                 $("body").css({
                     overflow: "auto",
@@ -716,49 +761,6 @@ const GoListFunc = {
             }, 200)
         }
 
-        //rotate Slide Code
-        const rotateAllIconAndSlideAllCode = () => {
-            const content_codingContainer = [
-                ".content_coding_settingContainer",
-                ".content_coding_configContainer",
-                ".content_coding_preloadContainer",
-                ".content_coding_createContainer",
-                ".content_coding_updateContainer",
-                ".content_coding_customContainer",
-            ]
-
-            if ($(".content_slide").attr("id") === "open") {
-                ClickListening("", `全部收合-${s.text}-Code`)
-                for (const codeContainer of content_codingContainer) {
-                    if ($(codeContainer).attr("id") === "open") {
-                        $(codeContainer).attr("id", "close").slideUp(300)
-                        $(".codeDownIcon").css(
-                            {
-                                transform: "rotate(0deg)",
-                            },
-                            200
-                        )
-
-                        $(".content_slide").attr("id", "close").html("全部展開")
-                    }
-                }
-            } else {
-                ClickListening("", `全部展開-${s.text}-Code`)
-                for (const codeContainer of content_codingContainer) {
-                    if ($(codeContainer).attr("id") === "close") {
-                        $(codeContainer).attr("id", "open").slideDown(300)
-                        $(".codeDownIcon").css(
-                            {
-                                transform: "rotate(180deg)",
-                            },
-                            200
-                        )
-
-                        $(".content_slide").attr("id", "open").html("全部收合")
-                    }
-                }
-            }
-        }
         // loadingPage(true)
 
         //辨別任務
@@ -830,30 +832,73 @@ const GoListFunc = {
             })
             .appendTo(content_iconContainer)
         //------------------------------------------------
-        $("<button>")
-            .prop({
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            //rotate Slide Code
+            const rotateAllIconAndSlideAllCode = () => {
+                const content_codingContainer = [
+                    ".content_coding_settingContainer",
+                    ".content_coding_configContainer",
+                    ".content_coding_preloadContainer",
+                    ".content_coding_createContainer",
+                    ".content_coding_updateContainer",
+                    ".content_coding_customContainer",
+                ]
+
+                if ($(".content_slide").attr("id") === "open") {
+                    ClickListening("", `全部收合-${s.text}-Code`)
+                    for (const codeContainer of content_codingContainer) {
+                        if ($(codeContainer).attr("id") === "open") {
+                            $(codeContainer).attr("id", "close").slideUp(300)
+                            $(".codeDownIcon").css(
+                                {
+                                    transform: "rotate(0deg)",
+                                },
+                                200
+                            )
+
+                            $(".content_slide").attr("id", "close").html("全部展開")
+                        }
+                    }
+                } else {
+                    ClickListening("", `全部展開-${s.text}-Code`)
+                    for (const codeContainer of content_codingContainer) {
+                        if ($(codeContainer).attr("id") === "close") {
+                            $(codeContainer).attr("id", "open").slideDown(300)
+                            $(".codeDownIcon").css(
+                                {
+                                    transform: "rotate(180deg)",
+                                },
+                                200
+                            )
+
+                            $(".content_slide").attr("id", "open").html("全部收合")
+                        }
+                    }
+                }
+            }
+            // 收合 button
+            $("<button>").prop({
                 className: "col-1 content_slide btn-outline-primary btn",
                 id: "open",
                 innerHTML: "全部收合",
-            })
-            .click(e => {
+            }).click(e => {
                 e.stopPropagation()
                 rotateAllIconAndSlideAllCode()
-            })
-            .appendTo(content_iconContainer)
-
+            }).appendTo(content_iconContainer)
+        }
         //question button
-        $("<button>")
-            .prop({
-                className: "col-1 btn btn-warning content_question",
-                innerHTML:
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
-                id: "LS_programmingHint",
-            })
-            .attr("data-bs-toggle", "modal")
-            .attr("data-bs-target", "#programmingHintModal")
-            .appendTo(content_iconContainer)
-
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            $("<button>")
+                .prop({
+                    className: "col-1 btn btn-warning content_question",
+                    innerHTML:
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
+                    id: "LS_programmingHint",
+                })
+                .attr("data-bs-toggle", "modal")
+                .attr("data-bs-target", "#programmingHintModal")
+                .appendTo(content_iconContainer)
+        }
         //complete Icon
         $("<div>")
             .prop({
@@ -889,119 +934,58 @@ const GoListFunc = {
                 case "Target":
                     TargetBox().appendTo(contentContainer)
 
-                    await studentClientConnect
-                        .getMaterial(NormalizeFunc.getFrontEndCode("courseId"))
-                        .then(response => {
-                            if (
-                                NormalizeFunc.serverResponseErrorDetect(
-                                    response
-                                )
-                            ) {
+                    if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+                        await studentClientConnect
+                            .getMaterial(NormalizeFunc.getFrontEndCode("courseId"))
+                            .then(response => {
+                                if (
+                                    NormalizeFunc.serverResponseErrorDetect(
+                                        response
+                                    )
+                                ) {
+                                    categoryBox.Target(response.data)
+                                    NormalizeFunc.loadingPage(false)
+                                }
+                            })
+                    } else {
+                        await studentClientConnect.cowork.getMaterial(NormalizeFunc.getFrontEndCode("courseId")).then(response => {
+                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
                                 categoryBox.Target(response.data)
                                 NormalizeFunc.loadingPage(false)
                             }
                         })
+                    }
+
                     break
                 case "Understanding":
-                case "Completed-Understanding":
-                case "Bonus-Understanding":
-                    UnderstandingBox().appendTo(contentContainer)
-
-                    await studentClientConnect
-                        .getUnderstanding(
-                            NormalizeFunc.getFrontEndCode("courseId"),
-                            s.key
-                        )
-                        .then(response => {
-                            if (
-                                NormalizeFunc.serverResponseErrorDetect(
-                                    response
-                                )
-                            ) {
-                                categoryBox.Understanding(response.data)
-                                NormalizeFunc.loadingPage(false)
-                            }
-                        })
+                    understandingContainer()
                     break
                 case "Formulating":
-                case "Completed-Formulating":
-                    FormulatingBox(s).appendTo(contentContainer)
-
-                    await studentClientConnect
-                        .getFormulating(
-                            NormalizeFunc.getFrontEndCode("courseId"),
-                            s.key
-                        )
-                        .then(response => {
-                            if (
-                                NormalizeFunc.serverResponseErrorDetect(
-                                    response
-                                )
-                            ) {
-                                categoryBox.Formulating(response.data)
-                                NormalizeFunc.loadingPage(false)
-                            }
-                        })
+                    formulatingContainer()
                     break
                 case "Programming":
-                case "Completed-Programming":
-                case "Bonus-Programming":
-                    ProgrammingBox(s).appendTo(contentContainer)
-
-                    //確認userId資料夾是否建立
-                    await studentClientConnect.createDemo().then(response => {
-                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                            //讀取該key值的Code內容
-                            studentClientConnect
-                                .readCode(
-                                    NormalizeFunc.getFrontEndCode("courseId"),
-                                    s.key
-                                )
-                                .then(response => {
-                                    if (
-                                        NormalizeFunc.serverResponseErrorDetect(
-                                            response
-                                        )
-                                    ) {
-                                        // listenMessageBind()
-                                        categoryBox.Programming(
-                                            response.data,
-                                            s.key
-                                        )
-                                        GoListFunc.saveCodeStatus(false)
-                                        NormalizeFunc.loadingPage(false)
-                                    }
-                                })
-                        }
-                    })
+                    programmingContainer()
                     break
                 case "Reflection":
-                case "Completed-Reflection":
-                case "Bonus-Reflection":
-                    ReflectionBox(s).appendTo(contentContainer)
-
-                    //讀取 reflection 內容
-                    await studentClientConnect
-                        .readReflection(
-                            NormalizeFunc.getFrontEndCode("courseId"),
-                            s.key
-                        )
-                        .then(response => {
-                            if (
-                                NormalizeFunc.serverResponseErrorDetect(
-                                    response
-                                )
-                            ) {
-                                categoryBox.Reflection(response.data.message)
-                                NormalizeFunc.loadingPage(false)
-                            }
-                        })
+                    reflectionContainer()
                     break
-                case "Comment":
-                    CommentBox(s).appendTo(contentContainer)
-                    NormalizeFunc.loadingPage(false)
+                // Complete 使用
+                case "Completed-Understanding":
+                    understandingContainer()
+                    break
+                case "Completed-Formulating":
+                    formulatingContainer()
+                    break
+                case "Completed-Programming":
+                    programmingContainer()
+                    break
+                case "Completed-Reflection":
+                    reflectionContainer()
                     break
                 // Bouns 使用
+                case "Bonus-Understanding":
+                    understandingContainer()
+                    break
                 case "Bonus-Formulating":
                     WriteFormulatingBox(s).appendTo(contentContainer)
 
@@ -1021,7 +1005,121 @@ const GoListFunc = {
                             }
                         })
                     break
+                case "Bonus-Programming":
+                    programmingContainer()
+                    break
+                case "Bonus-Reflection":
+                    reflectionContainer()
+                    break
+                // Comment 使用
+                case "Comment":
+                    CommentBox(s).appendTo(contentContainer)
+                    NormalizeFunc.loadingPage(false)
+                    break
             }
+        }
+
+        //understanding
+        async function understandingContainer() {
+            UnderstandingBox().appendTo(contentContainer)
+
+            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+                await studentClientConnect
+                    .getUnderstanding(
+                        NormalizeFunc.getFrontEndCode("courseId"),
+                        s.key
+                    )
+                    .then(response => {
+                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                            categoryBox.Understanding(response.data)
+                            NormalizeFunc.loadingPage(false)
+                        }
+                    })
+            } else {
+                await studentClientConnect.cowork.getUnderstanding(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        categoryBox.Understanding(response.data)
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
+            }
+        }
+        //formulating (expected bouns formulating)
+        async function formulatingContainer() {
+            FormulatingBox(s).appendTo(contentContainer)
+
+            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+                await studentClientConnect.getFormulating(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        categoryBox.Formulating(response.data)
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
+            } else {
+                await studentClientConnect.cowork.getFormulating(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        categoryBox.Formulating(response.data)
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
+            }
+
+        }
+        //programming
+        async function programmingContainer() {
+            ProgrammingBox(s).appendTo(contentContainer)
+
+            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+                //確認userId資料夾是否建立
+                await studentClientConnect.createDemo().then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        //讀取該key值的Code內容
+                        studentClientConnect.readCode(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
+                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                                categoryBox.Programming(response.data, s.key)
+                                GoListFunc.saveCodeStatus(false)
+                                NormalizeFunc.loadingPage(false)
+                            }
+                        })
+                    }
+                })
+            } else {
+                //確認userId資料夾是否建立
+                await studentClientConnect.cowork.createDemo().then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        //讀取該key值的Code內容
+                        studentClientConnect.cowork.readCode(NormalizeFunc.getFrontEndCode("courseId")).then(response => {
+                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                                categoryBox.Programming(response.data.message)
+                                GoListFunc.saveCodeStatus(false)
+                                NormalizeFunc.loadingPage(false)
+                            }
+                        })
+                    }
+                })
+            }
+
+        }
+        //reflection
+        async function reflectionContainer() {
+            ReflectionBox(s).appendTo(contentContainer)
+
+            //讀取 reflection 內容
+            await studentClientConnect
+                .readReflection(
+                    NormalizeFunc.getFrontEndCode("courseId"),
+                    s.key
+                )
+                .then(response => {
+                    if (
+                        NormalizeFunc.serverResponseErrorDetect(
+                            response
+                        )
+                    ) {
+                        categoryBox.Reflection(response.data.message)
+                        NormalizeFunc.loadingPage(false)
+                    }
+                })
         }
     },
 }
@@ -1078,7 +1176,7 @@ const CodeMirrorFunc = {
             //編譯模式
             mode: "text/javascript",
             //主題
-            theme: "blackboard",
+            theme: "material-ocean",
             //是否要行號
             lineNumbers: true,
             //開始行號
@@ -1089,7 +1187,7 @@ const CodeMirrorFunc = {
             //支持代碼折疊
             foldGutter: true,
             //摺疊順序[左到右]
-            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            gutters: ["CodeMirror-foldgutter", "CodeMirror-linenumbers"],
             //括號匹配
             matchBrackets: true,
             //縮排單位
@@ -1111,22 +1209,7 @@ const CodeMirrorFunc = {
             // cursorScrollMargin: 250,
             //光標高度
             cursorHeight: name == "tutorial" ? 0 : 0.85,
-            readOnly: name == isReadOnly,
-        })
-        Editor.on("inputRead", e => {
-            Editor.showHint()
-        })
-        Editor.on("change", e => {
-            $(".content_complete").animate(
-                {
-                    color: "black",
-                    border: "1px solid black",
-                    "font-size": "12px",
-                    "font-weight": "normal",
-                    opacity: "0.3",
-                },
-                500
-            )
+            readOnly: isReadOnly,
         })
 
         if (content == "") {
@@ -1137,22 +1220,51 @@ const CodeMirrorFunc = {
                 case "config":
                     Editor.setValue(
                         "//Config writing here\n" +
-                        "let config = {\n" +
-                        "type: Phaser.AUTO,\n" +
-                        "width: 1200,\n" +
-                        "height: 800,\n" +
-                        "scene: {\n" +
-                        "preload: preload,\n" +
-                        "create: create,\n" +
-                        "update: update\n" +
-                        "},\n" +
-                        'parent:"container",\n' +
-                        "};\n" +
-                        "let game = new Phaser.Game(config);\n"
+                        "const config = {\n" +
+                        "\ttype: Phaser.AUTO,\n" +
+                        "\twidth: 1200,\n" +
+                        "\theight: 800,\n" +
+                        "\tscene: {\n" +
+                        "\t\tpreload: preload,\n" +
+                        "\t\tcreate: create,\n" +
+                        "\t\tupdate: update\n" +
+                        "\t},\n" +
+                        "\tscale: {\n" +
+                        "\t\tmode: Phaser.Scale.FIT,\n" +
+                        "\t\tautoCenter: Phaser.Scale.CENTER_BOTH,\n" +
+                        "\t}," +
+                        '\tparent: "container",\n' +
+                        "};\n\n" +
+                        "const game = new Phaser.Game(config);\n"
                     )
                     break
                 case "custom":
                     Editor.setValue(`//all custom function writing here\n`)
+                    break
+                case 'coworkArea':
+                    Editor.setValue(
+                        `//Id:${NormalizeFunc.getFrontEndCode('chatRoomId')}\n` +
+                        "//這裡是共編區域，請與你的夥伴一同編寫該處程式。\n" +
+                        "//以下為初始設定\n" +
+                        "//※請注意:請勿更動 parent 設定，避免造成程式無法順利執行\n" +
+                        "const config = {\n" +
+                        "\ttype: Phaser.AUTO,\n" +
+                        "\twidth: 1200,\n" +
+                        "\theight: 800,\n" +
+                        "\tscene: {\n" +
+                        "\t\tpreload: preload,\n" +
+                        "\t\tcreate: create,\n" +
+                        "\t\tupdate: update\n" +
+                        "\t},\n" +
+                        "\tscale: {\n" +
+                        "\t\tmode: Phaser.Scale.FIT,\n" +
+                        "\t\tautoCenter: Phaser.Scale.CENTER_BOTH,\n" +
+                        "\t}," +
+                        '\tparent: "container",\n' +
+                        "};\n\n" +
+                        "const game = new Phaser.Game(config);\n" +
+                        "//請於以下開始您的程式"
+                    )
                     break
                 default:
                     Editor.setValue(
@@ -1165,6 +1277,36 @@ const CodeMirrorFunc = {
 
         //save the Instance
         $(`#${name}`).data("CodeMirror", Editor)
+        //監聽共編程式輸入
+        socketConnect.cowork.receiveUpdateCode()
+
+        Editor.on("change", (instance, obj) => {
+            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+                $(".content_complete").animate(
+                    {
+                        color: "black",
+                        border: "1px solid black",
+                        "font-size": "12px",
+                        "font-weight": "normal",
+                        opacity: "0.3",
+                    },
+                    500
+                )
+            } else {
+                const coworkCode = $('#coworkArea').data("CodeMirror")
+
+                studentClientConnect.cowork.saveCode(
+                    NormalizeFunc.getFrontEndCode("courseId"),
+                    coworkCode.getValue()
+                ).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) NormalizeFunc.loadingPage(false)
+                })
+            }
+
+        })
+        Editor.on("inputRead", (e, obj) => {
+            Editor.showHint()
+        })
     },
 }
 //------------------------------ Clicking Listening Function ------------------------------//

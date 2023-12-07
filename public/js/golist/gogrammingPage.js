@@ -641,81 +641,103 @@ const ProgrammingBox = programmingKey => {
         })
         .appendTo(contentRowDiv)
 
-    //Coding 分層
-    const content_codingContainer = [
-        {
-            title: "Setting",
-            container: "content_coding_settingContainer",
-            id: "setting",
-        },
-        {
-            title: "Config",
-            container: "content_coding_configContainer",
-            id: "config",
-        },
-        {
-            title: "Preload",
-            container: "content_coding_preloadContainer",
-            id: "preload",
-        },
-        {
-            title: "Create",
-            container: "content_coding_createContainer",
-            id: "create",
-        },
-        {
-            title: "Update",
-            container: "content_coding_updateContainer",
-            id: "update",
-        },
-        {
-            title: "Custom",
-            container: "content_coding_customContainer",
-            id: "custom",
-        },
-    ]
-    //render coding Area
-    for (const codingType of content_codingContainer) {
+    if (NormalizeFunc.getFrontEndCode('coworkStatus') === "N") {
+        //Coding 分層
+        const content_codingContainer = [
+            {
+                title: "Setting",
+                container: "content_coding_settingContainer",
+                id: "setting",
+            },
+            {
+                title: "Config",
+                container: "content_coding_configContainer",
+                id: "config",
+            },
+            {
+                title: "Preload",
+                container: "content_coding_preloadContainer",
+                id: "preload",
+            },
+            {
+                title: "Create",
+                container: "content_coding_createContainer",
+                id: "create",
+            },
+            {
+                title: "Update",
+                container: "content_coding_updateContainer",
+                id: "update",
+            },
+            {
+                title: "Custom",
+                container: "content_coding_customContainer",
+                id: "custom",
+            },
+        ]
+        //render coding Area
+        for (const codingType of content_codingContainer) {
+            const content_CodingContainer = $("<div>")
+                .prop({
+                    className: "container-fluid content_codingContainer",
+                })
+                .appendTo(content_CodingDiv)
+
+            //title Area
+            const content_CodingContainer_title = $("<div>")
+                .prop({
+                    className: "row content_codingContainer_title",
+                })
+                .click(e => {
+                    rotateIconAndSlideCode(
+                        content_CodingContainer_Code,
+                        downIcon,
+                        codingType.title
+                    )
+                })
+                .appendTo(content_CodingContainer)
+
+            $("<h3>")
+                .prop({
+                    className: "function_title col-10",
+                    innerHTML: codingType.title,
+                })
+                .appendTo(content_CodingContainer_title)
+
+            //DownIcon
+            const downIcon = $("<div>")
+                .prop({
+                    className: "col-2 codeDownIcon",
+                    innerHTML:
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" fill="white" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+                })
+                .appendTo(content_CodingContainer_title)
+
+            //Coding Area
+            const content_CodingContainer_Code = $("<div>")
+                .prop({
+                    className: `container-sm ${codingType.container}`,
+                    id: "open",
+                })
+                .appendTo(content_CodingContainer)
+            //textarea
+            $("<textarea>")
+                .prop({
+                    className: "form-control",
+                    id: codingType.id,
+                })
+                .appendTo(content_CodingContainer_Code)
+        }
+    } else {
         const content_CodingContainer = $("<div>")
             .prop({
                 className: "container-fluid content_codingContainer",
             })
             .appendTo(content_CodingDiv)
-
-        //title Area
-        const content_CodingContainer_title = $("<div>")
-            .prop({
-                className: "row content_codingContainer_title",
-            })
-            .click(e => {
-                rotateIconAndSlideCode(
-                    content_CodingContainer_Code,
-                    downIcon,
-                    codingType.title
-                )
-            })
-            .appendTo(content_CodingContainer)
-
-        $("<h3>")
-            .prop({
-                className: "function_title col-10",
-                innerHTML: codingType.title,
-            })
-            .appendTo(content_CodingContainer_title)
-
-        //DownIcon
-        const downIcon = $("<div>")
-            .prop({
-                className: "col-2 codeDownIcon",
-                innerHTML:
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" fill="white" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
-            })
-            .appendTo(content_CodingContainer_title)
-
         //Coding Area
         const content_CodingContainer_Code = $("<div>")
             .prop({
-                className: `container-sm ${codingType.container}`,
+                className: `container-sm content_coding_coworkAreaContainer`,
                 id: "open",
             })
             .appendTo(content_CodingContainer)
@@ -723,10 +745,11 @@ const ProgrammingBox = programmingKey => {
         $("<textarea>")
             .prop({
                 className: "form-control",
-                id: codingType.id,
+                id: 'coworkArea',
             })
             .appendTo(content_CodingContainer_Code)
     }
+
     //--------------------------------------------------------------
     //Button area
     const content_LaunchDiv = $("<div>")
@@ -743,9 +766,7 @@ const ProgrammingBox = programmingKey => {
             innerHTML:
                 '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
         })
-        .click(e => {
-            launchDemo()
-        })
+        .click(launchDemo)
         .appendTo(content_LaunchDiv)
 
     //save code
@@ -755,9 +776,7 @@ const ProgrammingBox = programmingKey => {
             innerHTML:
                 '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 448 512"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 416c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z"/></svg>',
         })
-        .click(e => {
-            saveCode()
-        })
+        .click(saveCode)
         .appendTo(content_LaunchDiv)
 
     //Save Btn
@@ -793,9 +812,7 @@ const ProgrammingBox = programmingKey => {
             innerHTML:
                 '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM216 408c0 13.3-10.7 24-24 24s-24-10.7-24-24V305.9l-31 31c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l72-72c9.4-9.4 24.6-9.4 33.9 0l72 72c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-31-31V408z"/></svg>',
         })
-        .click(e => {
-            uploadFileClick()
-        })
+        .click(uploadFileClick)
         .appendTo(content_LaunchDiv)
     //-----------------------------------------------------------------------
     //Data Visualization Area
@@ -866,63 +883,51 @@ const ProgrammingBox = programmingKey => {
         .appendTo(dataVisualization_container)
 
     // index file icon
-    $("<div>")
-        .prop({
-            className: "dataVisualizationArea_filedisk_icon",
-            id: "LS_programmingVisualizationArea_indexFileIcon",
-            innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg" width="5%" height="30px" fill="gray" style="transform:rotate(180deg);" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>' +
-                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="lightblue" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
-                "<p>index</p>",
-        }).click(e => {
-            e.stopPropagation()
-        }).appendTo(dataVisualizationArea_filedisk)
+    $("<div>").prop({
+        className: "dataVisualizationArea_filedisk_icon",
+        id: "LS_programmingVisualizationArea_indexFileIcon",
+        innerHTML:
+            '<svg xmlns="http://www.w3.org/2000/svg" width="5%" height="30px" fill="gray" style="transform:rotate(180deg);" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="lightblue" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
+            "<p>index</p>",
+    }).click(e => { e.stopPropagation() }).appendTo(dataVisualizationArea_filedisk)
     ////html icon
-    $("<div>")
-        .prop({
-            className: "dataVisualizationArea_filedisk_icon",
-            id: "LS_programmingVisualizationArea_htmlIcon",
-            innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="red" viewBox="0 0 384 512"><path d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>' +
-                "<p>index.html</p>",
-        })
-        .click(e => {
-            e.stopPropagation()
-            dataVisualizationArea_showing.empty()
-            dataVisualizationArea_showing.append(dataHtml())
-        })
-        .appendTo(dataVisualizationArea_filedisk)
+    $("<div>").prop({
+        className: "dataVisualizationArea_filedisk_icon",
+        id: "LS_programmingVisualizationArea_htmlIcon",
+        innerHTML:
+            '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="red" viewBox="0 0 384 512"><path d="M0 32l34.9 395.8L191.5 480l157.6-52.2L384 32H0zm308.2 127.9H124.4l4.1 49.4h175.6l-13.6 148.4-97.9 27v.3h-1.1l-98.7-27.3-6-75.8h47.7L138 320l53.5 14.5 53.7-14.5 6-62.2H84.3L71.5 112.2h241.1l-4.4 47.7z"/></svg>' +
+            "<p>index.html</p>",
+    }).click(e => {
+        e.stopPropagation()
+        dataVisualizationArea_showing.empty()
+        dataVisualizationArea_showing.append(dataHtml())
+    }).appendTo(dataVisualizationArea_filedisk)
     ////js icon
-    $("<div>")
-        .prop({
-            className: "dataVisualizationArea_filedisk_icon",
-            id: "LS_programmingVisualizationArea_jsIcon",
-            innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="orange" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>' +
-                "<p>script.js</p>",
-        })
-        .click(e => {
-            e.stopPropagation()
-            dataVisualizationArea_showing.empty()
-            dataVisualizationArea_showing.append(dataJs())
-        })
-        .appendTo(dataVisualizationArea_filedisk)
+    $("<div>").prop({
+        className: "dataVisualizationArea_filedisk_icon",
+        id: "LS_programmingVisualizationArea_jsIcon",
+        innerHTML:
+            '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="orange" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z"/></svg>' +
+            "<p>script.js</p>",
+    }).click(e => {
+        e.stopPropagation()
+        dataVisualizationArea_showing.empty()
+        dataVisualizationArea_showing.append(dataJs())
+    }).appendTo(dataVisualizationArea_filedisk)
     ////media folder icon
-    $("<div>")
-        .prop({
-            className: "dataVisualizationArea_filedisk_icon",
-            id: "LS_programmingVisualizationArea_fileIcon",
-            innerHTML:
-                '<svg xmlns="http://www.w3.org/2000/svg" width="5%" height="30px" fill="gray" style="transform:rotate(180deg);" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>' +
-                '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="lightblue" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
-                "<p>media</p>",
-        })
-        .click(e => {
-            e.stopPropagation()
-            dataVisualizationArea_showing.empty()
-            dataVisualizationArea_showing.append(dataMedia())
-        })
-        .appendTo(dataVisualizationArea_filedisk)
+    $("<div>").prop({
+        className: "dataVisualizationArea_filedisk_icon",
+        id: "LS_programmingVisualizationArea_fileIcon",
+        innerHTML:
+            '<svg xmlns="http://www.w3.org/2000/svg" width="5%" height="30px" fill="gray" style="transform:rotate(180deg);" viewBox="0 0 320 512"><path d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"/></svg>' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="30%" height="30px" fill="lightblue" viewBox="0 0 512 512"><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>' +
+            "<p>media</p>",
+    }).click(e => {
+        e.stopPropagation()
+        dataVisualizationArea_showing.empty()
+        dataVisualizationArea_showing.append(dataMedia())
+    }).appendTo(dataVisualizationArea_filedisk)
     //-----------------------------------------------------------------------
     //console error area
     // const consoleErrorArea = $('<div>').prop({
@@ -954,139 +959,59 @@ const ProgrammingBox = programmingKey => {
     // }).appendTo(consoleError_container)
     //--------------------------------------------------------------
     //Launch demo function
-    const launchDemo = async () => {
+    async function launchDemo() {
         NormalizeFunc.loadingPage(true)
-        //取得各階段程式碼
-        const settingCode = $("#setting").data("CodeMirror")
-        const configCode = $("#config").data("CodeMirror")
-        const preloadCode = $("#preload").data("CodeMirror")
-        const createCode = $("#create").data("CodeMirror")
-        const updateCode = $("#update").data("CodeMirror")
-        const customCode = $("#custom").data("CodeMirror")
+        ClickListening("", "執行-計畫執行-Code")
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            //取得各階段程式碼
+            const settingCode = $("#setting").data("CodeMirror")
+            const configCode = $("#config").data("CodeMirror")
+            const preloadCode = $("#preload").data("CodeMirror")
+            const createCode = $("#create").data("CodeMirror")
+            const updateCode = $("#update").data("CodeMirror")
+            const customCode = $("#custom").data("CodeMirror")
 
-        //重整Code Line 以便查詢錯誤位置
-        for (let name of [
-            "setting",
-            "config",
-            "preload",
-            "create",
-            "update",
-            "custom",
-        ]) {
-            $(`#${name}`)
-                .data("CodeMirror")
-                .setOption(
-                    "firstLineNumber",
-                    CodeMirrorFunc.swtichEditorNameToStartLineNumber(name)
+
+            //重整Code Line 以便查詢錯誤位置
+            for (let name of [
+                "setting",
+                "config",
+                "preload",
+                "create",
+                "update",
+                "custom",
+            ]) {
+                $(`#${name}`).data("CodeMirror").setOption("firstLineNumber", CodeMirrorFunc.swtichEditorNameToStartLineNumber(name))
+            }
+            await studentClientConnect
+                .launchDemo(
+                    settingCode.getValue(),
+                    configCode.getValue(),
+                    preloadCode.getValue(),
+                    createCode.getValue(),
+                    updateCode.getValue(),
+                    customCode.getValue()
                 )
-        }
-
-        await studentClientConnect
-            .launchDemo(
-                settingCode.getValue(),
-                configCode.getValue(),
-                preloadCode.getValue(),
-                createCode.getValue(),
-                updateCode.getValue(),
-                customCode.getValue()
-            )
-            .then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                    return response.data.message
-                }
-            })
-            .then(async response => {
-                if (!response) {
-                    return
-                }
-
-                $('.DemoDiv').remove()
-
-                const demoDiv = $("<div>")
-                    .prop({
-                        className: "container-fluid DemoDiv",
-                    })
-                    .prependTo($("body"))
-
-                const demoIframe = $("<div>")
-                    .prop({
-                        className:
-                            "row justify-content-start iframeContainer",
-                    })
-                    .appendTo(demoDiv)
-
-                const demoContent = $("<div>")
-                    .prop({
-                        className: "col-12 demoContent",
-                        id: "LS_programmingDemoContent_up",
-                    })
-                    .click(e => {
-                        if (
-                            demoContent.attr("id") ===
-                            "LS_programmingDemoContent_up"
-                        ) {
-                            demoContent.attr(
-                                "id",
-                                "LS_programmingDemoContent_down"
-                            )
-                            downIcon.css({
-                                transform: "rotate(180deg)",
-                            })
-                            demoContent.css({
-                                transform: "translateY(-10px)",
-                            })
-                        } else {
-                            demoContent.attr(
-                                "id",
-                                "LS_programmingDemoContent_up"
-                            )
-                            downIcon.css({
-                                transform: "rotate(0deg)",
-                            })
-                            demoContent.css({
-                                transform: "translateY(-95vh)",
-                            })
-                        }
-                    })
-                    .appendTo(demoIframe)
-
-                const demoIframeInfo = $("<iframe>")
-                    .prop({
-                        className: "col-12",
-                        id: "demoIframe",
-                        src: `../Access/${NormalizeFunc.getCookie("studentId")}/${response}/${response}.html`,
-                        sandBox: "allow-scripts",
-                        //document.cookie.split("; ")[1].split("=")[1]
-                        //cookie 0 token , cookie 1 studentId
-                    })
-                    .css({
-                        width: "100%",
-                        height: "95%",
-                        margin: "0 auto",
-                        "margin-top": "5px",
-                        border: "1px dashed black",
-                        "border-radius": "20px",
-                    })
-                    .appendTo(demoContent)
-                //DownIcon
-                const downIcon = $("<div>")
-                    .prop({
-                        className: "col-1 offset-md-5 downIcon",
-                        innerHTML:
-                            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
-                    })
-                    .appendTo(demoContent)
-
-                demoIframeInfo.on("load", e => {
-                    e.preventDefault()
-                    NormalizeFunc.loadingPage(false)
-                    demoContent.click()
+                .then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        renderDemoContainer(response.data.message)
+                        NormalizeFunc.loadingPage(false)
+                    }
                 })
 
+        } else {
+            const coworkCode = $('#coworkArea').data("CodeMirror")
+
+            await studentClientConnect.cowork.launchDemo(coworkCode.getValue()).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    renderDemoContainer(response.data.message)
+                    NormalizeFunc.loadingPage(false)
+                }
             })
+        }
     }
     //rotate
-    const rotateIconAndSlideCode = (container, icon, title) => {
+    async function rotateIconAndSlideCode(container, icon, title) {
         if (container.attr("id") === "open") {
             ClickListening("", `收合-計畫執行-程式之${title}`)
 
@@ -1111,45 +1036,53 @@ const ProgrammingBox = programmingKey => {
     }
 
     //save code function
-    const saveCode = async () => {
+    async function saveCode() {
         GoListFunc.saveCodeStatus(true)
-        //取得各階段程式碼
-        const settingCode = $("#setting").data("CodeMirror")
-        const configCode = $("#config").data("CodeMirror")
-        const preloadCode = $("#preload").data("CodeMirror")
-        const createCode = $("#create").data("CodeMirror")
-        const updateCode = $("#update").data("CodeMirror")
-        const customCode = $("#custom").data("CodeMirror")
-
         ClickListening("", "儲存-計畫執行-Code")
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            //取得各階段程式碼
+            const settingCode = $("#setting").data("CodeMirror")
+            const configCode = $("#config").data("CodeMirror")
+            const preloadCode = $("#preload").data("CodeMirror")
+            const createCode = $("#create").data("CodeMirror")
+            const updateCode = $("#update").data("CodeMirror")
+            const customCode = $("#custom").data("CodeMirror")
 
-        const keyCode = programmingKey.key
-        await studentClientConnect
-            .saveCode(
-                settingCode.getValue(),
-                configCode.getValue(),
-                preloadCode.getValue(),
-                createCode.getValue(),
-                updateCode.getValue(),
-                customCode.getValue(),
-                keyCode,
-                NormalizeFunc.getFrontEndCode("courseId")
-            )
-            .then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                    GoListFunc.saveCodeStatus(false)
-                }
+
+            const keyCode = programmingKey.key
+            await studentClientConnect
+                .saveCode(
+                    settingCode.getValue(),
+                    configCode.getValue(),
+                    preloadCode.getValue(),
+                    createCode.getValue(),
+                    updateCode.getValue(),
+                    customCode.getValue(),
+                    keyCode,
+                    NormalizeFunc.getFrontEndCode("courseId")
+                )
+                .then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) GoListFunc.saveCodeStatus(false)
+                })
+        } else {
+            const coworkCode = $('#coworkArea').data("CodeMirror")
+
+            await studentClientConnect.cowork.saveCode(NormalizeFunc.getFrontEndCode('courseId'), coworkCode.getValue()).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) GoListFunc.saveCodeStatus(false)
             })
+        }
+
     }
 
     //upload flie & click function
     //click
-    const uploadFileClick = async () => {
+    async function uploadFileClick() {
         //模擬Click隱藏之Input
         return $(".uploadfileInput").click()
     }
+
     //upload
-    const uploadFile = async files => {
+    async function uploadFile(files) {
         NormalizeFunc.loadingPage(true)
         let uploadFile = new FormData()
 
@@ -1162,7 +1095,7 @@ const ProgrammingBox = programmingKey => {
 
             //檢查檔案大小
             if (file.size >= NormalizeFunc.maximumSizeInMegaByte(20)) {
-                window.alert("上傳檔案禁止超過 20 MB")
+                window.alert("上傳檔案禁止超過 25 MB")
                 NormalizeFunc.loadingPage(false)
                 return
             }
@@ -1175,18 +1108,30 @@ const ProgrammingBox = programmingKey => {
             ) {
                 uploadFile.append("image", file)
             } else {
-                window.alert("上傳檔案僅限 png jpg jpeg , mp3")
+                window.alert("上傳檔案僅限 png jpg jpeg mp3")
                 NormalizeFunc.loadingPage(false)
                 return
             }
         }
-        await studentClientConnect.uploadFile(uploadFile).then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                NormalizeFunc.loadingPage(false)
-                $('.dataVisualizationArea_container').click()
-                $('#LS_programmingVisualizationArea_fileIcon').click()
-            }
-        })
+
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            await studentClientConnect.uploadFile(uploadFile).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    NormalizeFunc.loadingPage(false)
+                    $('.dataVisualizationArea_container').click()
+                    $('#LS_programmingVisualizationArea_fileIcon').click()
+                }
+            })
+        } else {
+            await studentClientConnect.cowork.uploadFile(uploadFile).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    NormalizeFunc.loadingPage(false)
+                    $('.dataVisualizationArea_container').click()
+                    $('#LS_programmingVisualizationArea_fileIcon').click()
+                }
+            })
+        }
+
     }
     //--------------------------------------------------------------
     //data Visualization function
@@ -1247,80 +1192,64 @@ const ProgrammingBox = programmingKey => {
             })
             .appendTo(datamediaContainer)
 
-        //搜尋file
-        studentClientConnect.searchFile().then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                //去除Loading畫面
-                datamediaLoading.remove()
-
-                if (response.data.files != undefined) {
-                    //製作 IMG 的列表圖
-                    for (let mediaFile of response.data.files) {
-                        const fileItem = $("<div>")
-                            .prop({
-                                className: "col-2 media_item",
-                                id: `programmingFile___${mediaFile.name}`,
-                                innerHTML:
-                                    `<img src=${mediaFile.src} style="width:40px;height:40px"></img>` +
-                                    `<p>${mediaFile.name}</p>`,
-                                name: mediaFile.name,
-                            })
-                            .hover(
-                                e => {
-                                    deleteIcon.fadeIn(200)
-                                },
-                                e => {
-                                    deleteIcon.fadeOut(50)
-                                }
-                            )
-                            .click(e => {
-                                e.stopPropagation()
-                            })
-                            .appendTo(datamediaContainer)
-
-                        const deleteIcon = $("<div>")
-                            .prop({
-                                innerHTML:
-                                    '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="10px" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>',
-                            })
-                            .css({
-                                display: "none",
-                                "background-color": "rgba(0,0,0,0.3)",
-                                width: "50%",
-                                "border-radius": "10px",
-                                margin: "0 auto",
-                                "transition-duration": "0.3s",
-                            })
-                            .hover(
-                                e => {
-                                    deleteIcon.css({
-                                        "background-color": "rgba(255,0,0,0.7)",
-                                    })
-                                },
-                                e => {
-                                    deleteIcon.css({
-                                        "background-color": "rgba(0,0,0,0.3)",
-                                    })
-                                }
-                            )
-                            .click(e => {
-                                e.stopPropagation()
-                                deleteMedia(fileItem)
-                            })
-                            .appendTo(fileItem)
-                    }
-                } else {
-                    $("<h3>")
-                        .prop({
-                            innerHTML: "no file exist",
-                        })
-                        .css({
-                            margin: "0 auto",
-                        })
-                        .appendTo(datamediaContainer)
+        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            //搜尋file
+            studentClientConnect.searchFile().then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    //去除Loading畫面
+                    datamediaLoading.remove()
+                    renderFileIcon(response.data.files, datamediaContainer)
                 }
+            })
+        } else {
+            studentClientConnect.cowork.searchFile(NormalizeFunc.getFrontEndCode('chatRoomId')).then(response => {
+                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    //去除Loading畫面
+                    datamediaLoading.remove()
+                    renderFileIcon(response.data.files, datamediaContainer)
+                }
+            })
+        }
+
+        function renderFileIcon(files, datamediaContainer) {
+            if (files != undefined) {
+                //製作 IMG 的列表圖
+                for (let mediaFile of files) {
+                    const fileItem = $("<div>")
+                        .prop({
+                            className: "col-2 media_item",
+                            id: `programmingFile___${mediaFile.name}`,
+                            innerHTML:
+                                `<img src=${mediaFile.src} style="width:40px;height:40px"></img>` +
+                                `<p>${mediaFile.name}</p>`,
+                            name: mediaFile.name,
+                        })
+                        .hover(e => { deleteIcon.fadeIn(200) }, e => { deleteIcon.fadeOut(50) })
+                        .click(e => { e.stopPropagation() })
+                        .appendTo(datamediaContainer)
+
+                    const deleteIcon = $("<div>")
+                        .prop({ innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="10px" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>', })
+                        .css({
+                            display: "none",
+                            "background-color": "rgba(0,0,0,0.3)",
+                            width: "50%",
+                            "border-radius": "10px",
+                            margin: "0 auto",
+                            "transition-duration": "0.3s",
+                        })
+                        .hover(e => { deleteIcon.css({ "background-color": "rgba(255,0,0,0.7)", }) }, e => { deleteIcon.css({ "background-color": "rgba(0,0,0,0.3)", }) })
+                        .click(e => {
+                            e.stopPropagation()
+                            deleteMedia(fileItem)
+                        })
+                        .appendTo(fileItem)
+                }
+            } else {
+                $("<h3>").prop({ innerHTML: "no file exist" }).css({ margin: "0 auto" }).appendTo(datamediaContainer)
             }
-        })
+        }
+
         return datamediaContainer
     }
     //delete Media
@@ -1336,6 +1265,90 @@ const ProgrammingBox = programmingKey => {
                 }
             })
         }
+    }
+
+    function renderDemoContainer(response) {
+        $('.DemoDiv').remove()
+        const demoDiv = $("<div>")
+            .prop({
+                className: "container-fluid DemoDiv",
+            })
+            .prependTo($("body"))
+
+        const demoIframe = $("<div>")
+            .prop({
+                className:
+                    "row justify-content-start iframeContainer",
+            })
+            .appendTo(demoDiv)
+
+        const demoContent = $("<div>")
+            .prop({
+                className: "col-12 demoContent",
+                id: "LS_programmingDemoContent_up",
+            })
+            .click(e => {
+                if (
+                    demoContent.attr("id") ===
+                    "LS_programmingDemoContent_up"
+                ) {
+                    demoContent.attr(
+                        "id",
+                        "LS_programmingDemoContent_down"
+                    )
+                    downIcon.css({
+                        transform: "rotate(180deg)",
+                    })
+                    demoContent.css({
+                        transform: "translateY(-10px)",
+                    })
+                } else {
+                    demoContent.attr(
+                        "id",
+                        "LS_programmingDemoContent_up"
+                    )
+                    downIcon.css({
+                        transform: "rotate(0deg)",
+                    })
+                    demoContent.css({
+                        transform: "translateY(-95vh)",
+                    })
+                }
+            })
+            .appendTo(demoIframe)
+
+        const demoIframeInfo = $("<iframe>")
+            .prop({
+                className: "col-12",
+                id: "demoIframe",
+                src: NormalizeFunc.getFrontEndCode('coworkStatus') === 'N' ?
+                    `../Access/${NormalizeFunc.getCookie("studentId")}/${response}/${response}.html` :
+                    `../../Cowork/${NormalizeFunc.getFrontEndCode('chatRoomId')}/${response}/${response}.html`,
+                sandBox: "allow-scripts"
+            })
+            .css({
+                width: "100%",
+                height: "95%",
+                margin: "0 auto",
+                "margin-top": "5px",
+                border: "1px dashed black",
+                "border-radius": "20px",
+            })
+            .appendTo(demoContent)
+        //DownIcon
+        const downIcon = $("<div>")
+            .prop({
+                className: "col-1 offset-md-5 downIcon",
+                innerHTML:
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+            })
+            .appendTo(demoContent)
+
+        demoIframeInfo.on("load", e => {
+            e.preventDefault()
+            NormalizeFunc.loadingPage(false)
+            demoContent.click()
+        })
     }
 
     return contentRowDiv

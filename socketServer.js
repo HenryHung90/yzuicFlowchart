@@ -63,6 +63,16 @@ const socketServer = (io) => {
 
             io.emit('re-sendMessage', JSON.stringify(messageData))
         })
+
+        // 收到滑鼠監聽事件
+        socket.on('sendMouseMove', async (message) => {
+            io.emit('re-sendMouseMove', message)
+        })
+
+        // 收到共編程式事件
+        socket.on('sendUpdateCode', async (message) => {
+            io.emit('re-sendUpdateCode', message)
+        })
     })
 }
 

@@ -46,7 +46,7 @@ const chatBoxInit = () => {
             .prop({
                 className: "input-group chatBox_MessageEnterBox",
                 innerHTML:
-                    '<textarea id="Message"  class="form-control" placeholder="輸入訊息" aria-label="輸入訊息" aria-describedby="button-addon2">',
+                    '<textarea id="Message" class="form-control chatBox_MessageEnterBox_Input" placeholder="..." aria-describedby="button-addon2">',
             })
             .appendTo(MessageBox)
 
@@ -130,39 +130,21 @@ const chatBoxInit = () => {
         let freshCount = 2
         $(MessageContent).on("scroll", () => {
             if ($(MessageContent).scrollTop() === 0) {
-                studentClientConnect
-                    .getMessageHistory(
-                        freshCount,
-                        NormalizeFunc.getFrontEndCode("chatRoomId")
-                    )
+                studentClientConnect.getMessageHistory(freshCount, NormalizeFunc.getFrontEndCode("chatRoomId"))
                     .then(response => {
                         if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                            const reverseMessage =
-                                response.data.message.reverse()
-                            const OffsetScrollTop = $(
-                                ".chatBox_MessageContent"
-                            )[0].scrollHeight
+                            const reverseMessage = response.data.message.reverse()
+                            const OffsetScrollTop = $(".chatBox_MessageContent")[0].scrollHeight
 
                             for (let messageHistory of reverseMessage) {
-                                if (
-                                    messageHistory.studentId ===
-                                    NormalizeFunc.getCookie("studentId")
-                                ) {
-                                    MessageType.sendMessage_History(
-                                        messageHistory
-                                    )
+                                if (messageHistory.studentId === NormalizeFunc.getCookie("studentId")) {
+                                    MessageType.sendMessage_History(messageHistory)
                                 } else {
                                     //別人傳則使用別人傳的模型
-                                    MessageType.receiveMessage_History(
-                                        messageHistory
-                                    )
+                                    MessageType.receiveMessage_History(messageHistory)
                                 }
                             }
-                            $(".chatBox_MessageContent").scrollTop(
-                                $(".chatBox_MessageContent")[0].scrollHeight -
-                                OffsetScrollTop -
-                                100
-                            )
+                            $(".chatBox_MessageContent").scrollTop($(".chatBox_MessageContent")[0].scrollHeight - OffsetScrollTop - 100)
                             freshCount++
                         }
                     })
