@@ -388,13 +388,13 @@ router.post('/updatechatroom', async (req, res) => {
     try {
         // 更新 Chatroom 部分
         await chatroomconfig.updateOne(
-            { chatRoomId: req.body.chatRoomId },
+            { chatRoomId: req.body.studentChatRoomId },
             { studentGroup: req.body.studentGroup }
         )
         for (const studentId of req.body.studentGroup) {
             await studentConfig.updateOne(
                 { studentClass: req.body.studentClass, studentId: studentId },
-                { studentChatRoomId: req.body.chatRoomId }
+                { studentChatRoomId: req.body.studentChatRoomId || "" }
             ).then(response => {
                 if (!response.acknowledged) {
                     res.json({
@@ -407,11 +407,11 @@ router.post('/updatechatroom', async (req, res) => {
         }
         // 更新共編部分
         await coworkconfig.updateOne(
-            { groupId: req.body.chatRoomId },
+            { groupId: req.body.studentChatRoomId },
             { studentGroup: req.body.studentGroup }
         )
         res.json({
-            message: `加入成功!\n房間ID:${req.body.chatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
+            message: `加入成功!\n房間ID:${req.body.studentChatRoomId}\n學生群組${req.body.studentGroup.map(value => { return value })}`,
             status: 200,
         })
     }
@@ -589,8 +589,28 @@ router.get('/getallstudent', async (req, res) => {
 // Admin 修改學生
 router.post('/updatestudent', async (req, res) => {
     try {
+        console.log(req.body)
         //刪除群組功能 removeChatRoom
         if (req.body.type === 'removeChatRoom') {
+            await studentConfig.updateOne(
+                { studentId: req.body.studentId, studentClass: req.body.studentClass },
+                { studentChatRoomId: "" }
+            ).then(response => {
+                if (!response.acknowledged) {
+                    res.json({
+                        message: "刪除失敗",
+                        status: 500
+                    })
+                    return
+                }
+                res.json({
+                    message: "success",
+                    status: 200
+                })
+            })
+        }
+        //增加群組功能 addChatRoom
+        if (req.body.type === 'addChatRoom'){
             await studentConfig.updateOne(
                 { studentId: req.body.studentId, studentClass: req.body.studentClass },
                 { studentChatRoomId: "" }

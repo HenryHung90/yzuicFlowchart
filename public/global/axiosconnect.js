@@ -652,10 +652,11 @@ const adminClientConnect = {
         },
     // 更新學生資料
     updateStudent:
-        (type, studentId, studentClass, switchConfirm) => {
+        (type, studentId, studentClass, switchConfirm, studentChatRoomId) => {
             // type
             // removeChatRoom => 刪除 Group
             // switchCowork => 合作功能開啟關閉
+            // addChatRoom => 加入 Group
             return (
                 axios({
                     method: 'post',
@@ -664,7 +665,8 @@ const adminClientConnect = {
                         type: type,
                         studentId: studentId,
                         studentClass: studentClass,
-                        switchConfirm: switchConfirm || null
+                        switchConfirm: switchConfirm || null,
+                        studentChatRoomId: studentChatRoomId
                     }
                 })
             )
@@ -778,13 +780,13 @@ const adminClientConnect = {
         },
     // 更新單一 Group
     updateStudentGroup:
-        (chatRoomId, studentGroup, studentClass) => {
+        (studentChatRoomId, studentGroup, studentClass) => {
             return (
                 axios({
                     method: 'post',
                     url: '/admin/updatechatroom',
                     data: {
-                        chatRoomId: chatRoomId,
+                        studentChatRoomId: studentChatRoomId,
                         studentGroup: studentGroup,
                         studentClass: studentClass
                     }

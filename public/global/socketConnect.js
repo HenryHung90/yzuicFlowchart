@@ -117,20 +117,32 @@ const socketConnect = {
                 if (reciveMessage.chatRoomId === NormalizeFunc.getFrontEndCode('chatRoomId') &&
                     reciveMessage.studentId !== NormalizeFunc.getFrontEndCode('studentId')
                 ) {
-                    $('#coworkArea').data("CodeMirror").off('change', emitUpdateCode)
-                    $('#coworkArea').data("CodeMirror").replaceRange(
-                        reciveMessage.text,
-                        reciveMessage.lineFrom,
-                        reciveMessage.lineTo,
-                        reciveMessage.origin
-                    )
-                    $('#coworkArea').data("CodeMirror").on('change', emitUpdateCode)
+                    turnChangeEventOff(replaceCode, turnChangeEventOn)
+
                 }
             })
 
             function emitUpdateCode(instance, obj) {
-                console.log(obj)
                 socketConnect.cowork.updateCode(obj.text, obj.from, obj.to, obj.origin)
+            }
+
+            async function turnChangeEventOff(replaceCode, evenOn) {
+                await $('#coworkArea').data("CodeMirror").off('change', emitUpdateCode)
+                await replaceCode()
+                await evenOn()
+            }
+
+            function replaceCode() {
+                $('#coworkArea').data("CodeMirror").replaceRange(
+                    reciveMessage.text,
+                    reciveMessage.lineFrom,
+                    reciveMessage.lineTo,
+                    reciveMessage.origin
+                )
+            }
+
+            function turnChangeEventOn() {
+                $('#coworkArea').data("CodeMirror").on('change', emitUpdateCode)
             }
         }
     }

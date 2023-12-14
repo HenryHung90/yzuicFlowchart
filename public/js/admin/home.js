@@ -1017,7 +1017,14 @@ const renderGroup = async () => {
 
             const groupInfoData = await adminClientConnect.getStudentGroup(chatRoomId).then(response => { return response.data.message })
             // 加入新學生
-            if (groupInfoData.studentGroup.indexOf(studentId) === -1) groupInfoData.studentGroup.push(studentId)
+            if (groupInfoData.studentGroup.indexOf(studentId) === -1) {
+                groupInfoData.studentGroup.push(studentId)
+                await adminClientConnect.updateStudent('addChatRoom', studentId, groupInfoData.class, null, chatRoomId).then(response => {
+                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        alert(response.data.message)
+                    }
+                })
+            }
             else {
                 //刪除原群組的學生
                 groupInfoData.studentGroup.splice(groupInfoData.studentGroup.indexOf(studentId), 1)
