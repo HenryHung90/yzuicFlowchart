@@ -25,9 +25,11 @@ function converDangerString(string) {
     return outputString.join("")
 }
 
-const socketServer = (io) => {
-    io.on('connection', (socket) => {
-        // 收到進入房間資資訊
+const socketServer = async (io) => {
+    io.of(/room_[a-zA-Z0-9]+/).on('connection', socket => {
+        // console.log(socket.nsp.name.split("_")[1])
+        const socketRoomUser = socket.nsp.adapter.rooms
+        // 收到進入房間資訊
         socket.on('enterRoom', async (message) => {
             const messageData = JSON.parse(message)
 
@@ -37,7 +39,12 @@ const socketServer = (io) => {
             socket.emit('re-enterRoom', JSON.stringify(chatHistory))
 
             //告訴所有人你進來了
-            io.emit('re-enterRoom', message)
+            socket.nsp.emit('re-enterRoom', message)
+            socket.nsp.emit('roomNumber', socketRoomUser.size)
+        })
+        // 收到離開房間資訊
+        socket.on('leaveRoom', async (message) => {
+            socket.nsp.emit('re-leaveRoom', message)
         })
 
         // 收到訊息
@@ -61,17 +68,27 @@ const socketServer = (io) => {
                 messageHistory: chatData.messageHistory
             })
 
-            io.emit('re-sendMessage', JSON.stringify(messageData))
+            socket.nsp.emit('re-sendMessage', JSON.stringify(messageData))
         })
 
         // 收到滑鼠監聽事件
         socket.on('sendMouseMove', async (message) => {
-            io.emit('re-sendMouseMove', message)
+            socket.nsp.emit('re-sendMouseMove', message)
         })
 
         // 收到共編程式事件
         socket.on('sendUpdateCode', async (message) => {
-            io.emit('re-sendUpdateCode', message)
+            socket.nsp.emit('re-sendUpdateCode', message)
+        })
+
+        // 收到執行程式事件
+        socket.on("executeProject", async (message) => {
+            socket.nsp.emit('re-executeProject', message)
+        })
+
+        // 收到離開房間訊息
+        socket.on('disconnect', async (type) => {
+            socket.nsp.emit('roomNumber', socketRoomUser.size)
         })
     })
 }

@@ -1,4 +1,4 @@
-import { NormalizeFunc } from "./common.js"
+import customizeOperation from "./customizeOperation.js"
 
 const studentClientConnect = {
     // 登入
@@ -146,14 +146,14 @@ const studentClientConnect = {
     //readCode
     readCode:
         (courseId, keyCode) => {
-            if (NormalizeFunc.getCookie('adminId')) {
+            if (customizeOperation.getCookie('adminId')) {
                 return (
                     axios({
                         method: 'post',
                         url: '/admin/readcode',
                         data: {
-                            studentId: NormalizeFunc.getFrontEndCode('studentId'),
-                            courseId: NormalizeFunc.getFrontEndCode('courseId'),
+                            studentId: customizeOperation.getFrontEndCode('studentId'),
+                            courseId: customizeOperation.getFrontEndCode('courseId'),
                             keyCode: keyCode
                         }
                     })
@@ -173,7 +173,7 @@ const studentClientConnect = {
     //saveCode
     saveCode:
         (setting, config, preload, create, update, custom, keyCode, courseId) => {
-            if (NormalizeFunc.getCookie('adminId')) {
+            if (customizeOperation.getCookie('adminId')) {
                 return (
                     axios({
                         url: '/admin/skip',
@@ -215,13 +215,13 @@ const studentClientConnect = {
     //demo-----------------------------------------
     launchDemo:
         (setting, config, preload, create, update, custom) => {
-            if (NormalizeFunc.getCookie('adminId')) {
+            if (customizeOperation.getCookie('adminId')) {
                 return (
                     axios({
                         url: '/launch/launchdemo',
                         method: 'post',
                         data: {
-                            studentId: NormalizeFunc.getFrontEndCode("studentId"),
+                            studentId: customizeOperation.getFrontEndCode("studentId"),
                             setting: setting,
                             config: config,
                             preload: preload,
@@ -250,13 +250,13 @@ const studentClientConnect = {
         },
     createDemo:
         () => {
-            if (NormalizeFunc.getCookie('adminId')) {
+            if (customizeOperation.getCookie('adminId')) {
                 return (
                     axios({
                         url: '/launch/createdemo',
                         method: 'post',
                         data: {
-                            studentId: NormalizeFunc.getFrontEndCode("studentId"),
+                            studentId: customizeOperation.getFrontEndCode("studentId"),
                         }
                     })
                 )
@@ -508,7 +508,7 @@ const studentClientConnect = {
     // 暫存 Reflection
     tempSaveReflection:
         (courseId, key, learning, workhard, difficult, scoring) => {
-            if (NormalizeFunc.getCookie("adminId")) {
+            if (customizeOperation.getCookie("adminId")) {
                 return (
                     axios({
                         method: 'post',
@@ -534,7 +534,7 @@ const studentClientConnect = {
     // 送出 Reflection
     saveReflection:
         (courseId, key, learning, workhard, difficult, scoring) => {
-            if (NormalizeFunc.getCookie("adminId")) {
+            if (customizeOperation.getCookie("adminId")) {
                 return (
                     axios({
                         method: 'post',
@@ -560,13 +560,13 @@ const studentClientConnect = {
     // 讀取 Reflection
     readReflection:
         (courseId, key) => {
-            if (NormalizeFunc.getCookie("adminId")) {
+            if (customizeOperation.getCookie("adminId")) {
                 return (
                     axios({
                         method: 'post',
                         url: '/admin/readreflection',
                         data: {
-                            studentId: NormalizeFunc.getFrontEndCode("studentId"),
+                            studentId: customizeOperation.getFrontEndCode("studentId"),
                             courseId: courseId,
                             key: key
                         }

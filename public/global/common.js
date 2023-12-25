@@ -17,106 +17,13 @@ import {
 } from "../js/admin/golist/gogrammingPage.js"
 import { adminClientConnect, studentClientConnect } from "./axiosconnect.js"
 import { socketConnect } from "./socketConnect.js"
+import customizeOperation from "./customizeOperation.js"
 
-//------------------------------ normal function ------------------------------//]
-const NormalizeFunc = {
-    //loading Page
-    loadingPage: state => {
-        if (state) {
-            $(".loadingContainer").css('top', $(document).scrollTop())
-            $(".loadingContainer").fadeIn(200)
-        } else {
-            $(".loadingContainer").fadeOut(200)
-        }
-    },
-    //與 server 聯繫進行偵錯
-    serverResponseErrorDetect: response => {
-        // status sign meaning
-        // status 200 => success
-        // status 500 => server error
-        // status 501 => empty
-        // status 404 => error
-        // status 401 => account error
-        switch (response.data.status) {
-            case 200:
-                return true
-            case 500:
-                window.alert(response.data.message)
-                return false
-            case 501:
-                if (response.data.message) window.alert(response.data.message)
-                return true
-            case 404:
-                window.alert(response.data.message || "Error 請重新整理網頁")
-                return false
-            case 401:
-                window.alert(response.data.message)
-                NormalizeFunc.loadingPage(false)
-                return false
-        }
-    },
-    //取得 cookie值
-    getCookie: name => {
-        let value = "; " + document.cookie
-        let parts = value.split("; " + name + "=")
-        if (parts.length == 2) return parts.pop().split(";").shift()
-    },
-    //取得 當前時間
-    getNowTime: type => {
-        const date = new Date()
-        let hour = date.getHours()
-        let minute = date.getMinutes()
-        let second = date.getSeconds()
 
-        if (hour.toString().length === 1) {
-            hour = "0" + hour
-        }
-        if (minute.toString().length === 1) {
-            minute = "0" + minute
-        }
-        if (second.toString().length === 1) {
-            second = "0" + second
-        }
-
-        switch (type) {
-            case "SimpleTime":
-                return hour + ":" + minute
-            case "SecondTime":
-                return hour + ":" + minute + ":" + second
-            case "FullTime":
-                return `${date.getFullYear()}/${date.getMonth() + 1
-                    }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
-        }
-    },
-    //取得 Front-end Code
-    getFrontEndCode: id => {
-        return $.trim($(`#${id}`).text())
-    },
-    //calculate maximumSizeInMegaByte
-    maximumSizeInMegaByte: Byte => {
-        //MB -> KB -> Byte
-        return Byte * 1024 * 1024
-    },
-    //return Download xlsx
-    downloadDataToExcel: async (workbookTitle, worksheetData, worksheetName) => {
-        // console.log(workbookTitle, worksheetData, worksheetName)
-        const workbook = XLSX.utils.book_new();
-        worksheetData.map((dataValue, dataIndex) => {
-            XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
-            //Binary string
-            // XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
-            if (dataIndex == worksheetData.length - 1) {
-                const Month = new Date().getMonth();
-                const Today = new Date().getDate();
-                XLSX.writeFile(workbook, `${workbookTitle}_${Month}\/${Today}.xls`);
-            }
-        })
-    }
-}
 //------------------------------ category Box Function -----------------------------------//
 const categoryBox = {
     Target: data => {
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             $(".targetIframe").attr(
                 "src",
                 `../Material/${data.message}/full/index.html`
@@ -150,7 +57,7 @@ const categoryBox = {
 
         //starting 移植部分
         // 設定 Iframe 跑的　demo
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             $("#startIframe").attr("src", `../Material${data.message.startingData.material}`)
             // 設定 button click 事件
             $("#start_launchbtn").click(e => {
@@ -332,7 +239,7 @@ const categoryBox = {
         }
     },
     Programming: (data, key) => {
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             let codeData = [
                 { name: "setting", data: "" },
                 { name: "config", data: "" },
@@ -561,7 +468,7 @@ const GoListFunc = {
     showContainer: async (s, id) => {
         ClickListening("", `打開-Task ${s.key} ${s.text}`)
         // 設定共編進入區域
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === "Y") {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
             socketConnect.cowork.selectionArea = s.key
         }
         // //取得 Iframe 發出之 Error 警訊
@@ -597,7 +504,7 @@ const GoListFunc = {
         const closePage = () => {
             ClickListening("", `離開-${s.text}`)
             // 設定共編進入區域
-            if (NormalizeFunc.getFrontEndCode('coworkStatus') === "Y") {
+            if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
                 socketConnect.cowork.selectionArea = 'golist'
             }
             //關閉自動儲存
@@ -607,8 +514,8 @@ const GoListFunc = {
                 s.category === "Completed-Programming" ||
                 s.category === "Bonus-Programming"
             ) {
-                NormalizeFunc.loadingPage(true)
-                if (NormalizeFunc.getFrontEndCode('coworkStatus') === "N") {
+                customizeOperation.loadingPage(true)
+                if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
                     const settingCode = $("#setting").data("CodeMirror")
                     const configCode = $("#config").data("CodeMirror")
                     const preloadCode = $("#preload").data("CodeMirror")
@@ -626,22 +533,25 @@ const GoListFunc = {
                             updateCode.getValue(),
                             customCode.getValue(),
                             keyCode,
-                            NormalizeFunc.getFrontEndCode("courseId")
+                            customizeOperation.getFrontEndCode("courseId")
                         )
                         .then(response => {
-                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                                NormalizeFunc.loadingPage(false)
+                            if (customizeOperation.serverResponseErrorDetect(response)) {
+                                customizeOperation.loadingPage(false)
                             }
                         })
                 } else {
                     const coworkCode = $('#coworkArea').data("CodeMirror")
 
                     studentClientConnect.cowork.saveCode(
-                        NormalizeFunc.getFrontEndCode("courseId"),
+                        customizeOperation.getFrontEndCode("courseId"),
                         coworkCode.getValue()
                     ).then(response => {
-                        if (NormalizeFunc.serverResponseErrorDetect(response)) NormalizeFunc.loadingPage(false)
+                        if (customizeOperation.serverResponseErrorDetect(response)) customizeOperation.loadingPage(false)
                     })
+
+                    // 關閉共編程式監聽
+                    socketConnect.cowork.closeReceiveUpdateCode()
                 }
 
             }
@@ -661,7 +571,7 @@ const GoListFunc = {
                         ].id.split("_")[1]
                     )
 
-                    NormalizeFunc.loadingPage(true)
+                    customizeOperation.loadingPage(true)
 
                     let codeData = []
 
@@ -684,33 +594,33 @@ const GoListFunc = {
 
                     studentClientConnect
                         .saveWriteFormulating(
-                            NormalizeFunc.getFrontEndCode("courseId"),
+                            customizeOperation.getFrontEndCode("courseId"),
                             s.key,
                             formulatingData
                         )
                         .then(response => {
                             if (
-                                NormalizeFunc.serverResponseErrorDetect(
+                                customizeOperation.serverResponseErrorDetect(
                                     response
                                 )
                             ) {
-                                NormalizeFunc.loadingPage(false)
+                                customizeOperation.loadingPage(false)
                             }
                         })
                 } else {
                     studentClientConnect
                         .saveWriteFormulating(
-                            NormalizeFunc.getFrontEndCode("courseId"),
+                            customizeOperation.getFrontEndCode("courseId"),
                             s.key,
                             []
                         )
                         .then(response => {
                             if (
-                                NormalizeFunc.serverResponseErrorDetect(
+                                customizeOperation.serverResponseErrorDetect(
                                     response
                                 )
                             ) {
-                                NormalizeFunc.loadingPage(false)
+                                customizeOperation.loadingPage(false)
                             }
                         })
                 }
@@ -722,17 +632,17 @@ const GoListFunc = {
             //Auto save For Reflection and Bonus-Reflection----------
             if (s.category === "Reflection" || s.category === "Bonus-Reflection" || s.category === "Completed-Reflection") {
                 ClickListening("", `暫存-監控反思`)
-                NormalizeFunc.loadingPage(true)
+                customizeOperation.loadingPage(true)
                 studentClientConnect.tempSaveReflection(
-                    NormalizeFunc.getFrontEndCode("courseId"),
+                    customizeOperation.getFrontEndCode("courseId"),
                     s.key,
                     $("#learningValue").val(),
                     $("#workhardValue").val(),
                     $("#difficultValue").val(),
                     $("#scoringValue").val()
                 ).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        NormalizeFunc.loadingPage(false)
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        customizeOperation.loadingPage(false)
                     }
                 })
             }
@@ -769,7 +679,7 @@ const GoListFunc = {
         $("body").css({
             overflow: "hidden",
         })
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
 
         //blocking
         const block = $("<div>").prop({
@@ -832,7 +742,7 @@ const GoListFunc = {
             })
             .appendTo(content_iconContainer)
         //------------------------------------------------
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //rotate Slide Code
             const rotateAllIconAndSlideAllCode = () => {
                 const content_codingContainer = [
@@ -887,7 +797,7 @@ const GoListFunc = {
             }).appendTo(content_iconContainer)
         }
         //question button
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             $("<button>")
                 .prop({
                     className: "col-1 btn btn-warning content_question",
@@ -934,24 +844,24 @@ const GoListFunc = {
                 case "Target":
                     TargetBox().appendTo(contentContainer)
 
-                    if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+                    if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                         await studentClientConnect
-                            .getMaterial(NormalizeFunc.getFrontEndCode("courseId"))
+                            .getMaterial(customizeOperation.getFrontEndCode("courseId"))
                             .then(response => {
                                 if (
-                                    NormalizeFunc.serverResponseErrorDetect(
+                                    customizeOperation.serverResponseErrorDetect(
                                         response
                                     )
                                 ) {
                                     categoryBox.Target(response.data)
-                                    NormalizeFunc.loadingPage(false)
+                                    customizeOperation.loadingPage(false)
                                 }
                             })
                     } else {
-                        await studentClientConnect.cowork.getMaterial(NormalizeFunc.getFrontEndCode("courseId")).then(response => {
-                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        await studentClientConnect.cowork.getMaterial(customizeOperation.getFrontEndCode("courseId")).then(response => {
+                            if (customizeOperation.serverResponseErrorDetect(response)) {
                                 categoryBox.Target(response.data)
-                                NormalizeFunc.loadingPage(false)
+                                customizeOperation.loadingPage(false)
                             }
                         })
                     }
@@ -991,17 +901,17 @@ const GoListFunc = {
 
                     await studentClientConnect
                         .getWriteFormulating(
-                            NormalizeFunc.getFrontEndCode("courseId"),
+                            customizeOperation.getFrontEndCode("courseId"),
                             s.key
                         )
                         .then(response => {
                             if (
-                                NormalizeFunc.serverResponseErrorDetect(
+                                customizeOperation.serverResponseErrorDetect(
                                     response
                                 )
                             ) {
                                 categoryBox.WriteFormulating(response.data)
-                                NormalizeFunc.loadingPage(false)
+                                customizeOperation.loadingPage(false)
                             }
                         })
                     break
@@ -1014,7 +924,7 @@ const GoListFunc = {
                 // Comment 使用
                 case "Comment":
                     CommentBox(s).appendTo(contentContainer)
-                    NormalizeFunc.loadingPage(false)
+                    customizeOperation.loadingPage(false)
                     break
             }
         }
@@ -1023,23 +933,23 @@ const GoListFunc = {
         async function understandingContainer() {
             UnderstandingBox().appendTo(contentContainer)
 
-            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 await studentClientConnect
                     .getUnderstanding(
-                        NormalizeFunc.getFrontEndCode("courseId"),
+                        customizeOperation.getFrontEndCode("courseId"),
                         s.key
                     )
                     .then(response => {
-                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
                             categoryBox.Understanding(response.data)
-                            NormalizeFunc.loadingPage(false)
+                            customizeOperation.loadingPage(false)
                         }
                     })
             } else {
-                await studentClientConnect.cowork.getUnderstanding(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                await studentClientConnect.cowork.getUnderstanding(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         categoryBox.Understanding(response.data)
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.loadingPage(false)
                     }
                 })
             }
@@ -1048,18 +958,18 @@ const GoListFunc = {
         async function formulatingContainer() {
             FormulatingBox(s).appendTo(contentContainer)
 
-            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
-                await studentClientConnect.getFormulating(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
+                await studentClientConnect.getFormulating(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         categoryBox.Formulating(response.data)
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.loadingPage(false)
                     }
                 })
             } else {
-                await studentClientConnect.cowork.getFormulating(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                await studentClientConnect.cowork.getFormulating(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         categoryBox.Formulating(response.data)
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.loadingPage(false)
                     }
                 })
             }
@@ -1069,16 +979,16 @@ const GoListFunc = {
         async function programmingContainer() {
             ProgrammingBox(s).appendTo(contentContainer)
 
-            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 //確認userId資料夾是否建立
                 await studentClientConnect.createDemo().then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         //讀取該key值的Code內容
-                        studentClientConnect.readCode(NormalizeFunc.getFrontEndCode("courseId"), s.key).then(response => {
-                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        studentClientConnect.readCode(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
+                            if (customizeOperation.serverResponseErrorDetect(response)) {
                                 categoryBox.Programming(response.data, s.key)
                                 GoListFunc.saveCodeStatus(false)
-                                NormalizeFunc.loadingPage(false)
+                                customizeOperation.loadingPage(false)
                             }
                         })
                     }
@@ -1086,13 +996,13 @@ const GoListFunc = {
             } else {
                 //確認userId資料夾是否建立
                 await studentClientConnect.cowork.createDemo().then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         //讀取該key值的Code內容
-                        studentClientConnect.cowork.readCode(NormalizeFunc.getFrontEndCode("courseId")).then(response => {
-                            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        studentClientConnect.cowork.readCode(customizeOperation.getFrontEndCode("courseId")).then(response => {
+                            if (customizeOperation.serverResponseErrorDetect(response)) {
                                 categoryBox.Programming(response.data.message)
                                 GoListFunc.saveCodeStatus(false)
-                                NormalizeFunc.loadingPage(false)
+                                customizeOperation.loadingPage(false)
                             }
                         })
                     }
@@ -1107,17 +1017,17 @@ const GoListFunc = {
             //讀取 reflection 內容
             await studentClientConnect
                 .readReflection(
-                    NormalizeFunc.getFrontEndCode("courseId"),
+                    customizeOperation.getFrontEndCode("courseId"),
                     s.key
                 )
                 .then(response => {
                     if (
-                        NormalizeFunc.serverResponseErrorDetect(
+                        customizeOperation.serverResponseErrorDetect(
                             response
                         )
                     ) {
                         categoryBox.Reflection(response.data.message)
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.loadingPage(false)
                     }
                 })
         }
@@ -1243,7 +1153,7 @@ const CodeMirrorFunc = {
                     break
                 case 'coworkArea':
                     Editor.setValue(
-                        `//Id:${NormalizeFunc.getFrontEndCode('chatRoomId')}\n` +
+                        `//Id:${customizeOperation.getFrontEndCode('chatRoomId')}\n` +
                         "//這裡是共編區域，請與你的夥伴一同編寫該處程式。\n" +
                         "//以下為初始設定\n" +
                         "//※請注意:請勿更動 parent 設定，避免造成程式無法順利執行\n" +
@@ -1278,10 +1188,11 @@ const CodeMirrorFunc = {
         //save the Instance
         $(`#${name}`).data("CodeMirror", Editor)
         //監聽共編程式輸入
-        socketConnect.cowork.receiveUpdateCode()
+        if (name === 'coworkArea') socketConnect.cowork.receiveUpdateCode()
+
 
         Editor.on("change", (instance, obj) => {
-            if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+            if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 $(".content_complete").animate(
                     {
                         color: "black",
@@ -1296,10 +1207,10 @@ const CodeMirrorFunc = {
                 const coworkCode = $('#coworkArea').data("CodeMirror")
 
                 studentClientConnect.cowork.saveCode(
-                    NormalizeFunc.getFrontEndCode("courseId"),
+                    customizeOperation.getFrontEndCode("courseId"),
                     coworkCode.getValue()
                 ).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) NormalizeFunc.loadingPage(false)
+                    if (customizeOperation.serverResponseErrorDetect(response)) customizeOperation.loadingPage(false)
                 })
             }
 
@@ -1311,7 +1222,7 @@ const CodeMirrorFunc = {
 }
 //------------------------------ Clicking Listening Function ------------------------------//
 function ClickListening(e, customClick) {
-    if (NormalizeFunc.getCookie("adminId")) {
+    if (customizeOperation.getCookie("adminId")) {
         return
     }
     // /\s/g 是一個正則表達式，表示匹配所有空格字符。g 是全局匹配，會匹配到所有空格字符。
@@ -1378,7 +1289,7 @@ function ClickListening(e, customClick) {
         ["chatBox_Open", "關閉-聊天室"],
     ])
 
-    const time = NormalizeFunc.getNowTime("FullTime")
+    const time = customizeOperation.getNowTime("FullTime")
     //製作序列，避免點到 svg path 之類的找不到正確 id
     let operation
     let checkingMap
@@ -1440,7 +1351,7 @@ function ClickListening(e, customClick) {
 
     // operation => [0]operation , [1]keyName , [2]detail
 
-    const description = `${NormalizeFunc.getCookie("studentId")} 在 ${time} ${courseTitle} ${operation}`
+    const description = `${customizeOperation.getCookie("studentId")} 在 ${time} ${courseTitle} ${operation}`
 
     const tempOperation = operation.split("-")
     operation = tempOperation[0]
@@ -1491,10 +1402,10 @@ function ClickListening(e, customClick) {
             description
         )
         .then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 return
             }
         })
 }
 
-export { NormalizeFunc, GoListFunc, CodeMirrorFunc, ClickListening }
+export { GoListFunc, CodeMirrorFunc, ClickListening }

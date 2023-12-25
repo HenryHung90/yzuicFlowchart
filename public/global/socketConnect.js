@@ -1,30 +1,38 @@
 import { io } from "https:/cdn.socket.io/4.3.2/socket.io.esm.min.js"
-import { NormalizeFunc } from './common.js'
+import customizeOperation from './customizeOperation.js'
 
 
-const socket = io()
+
 const socketConnect = {
+    socket: io(`/room_${customizeOperation.getFrontEndCode('chatRoomId')}`),
     // 傳送進入房間訊息
     enterRoom: () => {
         const emitMessage = {
-            studentId: NormalizeFunc.getFrontEndCode('studentId'),
-            sendTime: NormalizeFunc.getNowTime('SimpleTime'),
-            chatRoomId: NormalizeFunc.getFrontEndCode('chatRoomId'),
+            studentId: customizeOperation.getFrontEndCode('studentId'),
+            sendTime: customizeOperation.getNowTime('SimpleTime'),
+            chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
         }
-        socket.emit('enterRoom', JSON.stringify(emitMessage))
+        socketConnect.socket.emit('enterRoom', JSON.stringify(emitMessage))
+    },
+    // 傳送離開房間訊息
+    leaveRoom: () => {
+        const emitMessage = {
+            studentId: customizeOperation.getFrontEndCode('studentId'),
+            sendTime: customizeOperation.getNowTime('SimpleTime'),
+            chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
+        }
+        socketConnect.socket.emit('leaveRoom', JSON.stringify(emitMessage))
     },
 
     // 收到進入房間訊息
     receiveEnterRoom: () => {
-        socket.on('re-enterRoom', (message) => {
+        socketConnect.socket.on('re-enterRoom', (message) => {
             const receiveMessage = JSON.parse(message)
-            if (receiveMessage.chatRoomId === NormalizeFunc.getFrontEndCode('chatRoomId')) {
-                MessageType.enterRoom(receiveMessage)
-            }
+            MessageType.enterRoom(receiveMessage)
             // 前十則訊息接收
             if (receiveMessage.chatRoomId === undefined) {
                 for (let message of receiveMessage) {
-                    if (message.studentId === NormalizeFunc.getFrontEndCode('studentId')) {
+                    if (message.studentId === customizeOperation.getFrontEndCode('studentId')) {
                         MessageType.sendMessage(message)
                     } else {
                         //別人傳則使用別人傳的模型
@@ -35,30 +43,42 @@ const socketConnect = {
 
         })
     },
+    // 收到離開房間訊息
+    receiveLeaveRoom: () => {
+        socketConnect.socket.on('re-leaveRoom', (message) => {
+            const receiveMessage = JSON.parse(message)
+            MessageType.leaveRoom(receiveMessage)
+        })
+    },
+
+    // 收到房間人數變動訊息
+    receiveRoomNumber: () => {
+        socketConnect.socket.on('roomNumber', (message) => {
+            $('#roomNumberCounter').text(`🤓 ${message}`)
+        })
+    },
 
     // 傳送訊息
     sendMessage: (message) => {
         const emitMessage = {
-            studentId: NormalizeFunc.getFrontEndCode('studentId'),
-            sendTime: NormalizeFunc.getNowTime('SecondTime'),
+            studentId: customizeOperation.getFrontEndCode('studentId'),
+            sendTime: customizeOperation.getNowTime('SecondTime'),
             message: message,
-            chatRoomId: NormalizeFunc.getFrontEndCode('chatRoomId'),
+            chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
         }
-        socket.emit('sendMessage', JSON.stringify(emitMessage))
+        socketConnect.socket.emit('sendMessage', JSON.stringify(emitMessage))
     },
 
     // 接收訊息
     receiveMessage: () => {
-        socket.on('re-sendMessage', (message) => {
+        socketConnect.socket.on('re-sendMessage', (message) => {
             const receiveMessage = JSON.parse(message)
-            if (receiveMessage.chatRoomId === NormalizeFunc.getFrontEndCode('chatRoomId')) {
-                //若自己傳的，顯示自己傳送的模型
-                if (receiveMessage.studentId === NormalizeFunc.getFrontEndCode('studentId')) {
-                    MessageType.sendMessage(receiveMessage)
-                } else {
-                    //別人傳則使用別人傳的模型
-                    MessageType.receiveMessage(receiveMessage)
-                }
+            //若自己傳的，顯示自己傳送的模型
+            if (receiveMessage.studentId === customizeOperation.getFrontEndCode('studentId')) {
+                MessageType.sendMessage(receiveMessage)
+            } else {
+                //別人傳則使用別人傳的模型
+                MessageType.receiveMessage(receiveMessage)
             }
         })
     },
@@ -66,17 +86,19 @@ const socketConnect = {
     //共編部分
     cowork: {
         selectionArea: 'golist',
+        executor: null,
+        changeReceiveMounted: false,
         //偵測滑鼠移動
         mouseMove: () => {
             $(document).on('mousemove', (e) => {
                 const mousePosition = {
-                    chatRoomId: NormalizeFunc.getFrontEndCode('chatRoomId'),
-                    studentId: NormalizeFunc.getFrontEndCode('studentId'),
+                    chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
+                    studentId: customizeOperation.getFrontEndCode('studentId'),
                     selectionArea: socketConnect.cowork.selectionArea,
                     mouseX: e.clientX,
                     mouseY: e.clientY,
                 }
-                socket.emit('sendMouseMove', JSON.stringify(mousePosition))
+                socketConnect.socket.emit('sendMouseMove', JSON.stringify(mousePosition))
             })
         },
         //偵測滑鼠點擊
@@ -85,11 +107,9 @@ const socketConnect = {
         },
         // 接收滑鼠偵測
         receiveMouseMove: () => {
-            socket.on('re-sendMouseMove', (message) => {
+            socketConnect.socket.on('re-sendMouseMove', (message) => {
                 const receivedMouseMove = JSON.parse(message)
-                if (receivedMouseMove.chatRoomId === NormalizeFunc.getFrontEndCode('chatRoomId') &&
-                    receivedMouseMove.studentId !== NormalizeFunc.getFrontEndCode('studentId')
-                ) {
+                if (receivedMouseMove.studentId !== customizeOperation.getFrontEndCode('studentId')) {
                     MouseType.mouseIcon(receivedMouseMove)
                 }
             })
@@ -98,53 +118,175 @@ const socketConnect = {
         // 共編程式
         updateCode: (text, lineFrom, lineTo, origin) => {
             const codeInformation = {
-                chatRoomId: NormalizeFunc.getFrontEndCode('chatRoomId'),
-                studentId: NormalizeFunc.getFrontEndCode('studentId'),
+                chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
+                studentId: customizeOperation.getFrontEndCode('studentId'),
                 text: text,
                 lineFrom: lineFrom,
                 lineTo: lineTo,
                 origin: origin
             }
-            socket.emit('sendUpdateCode', JSON.stringify(codeInformation))
+            socketConnect.socket.emit('sendUpdateCode', JSON.stringify(codeInformation))
         },
-
         // 接收共編程式
         receiveUpdateCode: () => {
             $('#coworkArea').data("CodeMirror").on('change', emitUpdateCode)
-
-            socket.on('re-sendUpdateCode', (message) => {
+            socketConnect.socket.on('re-sendUpdateCode', (message) => {
                 const reciveMessage = JSON.parse(message)
-                if (reciveMessage.chatRoomId === NormalizeFunc.getFrontEndCode('chatRoomId') &&
-                    reciveMessage.studentId !== NormalizeFunc.getFrontEndCode('studentId')
-                ) {
-                    turnChangeEventOff(replaceCode, turnChangeEventOn)
+                if (reciveMessage.studentId !== customizeOperation.getFrontEndCode('studentId')) turnChangeEventOff(replaceCode, turnChangeEventOn)
 
+                async function turnChangeEventOff(replaceCode, evenOn) {
+                    await $('#coworkArea').data("CodeMirror").off('change', emitUpdateCode)
+                    await replaceCode()
+                    await evenOn()
+                }
+
+                function replaceCode() {
+                    $('#coworkArea').data("CodeMirror").replaceRange(
+                        reciveMessage.text,
+                        reciveMessage.lineFrom,
+                        reciveMessage.lineTo,
+                        reciveMessage.origin
+                    )
+                }
+
+                function turnChangeEventOn() {
+                    $('#coworkArea').data("CodeMirror").on('change', emitUpdateCode)
                 }
             })
 
+            // 偵測 change 事件
             function emitUpdateCode(instance, obj) {
                 socketConnect.cowork.updateCode(obj.text, obj.from, obj.to, obj.origin)
             }
+        },
+        // 關閉接收共編程式
+        closeReceiveUpdateCode: () => {
+            socketConnect.socket.removeAllListeners('re-sendUpdateCode')
+        },
 
-            async function turnChangeEventOff(replaceCode, evenOn) {
-                await $('#coworkArea').data("CodeMirror").off('change', emitUpdateCode)
-                await replaceCode()
-                await evenOn()
+        // 執行程式
+        executeProject: (response) => {
+            const executeMessage = {
+                studentId: customizeOperation.getFrontEndCode("studentId"),
+                execute: true,
+                response: response
             }
+            socketConnect.socket.emit("executeProject", JSON.stringify(executeMessage))
+        },
+        // 結束執行程式
+        endProject: () => {
+            const executeMessage = {
+                studentId: customizeOperation.getFrontEndCode("studentId"),
+                execute: false
+            }
+            socketConnect.socket.emit("executeProject", JSON.stringify(executeMessage))
+        },
+        // 收到執行/結束程式
+        receiveExecuteProject: () => {
+            socketConnect.socket.on("re-executeProject", (message) => {
+                const reciveMessage = JSON.parse(message)
 
-            function replaceCode() {
-                $('#coworkArea').data("CodeMirror").replaceRange(
-                    reciveMessage.text,
-                    reciveMessage.lineFrom,
-                    reciveMessage.lineTo,
-                    reciveMessage.origin
-                )
-            }
+                if (socketConnect.cowork.selectionArea.split("-")[1] === '3') {
+                    if (reciveMessage.execute) {
+                        renderDemoContainer(reciveMessage.response)
+                        $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
+                        socketConnect.cowork.executor = reciveMessage.studentId
+                        console.log("EXE", reciveMessage, socketConnect.cowork.executor = reciveMessage.studentId)
+                    } else {
+                        if (socketConnect.cowork.executor === reciveMessage.studentId) {
+                            $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
+                            console.log("LEAVE", reciveMessage, socketConnect.cowork.executor = reciveMessage.studentId)
+                        }
+                    }
+                }
+            })
+            function renderDemoContainer(response) {
+                $('.DemoDiv').remove()
+                const demoDiv = $("<div>")
+                    .prop({
+                        className: "container-fluid DemoDiv",
+                    })
+                    .prependTo($("body"))
 
-            function turnChangeEventOn() {
-                $('#coworkArea').data("CodeMirror").on('change', emitUpdateCode)
+                const demoIframe = $("<div>")
+                    .prop({
+                        className:
+                            "row justify-content-start iframeContainer",
+                    })
+                    .appendTo(demoDiv)
+
+                const demoContent = $("<div>")
+                    .prop({
+                        className: "col-12 demoContent",
+                        id: "LS_programmingDemoContent_up",
+                    })
+                    .click(e => {
+                        if (
+                            demoContent.attr("id") ===
+                            "LS_programmingDemoContent_up"
+                        ) {
+                            demoContent.attr(
+                                "id",
+                                "LS_programmingDemoContent_down"
+                            )
+                            downIcon.css({
+                                transform: "rotate(180deg)",
+                            })
+                            demoContent.css({
+                                transform: "translateY(-10px)",
+                            })
+                        } else {
+                            demoContent.attr(
+                                "id",
+                                "LS_programmingDemoContent_up"
+                            )
+                            downIcon.css({
+                                transform: "rotate(0deg)",
+                            })
+                            demoContent.css({
+                                transform: "translateY(-95vh)",
+                            })
+                            socketConnect.cowork.endProject()
+                        }
+                    })
+                    .appendTo(demoIframe)
+
+                const demoIframeInfo = $("<iframe>")
+                    .prop({
+                        className: "col-12",
+                        id: "demoIframe",
+                        src: customizeOperation.getFrontEndCode('coworkStatus') === 'N' ?
+                            `../Access/${customizeOperation.getCookie("studentId")}/${response}/${response}.html` :
+                            `../../Cowork/${customizeOperation.getFrontEndCode('chatRoomId')}/${response}/${response}.html`,
+                        sandBox: "allow-scripts"
+                    })
+                    .css({
+                        width: "100%",
+                        height: "95%",
+                        margin: "0 auto",
+                        "margin-top": "5px",
+                        border: "1px dashed black",
+                        "border-radius": "20px",
+                    })
+                    .appendTo(demoContent)
+                //DownIcon
+                const downIcon = $("<div>")
+                    .prop({
+                        className: "col-1 offset-md-5 downIcon",
+                        innerHTML:
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="20px" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+                    })
+                    .appendTo(demoContent)
+
+                demoIframeInfo.on("load", e => {
+                    e.preventDefault()
+                    customizeOperation.loadingPage(false)
+                    demoContent.click()
+                })
             }
-        }
+        },
+
+
     }
 }
 
@@ -154,6 +296,14 @@ const MessageType = {
         $('<div>').prop({
             className: 'chatBox_enterMessage',
             innerHTML: `${message.sendTime} ${message.studentId} 進入房間`
+        }).appendTo($('.chatBox_MessageContent'))
+
+        $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
+    },
+    leaveRoom: (message) => {
+        $('<div>').prop({
+            className: 'chatBox_enterMessage',
+            innerHTML: `${message.sendTime} ${message.studentId} 離開房間`
         }).appendTo($('.chatBox_MessageContent'))
 
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
@@ -301,6 +451,7 @@ const MouseType = {
             $(`#mouseMoveContainer_mouseStudentId_${message.studentId}`).html(`${message.studentId}<br>(${transformSelectArea(message.selectionArea)})`)
         }
 
+        //轉換選擇區域
         function transformSelectArea(id) {
             const progress = id.split("-")[0]
             const status = id.split("-")[1]

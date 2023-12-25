@@ -1,20 +1,22 @@
-import { GoListFunc, NormalizeFunc, ClickListening } from "../../global/common.js";
+import { GoListFunc, ClickListening } from "../../global/common.js";
 import { chatBoxInit } from "../../global/chatbox.js";
 import { coworkInit } from "../../global/cowork.js";
 import { studentClientConnect } from "../../global/axiosconnect.js";
+import customizeOperation from "../../global/customizeOperation.js";
+import { socketConnect } from "../../global/socketConnect.js";
 
 //init Diagram varible
-let myDiagram
+let MY_DIAGRAM
 
 
-NormalizeFunc.loadingPage(true)
+customizeOperation.loadingPage(true)
 
 const goListInit = () => {
     // Since 2.2 you can also author concise templates with method chaining instead of GraphObject.make
     // For details, see https://gojs.net/latest/intro/buildingObjects.html
     const $ = go.GraphObject.make;  // for conciseness in defining templates
 
-    myDiagram =
+    MY_DIAGRAM =
         $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
             {
                 // "initialContentAlignment": go.Spot.Center, 
@@ -25,9 +27,9 @@ const goListInit = () => {
             });
 
     // when the document is modified, add a "*" to the title and enable the "Save" button
-    myDiagram.addDiagramListener("Modified", e => {
+    MY_DIAGRAM.addDiagramListener("Modified", e => {
         let idx = document.title.indexOf("*");
-        if (myDiagram.isModified) {
+        if (MY_DIAGRAM.isModified) {
             if (idx < 0) document.title += "*";
         } else {
             if (idx >= 0) document.title = document.title.slice(0, idx);
@@ -37,11 +39,11 @@ const goListInit = () => {
 
 
     //event function
-    myDiagram.addDiagramListener("ObjectDoubleClicked", e => {
+    MY_DIAGRAM.addDiagramListener("ObjectDoubleClicked", e => {
         const part = e.subject.part;
         if (!(part instanceof go.Link)) GoListFunc.showContainer(part.ob);
     });
-    myDiagram.addDiagramListener('SelectionDeleting', function (e) {
+    MY_DIAGRAM.addDiagramListener('SelectionDeleting', function (e) {
         // the DiagramEvent.subject is the collection of Parts about to be deleted
         e.subject.each(async function (part) {
             // console.log(part.ob)
@@ -190,22 +192,22 @@ const goListInit = () => {
             )
         )
 
-    myDiagram.nodeTemplateMap.add("Understanding", standardSetting)
-    myDiagram.nodeTemplateMap.add("Formulating", standardSetting)
-    myDiagram.nodeTemplateMap.add("Programming", standardSetting)
-    myDiagram.nodeTemplateMap.add("Reflection", standardSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Understanding", standardSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Formulating", standardSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Programming", standardSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Reflection", standardSetting)
 
-    myDiagram.nodeTemplateMap.add("Completed-Understanding", completedSetting)
-    myDiagram.nodeTemplateMap.add("Completed-Formulating", completedSetting)
-    myDiagram.nodeTemplateMap.add("Completed-Programming", completedSetting)
-    myDiagram.nodeTemplateMap.add("Completed-Reflection", completedSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Completed-Understanding", completedSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Completed-Formulating", completedSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Completed-Programming", completedSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Completed-Reflection", completedSetting)
 
-    myDiagram.nodeTemplateMap.add("Bonus-Understanding", bonusSetting)
-    myDiagram.nodeTemplateMap.add("Bonus-Formulating", bonusSetting)
-    myDiagram.nodeTemplateMap.add("Bonus-Programming", bonusSetting)
-    myDiagram.nodeTemplateMap.add("Bonus-Reflection", bonusSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Bonus-Understanding", bonusSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Bonus-Formulating", bonusSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Bonus-Programming", bonusSetting)
+    MY_DIAGRAM.nodeTemplateMap.add("Bonus-Reflection", bonusSetting)
 
-    myDiagram.nodeTemplateMap.add("Conditional",
+    MY_DIAGRAM.nodeTemplateMap.add("Conditional",
         $(go.Node, "Table", nodeStyle(),
             // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
             $(go.Panel, "Auto",
@@ -228,7 +230,7 @@ const goListInit = () => {
             makePort("B", go.Spot.Bottom, go.Spot.Bottom, true, false)
         ));
 
-    myDiagram.nodeTemplateMap.add("Start",
+    MY_DIAGRAM.nodeTemplateMap.add("Start",
         $(go.Node, "Table", nodeStyle(), { deletable: false },
             $(go.Panel, "Spot",
                 $(go.Shape, "Circle",
@@ -276,7 +278,7 @@ const goListInit = () => {
         return geo;
     });
 
-    myDiagram.nodeTemplateMap.add("Target",
+    MY_DIAGRAM.nodeTemplateMap.add("Target",
         $(go.Node, "Table", nodeStyle(), { deletable: false },
             $(go.Panel, "Spot",
                 $(go.Shape, "ExternalOrganization", { desiredSize: new go.Size(150, 150), fill: "#282c34", stroke: "#ffd3ac", strokeWidth: 4.5 }),
@@ -305,7 +307,7 @@ const goListInit = () => {
     });
 
 
-    myDiagram.nodeTemplateMap.add("Comment",
+    MY_DIAGRAM.nodeTemplateMap.add("Comment",
         $(go.Node, "Auto", nodeStyle(),
             $(go.Shape, "File",
                 { fill: "#282c34", stroke: "#DEE0A3", strokeWidth: 3 }),
@@ -323,7 +325,7 @@ const goListInit = () => {
 
 
     // replace the default Link template in the linkTemplateMap
-    myDiagram.linkTemplate =
+    MY_DIAGRAM.linkTemplate =
         $(go.Link,  // the whole link panel
             {
                 routing: go.Link.AvoidsNodes,
@@ -385,12 +387,12 @@ const goListInit = () => {
     }
 
     // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
-    myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
-    myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
+    MY_DIAGRAM.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
+    MY_DIAGRAM.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
 
 
     // initialize the Palette that is on the left side of the page
-    if (NormalizeFunc.getCookie('adminId') && !NormalizeFunc.getCookie('studentId')) {
+    if (customizeOperation.getCookie('adminId') && !customizeOperation.getCookie('studentId')) {
         let myPalette =
             $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
                 {
@@ -400,7 +402,7 @@ const goListInit = () => {
                     //禁止縮放
                     allowZoom: false,
 
-                    nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
+                    nodeTemplateMap: MY_DIAGRAM.nodeTemplateMap,  // share the templates used by MY_DIAGRAM
                     model: new go.GraphLinksModel([  // specify the contents of the Palette
                         { category: "Target", text: "成品展示" },
                         { category: "Understanding", text: "探索理解" },
@@ -469,7 +471,7 @@ const navInit = () => {
         navButton.vote()
     })
     //Save Btn
-    $('#myDiagramDiv').keydown((e) => {
+    $('#MY_DIAGRAMDiv').keydown((e) => {
         if (e.ctrlKey && e.keyCode == 83) {
             e.preventDefault()
             navButton.save()
@@ -485,8 +487,8 @@ const navInit = () => {
 }
 
 const leaderBoardInit = () => {
-    studentClientConnect.getAllStudentProgress(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+    studentClientConnect.getAllStudentProgress(customizeOperation.getFrontEndCode('courseId')).then(response => {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             let taskCount = 1
 
             for (const { count, member } of response.data.message) {
@@ -526,13 +528,13 @@ const leaderBoardInit = () => {
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
-    coworkStatus: NormalizeFunc.getFrontEndCode('coworkStatus'),
-    courseId: NormalizeFunc.getFrontEndCode('courseId'),
+    coworkStatus: customizeOperation.getFrontEndCode('coworkStatus'),
+    courseId: customizeOperation.getFrontEndCode('courseId'),
     //save
     save: async () => {
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         //Json Parse
-        const goData = JSON.parse(myDiagram.model.toJson());
+        const goData = JSON.parse(MY_DIAGRAM.model.toJson());
         //刪除 * 字號
         let idx = document.title.indexOf("*");
         ClickListening('', '儲存-List')
@@ -547,11 +549,11 @@ const navButton = {
         if (navButton.coworkStatus === 'Y') {
 
         } else {
-            await studentClientConnect.saveGoList(goData, NormalizeFunc.getFrontEndCode('courseId'))
+            await studentClientConnect.saveGoList(goData, customizeOperation.getFrontEndCode('courseId'))
                 .then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        NormalizeFunc.loadingPage(false)
-                        myDiagram.isModified = false;
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        customizeOperation.loadingPage(false)
+                        MY_DIAGRAM.isModified = false;
                     }
                 })
         }
@@ -560,18 +562,18 @@ const navButton = {
     //restart code & golist
     restart: async () => {
         if (window.confirm('確定重整嗎？所有內容將被清除！')) {
-            NormalizeFunc.loadingPage(true)
+            customizeOperation.loadingPage(true)
 
             //重整 goList
             if (navButton.coworkStatus === 'Y') {
 
             } else {
-                await studentClientConnect.restartGoList(NormalizeFunc.getFrontEndCode('courseId'))
+                await studentClientConnect.restartGoList(customizeOperation.getFrontEndCode('courseId'))
                     .then(response => {
-                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
                             ClickListening('', '重整-List')
                             load()
-                            NormalizeFunc.loadingPage(false)
+                            customizeOperation.loadingPage(false)
                         }
                     })
             }
@@ -580,16 +582,16 @@ const navButton = {
     },
     //download new golist
     download: async () => {
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         //更新 goList
         if (navButton.coworkStatus === 'Y') {
 
         } else {
-            await studentClientConnect.downloadGoList(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            await studentClientConnect.downloadGoList(customizeOperation.getFrontEndCode('courseId')).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
                     ClickListening('', '載入最新版本-List')
                     load()
-                    NormalizeFunc.loadingPage(false)
+                    customizeOperation.loadingPage(false)
                 }
             })
         }
@@ -599,7 +601,8 @@ const navButton = {
     leave: () => {
         if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
             ClickListening('', '退出-List')
-            window.location.href = `/home/${NormalizeFunc.getCookie('studentId')}`
+            socketConnect.leaveRoom()
+            window.location.href = `/home/${customizeOperation.getCookie('studentId')}`
         }
     },
     vote: () => {
@@ -609,13 +612,13 @@ const navButton = {
 //load
 const load = async () => {
     // 讀取 Golist
-    const checkCoworkStatus = NormalizeFunc.getFrontEndCode("coworkStatus")
-    const courseId = NormalizeFunc.getFrontEndCode("courseId")
-    const groupId = NormalizeFunc.getFrontEndCode("chatRoomId")
+    const checkCoworkStatus = customizeOperation.getFrontEndCode("coworkStatus")
+    const courseId = customizeOperation.getFrontEndCode("courseId")
+    const groupId = customizeOperation.getFrontEndCode("chatRoomId")
 
     if (checkCoworkStatus == 'Y') {
         await studentClientConnect.readCowork(courseId, groupId).then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 const process = parseInt(response.data.message.coworkStatus.process || 1)
                 let newNodeData = []
                 let newLinkData = []
@@ -660,15 +663,15 @@ const load = async () => {
                 response.data.message.coworkData.linkDataArray = newLinkData
 
 
-                myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message.coworkData))
+                MY_DIAGRAM.model = go.Model.fromJson(JSON.stringify(response.data.message.coworkData))
                 document.title += "*"
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
             }
         })
     } else {
         await studentClientConnect.readGoList(courseId)
             .then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
                     const progress = parseInt(response.data.message.progress || 1)
                     let newNodeData = []
                     let newLinkData = []
@@ -716,7 +719,7 @@ const load = async () => {
 
 
 
-                    myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
+                    MY_DIAGRAM.model = go.Model.fromJson(JSON.stringify(response.data.message))
                     document.title += "*"
                     navButton.save()
                 }
@@ -724,7 +727,7 @@ const load = async () => {
     }
 
 
-    // myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+    // MY_DIAGRAM.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
 
 }
 //----------------------------------------------------------------------------------------
@@ -736,29 +739,29 @@ const deleteNode = (part) => {
         let deletePart = part.copy();
         animation.add(deletePart, "scale", deletePart.scale, 0.01);
         animation.add(deletePart, "angle", deletePart.angle, 360);
-        animation.addTemporaryPart(deletePart, myDiagram);
+        animation.addTemporaryPart(deletePart, MY_DIAGRAM);
         animation.start();
     }
 
     switch (part.ob.category) {
         case 'Target':
-            window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生 / 小姐請自重!`)
+            window.alert(`編號 ${customizeOperation.getCookie('studentId')} 先生 / 小姐請自重!`)
             break
         case 'Start':
             window.alert('此為必須結構，禁止刪除！')
             break
         case 'Understanding':
-            window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生 / 小姐請住手!`)
+            window.alert(`編號 ${customizeOperation.getCookie('studentId')} 先生 / 小姐請住手!`)
             break
         case 'Formulating':
-            window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生 / 小姐我要報警囉!`)
+            window.alert(`編號 ${customizeOperation.getCookie('studentId')} 先生 / 小姐我要報警囉!`)
             break
         case 'Programming':
-            window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生 / 小姐不要這樣!`)
+            window.alert(`編號 ${customizeOperation.getCookie('studentId')} 先生 / 小姐不要這樣!`)
             break
         case 'Comment':
             if (window.confirm('確定是否刪除該筆記？\n這將導致該內容全部遭到刪除')) {
-                myDiagram.remove(part)
+                MY_DIAGRAM.remove(part)
                 animateDeletion(part)
                 save()
             }

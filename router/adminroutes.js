@@ -589,7 +589,6 @@ router.get('/getallstudent', async (req, res) => {
 // Admin 修改學生
 router.post('/updatestudent', async (req, res) => {
     try {
-        console.log(req.body)
         //刪除群組功能 removeChatRoom
         if (req.body.type === 'removeChatRoom') {
             await studentConfig.updateOne(

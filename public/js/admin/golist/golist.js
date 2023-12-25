@@ -1,12 +1,13 @@
-import { GoListFunc, NormalizeFunc } from "../../../global/common.js";
+import { GoListFunc } from "../../../global/common.js";
 import { chatBoxInit } from "./chatbox.js";
 import { adminClientConnect } from "../../../global/axiosconnect.js";
+import customizeOperation from "../../../global/customizeOperation.js";
 
 //init Diagram varible
 let myDiagram
 
 
-NormalizeFunc.loadingPage(true)
+customizeOperation.loadingPage(true)
 
 const goListInit = () => {
     // Since 2.2 you can also author concise templates with method chaining instead of GraphObject.make
@@ -467,17 +468,17 @@ const navInit = () => {
         }
     })
 
-    NormalizeFunc.loadingPage(false)
+    customizeOperation.loadingPage(false)
 }
 
 ///save & load  & print & logout function
 //----------------------------------------------------------------------------------------
 const navButton = {
-    coworkStatus: NormalizeFunc.getFrontEndCode('coworkStatus'),
-    courseId: NormalizeFunc.getFrontEndCode('courseId'),
+    coworkStatus: customizeOperation.getFrontEndCode('coworkStatus'),
+    courseId: customizeOperation.getFrontEndCode('courseId'),
     //save
     save: async () => {
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         //Json Parse
         const goData = JSON.parse(myDiagram.model.toJson());
         //刪除 * 字號
@@ -487,32 +488,32 @@ const navButton = {
             //存入資料庫
             if (navButton.coworkStatus == 'Y') {
                 await adminClientConnect.saveCowork(goData, navButton.courseId).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        NormalizeFunc.loadingPage(false)
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        customizeOperation.loadingPage(false)
                     }
                 })
             } else {
                 await adminClientConnect.saveStandard(goData, navButton.courseId).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        NormalizeFunc.loadingPage(false)
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        customizeOperation.loadingPage(false)
                     }
                 })
             }
             myDiagram.isModified = false;
         } else {
-            NormalizeFunc.loadingPage(false)
+            customizeOperation.loadingPage(false)
         }
     },
     //restart code & golist
     restart: async () => {
         if (window.confirm('確定重整嗎？所有內容將被清除！')) {
-            NormalizeFunc.loadingPage(true)
+            customizeOperation.loadingPage(true)
 
             //重整 goList
-            await adminClientConnect.restartStandard(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            await adminClientConnect.restartStandard(customizeOperation.getFrontEndCode('courseId')).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
                     load()
-                    NormalizeFunc.loadingPage(false)
+                    customizeOperation.loadingPage(false)
                 }
             })
         }
@@ -520,23 +521,23 @@ const navButton = {
     //logout
     logout: () => {
         if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
-            window.location.href = `/home/${NormalizeFunc.getCookie('adminId')}`
+            window.location.href = `/home/${customizeOperation.getCookie('adminId')}`
         }
     }
 }
 //load
 const load = async () => {
-    const checkCoworkStatus = NormalizeFunc.getFrontEndCode("coworkStatus")
-    const courseId = NormalizeFunc.getFrontEndCode('courseId')
+    const checkCoworkStatus = customizeOperation.getFrontEndCode("coworkStatus")
+    const courseId = customizeOperation.getFrontEndCode('courseId')
     if (checkCoworkStatus == 'Y') {
         await adminClientConnect.readCowork(courseId).then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
             }
         })
     } else {
         await adminClientConnect.readStandard(courseId).then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 myDiagram.model = go.Model.fromJson(JSON.stringify(response.data.message))
             }
         })
@@ -561,20 +562,20 @@ const deleteNode = (part) => {
 
     // switch (part.ob.category) {
     //     case 'Target':
-    //         window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請自重!`)
+    //         window.alert(`編號 ${customizeOperation.getCookie('studentId')} 先生/小姐請自重!`)
     //         break
     //     case 'Start':
     //         window.alert('此為必須結構，禁止刪除！')
     //         break
     //     case 'Understanding':
-    //         window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐請住手!`)
+    //         window.alert(`編號 ${customizeOperation.getCookie('studentId')} 先生/小姐請住手!`)
     //         break
     //     case 'Formulating':
-    //         window.alert(`編號 ${NormalizeFunc.getCookie('studentId')} 先生/小姐我要報警囉!`)
+    //         window.alert(`編號 ${customizeOperation.getCookie('studentId')} 先生/小姐我要報警囉!`)
     //         break
     //     case 'Programming':
-    //         adminClientConnect.deleteCode(part.ob.key, NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-    //             if (NormalizeFunc.serverResponseErrorDetect(response)) {
+    //         adminClientConnect.deleteCode(part.ob.key, customizeOperation.getFrontEndCode('courseId')).then(response => {
+    //             if (customizeOperation.serverResponseErrorDetect(response)) {
     //                 myDiagram.remove(part)
     //                 animateDeletion(part)
     //                 navButton.save()

@@ -1,4 +1,4 @@
-import { NormalizeFunc } from '../../../global/common.js'
+import customizeOperation from "../../../global/customizeOperation"
 
 const chatBoxInit = async () => {
     const chatBoxMessageContainer = $('<div>').prop({
@@ -71,4 +71,4 @@ const chatBoxInit = async () => {
 }
 
 
-export { chatBoxInit }
+export default chatBoxInit 

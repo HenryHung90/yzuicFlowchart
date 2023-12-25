@@ -117,8 +117,10 @@ app.set("view engine", "ejs")
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// app.get('/access/:file/:filename', async (req, res) => {
-//     res.sendFile(`${__dirname}/public/access/${req.params.file}/${req.params.filename}`)
+
+
+// app.get('/access/:studentId/:file/:filename', async (req, res) => {
+//     res.sendFile(`${__dirname}/public/access/${req.params.studentId}/${req.params.file}/${req.params.filename}`)
 //     console.log(req.params.file, req.params.filename)
 // })
 //靜態物件取得從public
@@ -134,6 +136,7 @@ app.use(cors(
     }
 ))
 
+//主畫面
 app.get('/', async (req, res) => {
     if (req.cookies['token'] == undefined) {
         res.render('./index')
@@ -141,17 +144,14 @@ app.get('/', async (req, res) => {
         res.redirect(`./home/${req.cookies.studentId}`)
     }
 })
+//登出
 app.post('/logout', async (req, res) => {
     res.clearCookie('token').clearCookie('studentId')
     res.send('/')
 })
 //登入
-// app.post('/login',async(req,res)=>{
-//     console.log(req.body)
-// })
 app.post('/login', passport.authenticate('login', { session: false }), signIn)
 
-// app.use('/admin', adminroutes)
 app.use((req, res, next) => {
     if (req.cookies['token'] == undefined) {
         res.redirect('/')
@@ -159,8 +159,8 @@ app.use((req, res, next) => {
     }
     next()
 })
+
 app.get('/home/:studentId', passport.authenticate('token', { session: false }), async (req, res) => {
-    console.log(req.user)
     if (req.user.studentId != req.params.studentId) {
         res.redirect('/')
     } else {
@@ -168,9 +168,17 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
     }
 })
 
+
 //routes
 app.use('/launch', passport.authenticate('token', { session: false }), launchroutes)
 app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
+
+
+
+const httpServer = http.createServer(app)
+const io = new Server(httpServer)
+//socket server management
+socketServer(io)
 
 
 //404
@@ -181,13 +189,6 @@ app.use((err, req, res, next) => {
     console.log(err.stack)
     res.status(500).render('./500error')
 })
-
-
-const httpServer = http.createServer(app)
-const io = new Server(httpServer)
-//socket server management
-socketServer(io)
-
 
 //admin routes
 
@@ -208,13 +209,6 @@ admin.get('/', async (req, res) => {
         res.redirect(`./home/${req.cookies.adminId}`)
     }
 })
-// admin.post("/testing", (req, res) => {
-//     res.set('Access-Control-Allow-Origin', 'http://localhost:3000')
-//     res.json({
-//         message: "Success",
-//         status: 200
-//     })
-// })
 admin.post('/login', passport.authenticate('admin-login', { session: false }), signInAdmin)
 admin.post('/logout', async (req, res) => {
     res.clearCookie('tokenADMIN').clearCookie('adminId')
@@ -253,7 +247,6 @@ admin.get("/:studentId/:courseId", async (req, res) => {
     }
 })
 
-
 //404
 admin.use((req, res, next) => {
     res.status(404).render('./404page')
@@ -267,7 +260,6 @@ admin.use((err, req, res, next) => {
 
 httpServer.listen(process.env.PORT_1, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_1) })
 // httpServer.listen(process.env.PORT_2, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_2) })
-
 admin.listen(process.env.ADMIN_PORT, () => { console.log("admin is running at " + process.env.HOST + ":" + process.env.ADMIN_PORT) })
 
 

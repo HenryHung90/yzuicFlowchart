@@ -1,10 +1,11 @@
 import {
-    NormalizeFunc,
     CodeMirrorFunc,
     GoListFunc,
     ClickListening,
 } from "../../global/common.js"
 import { studentClientConnect } from "../../global/axiosconnect.js"
+import customizeOperation from "../../global/customizeOperation.js"
+import { socketConnect } from "../../global/socketConnect.js"
 
 //Target 顯示最終成品的Block
 const TargetBox = () => {
@@ -40,7 +41,7 @@ const TargetBox = () => {
 //         className: "row justify-content-start startBoxContainer",
 //     })
 
-//     NormalizeFunc.loadingPage(false)
+//     customizeOperation.loadingPage(false)
 //     return startBoxContainer
 // }
 //CommentBox return function
@@ -641,7 +642,7 @@ const ProgrammingBox = programmingKey => {
         })
         .appendTo(contentRowDiv)
 
-    if (NormalizeFunc.getFrontEndCode('coworkStatus') === "N") {
+    if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
         //Coding 分層
         const content_codingContainer = [
             {
@@ -960,9 +961,9 @@ const ProgrammingBox = programmingKey => {
     //--------------------------------------------------------------
     //Launch demo function
     async function launchDemo() {
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         ClickListening("", "執行-計畫執行-Code")
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //取得各階段程式碼
             const settingCode = $("#setting").data("CodeMirror")
             const configCode = $("#config").data("CodeMirror")
@@ -993,19 +994,20 @@ const ProgrammingBox = programmingKey => {
                     customCode.getValue()
                 )
                 .then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         renderDemoContainer(response.data.message)
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.loadingPage(false)
                     }
                 })
 
         } else {
             const coworkCode = $('#coworkArea').data("CodeMirror")
-
+            // 執行程式, 鎖住其他人之操作
             await studentClientConnect.cowork.launchDemo(coworkCode.getValue()).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
+                    socketConnect.cowork.executeProject(response.data.message)
                     renderDemoContainer(response.data.message)
-                    NormalizeFunc.loadingPage(false)
+                    customizeOperation.loadingPage(false)
                 }
             })
         }
@@ -1034,12 +1036,11 @@ const ProgrammingBox = programmingKey => {
             )
         }
     }
-
     //save code function
     async function saveCode() {
         GoListFunc.saveCodeStatus(true)
         ClickListening("", "儲存-計畫執行-Code")
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //取得各階段程式碼
             const settingCode = $("#setting").data("CodeMirror")
             const configCode = $("#config").data("CodeMirror")
@@ -1059,31 +1060,29 @@ const ProgrammingBox = programmingKey => {
                     updateCode.getValue(),
                     customCode.getValue(),
                     keyCode,
-                    NormalizeFunc.getFrontEndCode("courseId")
+                    customizeOperation.getFrontEndCode("courseId")
                 )
                 .then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) GoListFunc.saveCodeStatus(false)
+                    if (customizeOperation.serverResponseErrorDetect(response)) GoListFunc.saveCodeStatus(false)
                 })
         } else {
             const coworkCode = $('#coworkArea').data("CodeMirror")
 
-            await studentClientConnect.cowork.saveCode(NormalizeFunc.getFrontEndCode('courseId'), coworkCode.getValue()).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) GoListFunc.saveCodeStatus(false)
+            await studentClientConnect.cowork.saveCode(customizeOperation.getFrontEndCode('courseId'), coworkCode.getValue()).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) GoListFunc.saveCodeStatus(false)
             })
         }
 
     }
-
     //upload flie & click function
     //click
     async function uploadFileClick() {
         //模擬Click隱藏之Input
         return $(".uploadfileInput").click()
     }
-
     //upload
     async function uploadFile(files) {
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         let uploadFile = new FormData()
 
         ClickListening("", `上傳-計畫執行-檔案，名稱為${files[0].name}`)
@@ -1094,9 +1093,9 @@ const ProgrammingBox = programmingKey => {
                 .toLowerCase()
 
             //檢查檔案大小
-            if (file.size >= NormalizeFunc.maximumSizeInMegaByte(20)) {
+            if (file.size >= customizeOperation.maximumSizeInMegaByte(20)) {
                 window.alert("上傳檔案禁止超過 25 MB")
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 return
             }
             //檢查檔案副檔名結構
@@ -1109,23 +1108,23 @@ const ProgrammingBox = programmingKey => {
                 uploadFile.append("image", file)
             } else {
                 window.alert("上傳檔案僅限 png jpg jpeg mp3")
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 return
             }
         }
 
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             await studentClientConnect.uploadFile(uploadFile).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                    NormalizeFunc.loadingPage(false)
+                if (customizeOperation.serverResponseErrorDetect(response)) {
+                    customizeOperation.loadingPage(false)
                     $('.dataVisualizationArea_container').click()
                     $('#LS_programmingVisualizationArea_fileIcon').click()
                 }
             })
         } else {
             await studentClientConnect.cowork.uploadFile(uploadFile).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                    NormalizeFunc.loadingPage(false)
+                if (customizeOperation.serverResponseErrorDetect(response)) {
+                    customizeOperation.loadingPage(false)
                     $('.dataVisualizationArea_container').click()
                     $('#LS_programmingVisualizationArea_fileIcon').click()
                 }
@@ -1192,18 +1191,18 @@ const ProgrammingBox = programmingKey => {
             })
             .appendTo(datamediaContainer)
 
-        if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //搜尋file
             studentClientConnect.searchFile().then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
                     //去除Loading畫面
                     datamediaLoading.remove()
                     renderFileIcon(response.data.files, datamediaContainer)
                 }
             })
         } else {
-            studentClientConnect.cowork.searchFile(NormalizeFunc.getFrontEndCode('chatRoomId')).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            studentClientConnect.cowork.searchFile(customizeOperation.getFrontEndCode('chatRoomId')).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
                     //去除Loading畫面
                     datamediaLoading.remove()
                     renderFileIcon(response.data.files, datamediaContainer)
@@ -1256,7 +1255,7 @@ const ProgrammingBox = programmingKey => {
     const deleteMedia = file => {
         if (window.confirm(`確定刪除圖像 ${file[0].name} ?`)) {
             studentClientConnect.deleteFile(file[0].name).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
                     ClickListening(
                         "",
                         `刪除-計畫執行-檔案，名稱為${file[0].name}`
@@ -1313,6 +1312,7 @@ const ProgrammingBox = programmingKey => {
                     demoContent.css({
                         transform: "translateY(-95vh)",
                     })
+                    socketConnect.cowork.endProject()
                 }
             })
             .appendTo(demoIframe)
@@ -1321,9 +1321,9 @@ const ProgrammingBox = programmingKey => {
             .prop({
                 className: "col-12",
                 id: "demoIframe",
-                src: NormalizeFunc.getFrontEndCode('coworkStatus') === 'N' ?
-                    `../Access/${NormalizeFunc.getCookie("studentId")}/${response}/${response}.html` :
-                    `../../Cowork/${NormalizeFunc.getFrontEndCode('chatRoomId')}/${response}/${response}.html`,
+                src: customizeOperation.getFrontEndCode('coworkStatus') === 'N' ?
+                    `../Access/${customizeOperation.getCookie("studentId")}/${response}/${response}.html` :
+                    `../../Cowork/${customizeOperation.getFrontEndCode('chatRoomId')}/${response}/${response}.html`,
                 sandBox: "allow-scripts"
             })
             .css({
@@ -1346,7 +1346,7 @@ const ProgrammingBox = programmingKey => {
 
         demoIframeInfo.on("load", e => {
             e.preventDefault()
-            NormalizeFunc.loadingPage(false)
+            customizeOperation.loadingPage(false)
             demoContent.click()
         })
     }
@@ -1594,10 +1594,10 @@ const ReflectionBox = reflectionKey => {
 
         function submitFunc() {
             ClickListening("", `送出-監控反思-${reflectionKey.key}`)
-            NormalizeFunc.loadingPage(true)
+            customizeOperation.loadingPage(true)
             studentClientConnect
                 .saveReflection(
-                    NormalizeFunc.getFrontEndCode("courseId"),
+                    customizeOperation.getFrontEndCode("courseId"),
                     reflectionKey.key,
                     $("#learningValue").val(),
                     $("#workhardValue").val(),
@@ -1605,9 +1605,9 @@ const ReflectionBox = reflectionKey => {
                     $("#scoringValue").val()
                 )
                 .then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         window.alert(response.data.message)
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.loadingPage(false)
                         $(".block").fadeOut(200)
                         $(".contentDiv").fadeOut(200)
                         //iframe

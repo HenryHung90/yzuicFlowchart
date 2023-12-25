@@ -1,6 +1,7 @@
-import { NormalizeFunc, ClickListening } from '../global/common.js'
+import { ClickListening } from '../global/common.js'
 import { studentClientConnect } from '../global/axiosconnect.js'
-NormalizeFunc.loadingPage(true)
+import customizeOperation from '../global/customizeOperation.js'
+customizeOperation.loadingPage(true)
 
 //----click function----//
 $('#logout').click(e => logout())
@@ -8,7 +9,7 @@ $('#changePassword').click(e => changePassword())
 
 
 const logout = () => {
-    NormalizeFunc.loadingPage(true)
+    customizeOperation.loadingPage(true)
     studentClientConnect.logout().then(response => {
         window.location.href = '/'
     })
@@ -111,12 +112,12 @@ const changePassword = () => {
             $('#old_password').val('')
             return
         }
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         studentClientConnect.changePassword(OP, NP_2).then(async response => {
             ClickListening('', `確認修改-密碼-新密碼為 ${NP_1}`)
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 cancelCP()
             }
         })
@@ -142,7 +143,7 @@ const homeInit = async () => {
     }).appendTo(courseContainer)
 
     await studentClientConnect.getAllCourse().then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             if (response.data.standardData !== null || response.data.standardData !== undefined) {
                 renderCourse(response.data.standardData, 'course')
             }
@@ -153,9 +154,9 @@ const homeInit = async () => {
         className: "goListCourse_contentTitle",
         innerHTML: "共編課程"
     }).appendTo(courseContainer)
-    if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'Y') {
+    if (customizeOperation.getFrontEndCode('coworkStatus') === 'Y') {
         await studentClientConnect.getAllCoworkCourse().then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 if (response.data.coworkData !== null || response.data.coworkData !== undefined) {
                     renderCourse(response.data.coworkData, 'cowork')
                 }
@@ -196,7 +197,7 @@ const homeInit = async () => {
     }
 
     document.addEventListener('mousedown', ClickListening, false)
-    NormalizeFunc.loadingPage(false)
+    customizeOperation.loadingPage(false)
 }
 
 

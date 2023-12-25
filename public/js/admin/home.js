@@ -1,6 +1,6 @@
-import { NormalizeFunc } from '../../global/common.js'
 import { adminClientConnect } from '../../global/axiosconnect.js'
-NormalizeFunc.loadingPage(true)
+import customizeOperation from '../../global/customizeOperation.js'
+customizeOperation.loadingPage(true)
 
 //----click function----//
 $('#logout').click(e => logout())
@@ -9,7 +9,7 @@ $('.goListTitle_Selection').click(e => changeSelection(e.currentTarget))
 
 
 const logout = () => {
-    NormalizeFunc.loadingPage(true)
+    customizeOperation.loadingPage(true)
     axios({
         method: 'post',
         url: '/logout'
@@ -112,7 +112,7 @@ const changePassword = () => {
             $('#old_password').val('')
             return
         }
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         axios({
             method: 'POST',
             url: '/student/changepassword',
@@ -122,9 +122,9 @@ const changePassword = () => {
             },
             withCredentials: true
         }).then(async response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 if (response.data.status === 200) {
                     cancelCP()
                 }
@@ -154,7 +154,7 @@ const changeSelection = (target) => {
 
 // 生成 Course 部分
 const renderGoList = async () => {
-    NormalizeFunc.loadingPage(true)
+    customizeOperation.loadingPage(true)
     const courseContainer = $('.goListCourse')
 
     //一般課程區-------------------------------------------------------
@@ -164,11 +164,11 @@ const renderGoList = async () => {
     }).appendTo(courseContainer)
 
     await adminClientConnect.getAllCourse().then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             if (response.data.standardData === null || response.data.standardData === undefined) return
             renderCourse(response.data.standardData, 'course')
         }
-        NormalizeFunc.loadingPage(false)
+        customizeOperation.loadingPage(false)
     })
 
     //共編課程區-------------------------------------------------------
@@ -178,7 +178,7 @@ const renderGoList = async () => {
     }).appendTo(courseContainer)
 
     await adminClientConnect.getAllCoworkCourse().then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             if (response.data.coworkData === null || response.data.coworkData === undefined) return
             renderCourse(response.data.coworkData, 'cowork')
         }
@@ -238,7 +238,7 @@ const renderGoList = async () => {
 
             if (courseName !== null) {
                 adminClientConnect.createCourse(courseName, courseClass).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         const goListContainer = $('<div>').prop({
                             className: 'goListCourse_contentContainer'
                         }).click(e => {
@@ -266,7 +266,7 @@ const renderGoList = async () => {
 
 // 生成 Student 名單部分
 const renderStudentList = async () => {
-    NormalizeFunc.loadingPage(true)
+    customizeOperation.loadingPage(true)
 
     const courseContainer = $('.goListCourse')
     courseContainer.css({ 'display': 'inline-block' })
@@ -292,7 +292,7 @@ const renderStudentList = async () => {
 
     // 取得所有課程 (用於下載區)
     adminClientConnect.getAllCourse().then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             if (response.data.standardData === undefined || response.data.standardData === null) {
                 return
             }
@@ -383,7 +383,7 @@ const renderStudentList = async () => {
     // 學生名單-----------------------------------------------------------------------------
     const studentList = {}
     adminClientConnect.getAllStudent().then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             if (response.data.studentData === null || response.data.studentData === undefined) return
 
             // 學生屆數分類
@@ -411,18 +411,18 @@ const renderStudentList = async () => {
         })
         // 產生名單
         renderStudentList(studentList[classSelector.val()])
-        NormalizeFunc.loadingPage(false)
+        customizeOperation.loadingPage(false)
     })
     //----------------------------------------------------
     // 下載所有事件紀錄
     function downloadAllListening() {
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         adminClientConnect.getAllStudentListener().then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
                 console.log(response.data.message.sheetData, response.data.message.sheetName)
-                NormalizeFunc.downloadDataToExcel("listenerData", response.data.message.sheetData, response.data.message.sheetName)
+                customizeOperation.downloadDataToExcel("listenerData", response.data.message.sheetData, response.data.message.sheetName)
             }
-            NormalizeFunc.loadingPage(false)
+            customizeOperation.loadingPage(false)
         })
     }
 
@@ -431,12 +431,12 @@ const renderStudentList = async () => {
         const courseId = $('#reflectionCourse').val()
         const courseName = $('#reflectionCourse').find("option:selected").text()
 
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         adminClientConnect.getAllStudentReflection(courseId).then(response => {
-            if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                NormalizeFunc.downloadDataToExcel(courseName, response.data.message.sheetData, response.data.message.sheetName)
+            if (customizeOperation.serverResponseErrorDetect(response)) {
+                customizeOperation.downloadDataToExcel(courseName, response.data.message.sheetData, response.data.message.sheetName)
             }
-            NormalizeFunc.loadingPage(false)
+            customizeOperation.loadingPage(false)
         })
     }
 
@@ -448,7 +448,7 @@ const renderStudentList = async () => {
             alert("Cancel")
             return
         }
-        NormalizeFunc.downloadDataToExcel(`空白學生名單_${Number(classNumber)}`, [[{ "級數": "", "學號": "", "姓名": "", "密碼": "" }]], ["108"])
+        customizeOperation.downloadDataToExcel(`空白學生名單_${Number(classNumber)}`, [[{ "級數": "", "學號": "", "姓名": "", "密碼": "" }]], ["108"])
     }
 
     // 批量上傳學生名單
@@ -457,7 +457,7 @@ const renderStudentList = async () => {
             window.alert("檔案錯誤")
             return
         }
-        NormalizeFunc.loadingPage(true)
+        customizeOperation.loadingPage(true)
         const [file] = e.target.files
         const reader = new FileReader()
 
@@ -488,9 +488,9 @@ const renderStudentList = async () => {
             console.log(studentListUpdate)
 
             await adminClientConnect.updateStudentList(studentListUpdate, session).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
 
-                    NormalizeFunc.loadingPage(false)
+                    customizeOperation.loadingPage(false)
                 }
             })
         }
@@ -529,9 +529,9 @@ const renderStudentList = async () => {
             }
         }
         ) + '請確認以上操作')) {
-            NormalizeFunc.loadingPage(true)
+            customizeOperation.loadingPage(true)
             adminClientConnect.updateStudent('switchCowork', studentList, classSelector.val(), confirmList).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) window.location.reload()
+                if (customizeOperation.serverResponseErrorDetect(response)) window.location.reload()
             })
         } else {
             alert('cancel')
@@ -631,20 +631,20 @@ const renderStudentList = async () => {
         // 下載單一學生監聽紀錄
         getListenerData:
             (studentClass, studentId) => {
-                NormalizeFunc.loadingPage(true)
+                customizeOperation.loadingPage(true)
                 adminClientConnect.getSingleStudentListener(studentClass, studentId).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                        NormalizeFunc.downloadDataToExcel(`${studentId}_listenerData`, response.data.message.sheetData, response.data.message.sheetName)
-                        NormalizeFunc.loadingPage(false)
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        customizeOperation.downloadDataToExcel(`${studentId}_listenerData`, response.data.message.sheetData, response.data.message.sheetName)
+                        customizeOperation.loadingPage(false)
                     }
                 })
             },
         // 監看 Golist
         watchingList:
             (studentClass, studentId) => {
-                NormalizeFunc.loadingPage(true)
+                customizeOperation.loadingPage(true)
                 adminClientConnect.getStudentCourse(studentClass, studentId).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         const courseContainer = $("<div>").prop({
                             className: 'studentList_courseContainer'
                         }).click(e => {
@@ -662,7 +662,7 @@ const renderStudentList = async () => {
                         }).appendTo(courseContainer)
                         if (response.data.status === 501) {
                             courseDiv.html("目前未有使用過的課程")
-                            NormalizeFunc.loadingPage(false)
+                            customizeOperation.loadingPage(false)
                             return
                         }
                         const studentContent = response.data.message.studentCourse
@@ -693,19 +693,19 @@ const renderStudentList = async () => {
                                 window.location.href = `/${studentId}/${id}`
                             }
                         })
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.loadingPage(false)
                     }
                 })
             },
         // 下載單一學生反思
         downloadReflection:
             (studentClass, studentId) => {
-                NormalizeFunc.loadingPage(true)
+                customizeOperation.loadingPage(true)
                 adminClientConnect.getSingleStudentReflection(studentClass, studentId).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         console.log(response.data.message)
-                        NormalizeFunc.downloadDataToExcel(`${studentId}_reflectionData`, response.data.message.sheetData, response.data.message.sheetName)
-                        NormalizeFunc.loadingPage(false)
+                        customizeOperation.downloadDataToExcel(`${studentId}_reflectionData`, response.data.message.sheetData, response.data.message.sheetName)
+                        customizeOperation.loadingPage(false)
                     }
                 })
             }
@@ -714,7 +714,7 @@ const renderStudentList = async () => {
 
 // 生成 Group 編輯部分
 const renderGroup = async () => {
-    NormalizeFunc.loadingPage(true)
+    customizeOperation.loadingPage(true)
 
     const courseContainer = $('.goListCourse')
     // Operation Button--------------------------------------------------------------
@@ -763,7 +763,7 @@ const renderGroup = async () => {
 
 
     //學生名單(比對名稱用)
-    const studentList = await adminClientConnect.getAllStudent().then(response => { if (NormalizeFunc.serverResponseErrorDetect(response)) return response.data.studentData })
+    const studentList = await adminClientConnect.getAllStudent().then(response => { if (customizeOperation.serverResponseErrorDetect(response)) return response.data.studentData })
     const studentName = new Map()
     const studentChatRoomId = new Map()
     studentList.forEach(student => {
@@ -777,7 +777,7 @@ const renderGroup = async () => {
     //生成 Group 名單---------------------------------------------------------------
     const groupList = {}
     adminClientConnect.getAllStudentGroup().then((response) => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             response.data.message.chatRoom.forEach((group, index) => {
                 if (groupList[group.class] === undefined) {
                     groupList[group.class] = [group]
@@ -801,7 +801,7 @@ const renderGroup = async () => {
             })
             // 產生群組名單
             renderStudentGroup(groupList[classSelector.val()])
-            NormalizeFunc.loadingPage(false)
+            customizeOperation.loadingPage(false)
         }
     })
 
@@ -879,7 +879,7 @@ const renderGroup = async () => {
         function sendGroupList() {
             let studentList = []
             let isComplete = true
-            NormalizeFunc.loadingPage(true)
+            customizeOperation.loadingPage(true)
             $('.addGroup_studentSelector').each((index, element) => {
                 if (element.value !== "") {
                     if (studentChatRoomId.has(element.value) && studentChatRoomId.get(element.value) !== 0) {
@@ -894,24 +894,24 @@ const renderGroup = async () => {
                 }
             })
             if (!isComplete) {
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 return
             }
             if (studentList.length == 0) {
                 alert("尚未選擇學生")
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 return
             }
             if (confirm('確定送出?')) {
                 console.log(123)
                 adminClientConnect.addNewStudentGroup($('#classSelectorInput').val(), studentList).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         alert(response.data.message)
                         window.location.reload()
                     }
                 })
             } else {
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
             }
         }
     }
@@ -1003,15 +1003,15 @@ const renderGroup = async () => {
         changeGroupMate: async (chatRoomId, studentName) => {
             const studentId = prompt("請輸入學號(輸入現有學號代表刪除, 輸入新學號代表加入)")
 
-            NormalizeFunc.loadingPage(true)
+            customizeOperation.loadingPage(true)
             if (studentId === "" || studentId === null) {
                 alert("Cancel")
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 return
             }
             if (!studentName.get(studentId)) {
                 alert("查無此學號")
-                NormalizeFunc.loadingPage(false)
+                customizeOperation.loadingPage(false)
                 return
             }
 
@@ -1020,7 +1020,7 @@ const renderGroup = async () => {
             if (groupInfoData.studentGroup.indexOf(studentId) === -1) {
                 groupInfoData.studentGroup.push(studentId)
                 await adminClientConnect.updateStudent('addChatRoom', studentId, groupInfoData.class, null, chatRoomId).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         alert(response.data.message)
                     }
                 })
@@ -1029,7 +1029,7 @@ const renderGroup = async () => {
                 //刪除原群組的學生
                 groupInfoData.studentGroup.splice(groupInfoData.studentGroup.indexOf(studentId), 1)
                 await adminClientConnect.updateStudent('removeChatRoom', studentId, groupInfoData.class).then(response => {
-                    if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
                         alert(response.data.message)
                     }
                 })
@@ -1037,20 +1037,20 @@ const renderGroup = async () => {
             groupInfoData.studentGroup.sort((a, b) => { return a - b })
 
             adminClientConnect.updateStudentGroup(chatRoomId, groupInfoData.studentGroup, groupInfoData.class).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
                     alert(response.data.message)
                     window.location.reload()
                 }
             })
-            NormalizeFunc.loadingPage(false)
+            customizeOperation.loadingPage(false)
         },
         //下載訊息紀錄
         downloadMessageHistory: (chatRoomId) => {
-            NormalizeFunc.loadingPage(true)
+            customizeOperation.loadingPage(true)
             adminClientConnect.getStudentGroup(chatRoomId).then(response => {
-                if (NormalizeFunc.serverResponseErrorDetect(response)) {
-                    NormalizeFunc.downloadDataToExcel(chatRoomId, [response.data.message.messageHistory], ["History"])
-                    NormalizeFunc.loadingPage(false)
+                if (customizeOperation.serverResponseErrorDetect(response)) {
+                    customizeOperation.downloadDataToExcel(chatRoomId, [response.data.message.messageHistory], ["History"])
+                    customizeOperation.loadingPage(false)
                 }
             })
         }

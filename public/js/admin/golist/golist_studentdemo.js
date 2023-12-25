@@ -1,11 +1,12 @@
-import { GoListFunc, NormalizeFunc } from "../../../global/common.js";
+import { GoListFunc } from "../../../global/common.js";
 import { adminClientConnect } from "../../../global/axiosconnect.js";
+import customizeOperation from "../../../global/customizeOperation.js";
 
 //init Diagram varible
 let myDiagram
 
 
-NormalizeFunc.loadingPage(true)
+customizeOperation.loadingPage(true)
 
 const goListInit = () => {
     // Since 2.2 you can also author concise templates with method chaining instead of GraphObject.make
@@ -405,8 +406,8 @@ const navInit = () => {
     $('#studentSelector').change(e => {
         navButton.changeStudent(e.currentTarget.value)
     })
-    adminClientConnect.getAllStudentByCourseId(NormalizeFunc.getFrontEndCode('courseId')).then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+    adminClientConnect.getAllStudentByCourseId(customizeOperation.getFrontEndCode('courseId')).then(response => {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             const selector = $('#studentSelector')
 
             response.data.message.selectName.forEach((name, index) => {
@@ -415,7 +416,7 @@ const navInit = () => {
                     value: response.data.message.selectValue[index]
                 }).appendTo(selector)
 
-                if (response.data.message.selectValue[index] === NormalizeFunc.getFrontEndCode('studentId')) option.attr("selected", true)
+                if (response.data.message.selectValue[index] === customizeOperation.getFrontEndCode('studentId')) option.attr("selected", true)
             });
 
 
@@ -428,7 +429,7 @@ const navInit = () => {
             })
         }
     })
-    NormalizeFunc.loadingPage(false)
+    customizeOperation.loadingPage(false)
 }
 
 ///save & load  & print & logout function
@@ -436,32 +437,32 @@ const navInit = () => {
 const navButton = {
     // logout
     logout: () => {
-        window.location.href = `/home/${NormalizeFunc.getCookie('adminId')}#student`
+        window.location.href = `/home/${customizeOperation.getCookie('adminId')}#student`
     },
     // Change Student
     changeStudent: (value) => {
-        window.location.href = `/${value}/${NormalizeFunc.getFrontEndCode('courseId')}`
+        window.location.href = `/${value}/${customizeOperation.getFrontEndCode('courseId')}`
     },
     // Change Student
     changeStudentBtn: (studentList, direction) => {
         if (direction === 'forward') {
             studentList.map((value, index) => {
-                if (value === NormalizeFunc.getFrontEndCode('studentId')) {
+                if (value === customizeOperation.getFrontEndCode('studentId')) {
                     if (studentList[index - 1] === undefined) {
-                        window.location.href = `/${studentList[studentList.length - 1]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                        window.location.href = `/${studentList[studentList.length - 1]}/${customizeOperation.getFrontEndCode('courseId')}`
                         return
                     }
-                    window.location.href = `/${studentList[index - 1]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                    window.location.href = `/${studentList[index - 1]}/${customizeOperation.getFrontEndCode('courseId')}`
                 }
             })
         } else {
             studentList.map((value, index) => {
-                if (value === NormalizeFunc.getFrontEndCode('studentId')) {
+                if (value === customizeOperation.getFrontEndCode('studentId')) {
                     if (studentList[index + 1] === undefined) {
-                        window.location.href = `/${studentList[0]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                        window.location.href = `/${studentList[0]}/${customizeOperation.getFrontEndCode('courseId')}`
                         return
                     }
-                    window.location.href = `/${studentList[index + 1]}/${NormalizeFunc.getFrontEndCode('courseId')}`
+                    window.location.href = `/${studentList[index + 1]}/${customizeOperation.getFrontEndCode('courseId')}`
                 }
             })
         }
@@ -470,8 +471,8 @@ const navButton = {
 }
 //load
 const load = async () => {
-    await adminClientConnect.readStudentCourse(NormalizeFunc.getFrontEndCode('courseId'), NormalizeFunc.getFrontEndCode('studentId')).then(response => {
-        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+    await adminClientConnect.readStudentCourse(customizeOperation.getFrontEndCode('courseId'), customizeOperation.getFrontEndCode('studentId')).then(response => {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
             const progress = parseInt(response.data.message.progress || 1)
             let newNodeData = []
             let newLinkData = []

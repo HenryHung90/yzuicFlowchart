@@ -1,19 +1,24 @@
 import { socketConnect, MessageType } from "../../global/socketConnect.js"
-import { ClickListening, NormalizeFunc } from "../../global/common.js"
+import { ClickListening } from "../../global/common.js"
 import { studentClientConnect } from "../../global/axiosconnect.js"
+import customizeOperation from "./customizeOperation.js"
 
 const chatBoxInit = () => {
-    if (NormalizeFunc.getFrontEndCode('coworkStatus') === 'N') {
+    if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
         $('.chatBox').remove()
         return
     }
-    if (NormalizeFunc.getFrontEndCode("chatRoomId")) {
+    if (customizeOperation.getFrontEndCode("chatRoomId")) {
         // 傳送進入房間訊息
         socketConnect.enterRoom()
         // 監聽是否有人進入
         socketConnect.receiveEnterRoom()
+        // 監聽是否有人離開
+        socketConnect.receiveLeaveRoom()
         // 監聽訊息
         socketConnect.receiveMessage()
+        // 監聽房間人數
+        socketConnect.receiveRoomNumber()
 
         const chatBoxMessageContainer = $("<div>")
             .prop({
@@ -130,14 +135,14 @@ const chatBoxInit = () => {
         let freshCount = 2
         $(MessageContent).on("scroll", () => {
             if ($(MessageContent).scrollTop() === 0) {
-                studentClientConnect.getMessageHistory(freshCount, NormalizeFunc.getFrontEndCode("chatRoomId"))
+                studentClientConnect.getMessageHistory(freshCount, customizeOperation.getFrontEndCode("chatRoomId"))
                     .then(response => {
-                        if (NormalizeFunc.serverResponseErrorDetect(response)) {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
                             const reverseMessage = response.data.message.reverse()
                             const OffsetScrollTop = $(".chatBox_MessageContent")[0].scrollHeight
 
                             for (let messageHistory of reverseMessage) {
-                                if (messageHistory.studentId === NormalizeFunc.getCookie("studentId")) {
+                                if (messageHistory.studentId === customizeOperation.getCookie("studentId")) {
                                     MessageType.sendMessage_History(messageHistory)
                                 } else {
                                     //別人傳則使用別人傳的模型

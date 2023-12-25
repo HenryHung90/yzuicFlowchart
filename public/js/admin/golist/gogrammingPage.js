@@ -1,9 +1,9 @@
 import {
-    NormalizeFunc,
     CodeMirrorFunc,
     GoListFunc
 } from "../../../global/common.js"
 import { studentClientConnect } from "../../../global/axiosconnect.js"
+import customizeOperation from "../../../global/customizeOperation.js"
 
 const adminTargetBox = () => {
 
