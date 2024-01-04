@@ -1,4 +1,4 @@
-// 階段五:程式能夠判斷是否完成遊戲
+// 階段六 Bonus: 遊戲開始時牌組能夠彈出顯示
 // => 程式規劃、程式邏輯
 let game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -46,7 +46,7 @@ const puzzleInformation = {
 
 
 function preload() {
-    this.load.spritesheet('puzzle', '../media/img/Aus.jpg', {
+    this.load.spritesheet('puzzle', '../media/img/pokemon.jpeg', {
         frameHeight: puzzleInformation.scale.height,
         frameWidth: puzzleInformation.scale.width,
     })
@@ -69,6 +69,13 @@ function create() {
 
         // 若選到的是要去掉的那塊，則跳過他
         else if (randomPick == puzzleInformation.invisiblePuzzle) {
+            // 創建隱藏的 puzzle ，並將其設置看不到
+            puzzleInformation.crop.create(
+                puzzleInformation.standardPosition[i].x,
+                puzzleInformation.standardPosition[i].y,
+                'puzzle',
+                randomPick
+            ).setVisible(false).setScale(puzzleInformation.cropScale)
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
         }
@@ -80,21 +87,28 @@ function create() {
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
                 randomPick
-            ).setScale(0)
+            )
+                //將其大小初始設置為 0
+                .setScale(0)
 
+            // 製作一個簡單的小動畫使其放大
             this.tweens.add({
                 targets: puzzle,
                 delay: 500,
                 duration: 800,
                 ease: 'Power3',
-                scale: 0.8,
+                scale: puzzleInformation.cropScale,
             })
 
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
+            // 使 puzzle 能夠互動
             puzzle.setInteractive()
+            // 設定 Puzzle 在 pointerup 的監聽事件
             puzzle.on('pointerup', (e) => {
-                puzzleClicking(puzzle, randomPick)
+                if (!puzzleInformation.isFinish) {
+                    puzzleClicking(puzzle, randomPick)
+                }
             })
         }
     }
@@ -118,12 +132,13 @@ function puzzleClicking(puzzle, clickId) {
         movePuzzle(puzzle, clickId, puzzlePosition, moveIndex)
     }
 
+
     if (detectFinish(puzzleInformation.motionPosition)) {
+        // 若發現已完成 就將 isFinish 改為 true
         puzzleInformation.isFinish = true
         window.alert("完成")
 
-        console.log(puzzleInformation.invisiblePuzzle)
-
+        // 將被消失的那張卡牌顯現出來，並擺在正確位置上
         puzzleInformation.crop.getChildren()[puzzleInformation.invisiblePuzzle]
             .setPosition(puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].x, puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].y)
             .setVisible(true)
@@ -215,20 +230,18 @@ function movePuzzle(puzzle, clickId, puzzlePosition, moveIndex) {
         puzzleInformation.standardPosition[puzzlePosition + moveIndex].y
     )
 
-    // 高級版
-    // // 每次點擊都會檢查是否為升冪排序
-    // if (puzzleInformation.motionPosition.every((val, i, arr) => !i || val >= arr[i - 1])) {
-    //     const invisiblePosition = puzzleInformation.motionPosition.indexOf(puzzleInformation.invisiblePuzzle)
+    if (puzzleInformation.motionPosition.every((val, i, arr) => !i || val >= arr[i - 1])) {
+        const invisiblePosition = puzzleInformation.motionPosition.indexOf(puzzleInformation.invisiblePuzzle)
 
-    //     puzzleInformation.crop.create(
-    //         puzzleInformation.standardPosition[invisiblePosition].x,
-    //         puzzleInformation.standardPosition[invisiblePosition].y,
-    //         'puzzle',
-    //         puzzleInformation.invisiblePuzzle
-    //     ).setScale(0.8)
+        puzzleInformation.crop.create(
+            puzzleInformation.standardPosition[invisiblePosition].x,
+            puzzleInformation.standardPosition[invisiblePosition].y,
+            'puzzle',
+            puzzleInformation.invisiblePuzzle
+        ).setScale(0.8)
 
-    //     alert('過關!')
-    // }
+        alert('過關!')
+    }
 }
 
 // 是否獲勝

@@ -20,7 +20,7 @@ let game = new Phaser.Game({
 //定義遊戲變數
 const puzzleInformation = {
     // puzzle 的數量
-    amount: [0, 1, 2, 3, 4, 5, 6, 8, 7],
+    amount: 9,
     // 每一個 puzzle 的大小
     scale: {
         width: 300,
@@ -46,51 +46,58 @@ const puzzleInformation = {
 
 
 function preload() {
-    this.load.spritesheet('puzzle', '../media/img/Aus.jpg', {
+    this.load.spritesheet('puzzle', '../media/img/pokemon.jpeg', {
         frameHeight: puzzleInformation.scale.height,
         frameWidth: puzzleInformation.scale.width,
     })
 }
 function create() {
-    //選擇一塊 puzzle 並記住他，在生成時不會生成他
-    puzzleInformation.invisiblePuzzle = 8
+    //隨機選擇一塊 puzzle 並記住他，在生成時不會生成他
+    puzzleInformation.invisiblePuzzle = Math.floor(Math.random() * 9)
     //將 crop 設為 Phaser 的群組
     puzzleInformation.crop = this.add.group()
 
 
-    for (let i = 0; i < puzzleInformation.amount.length; i++) {
-        // 若選到的是要去掉的那塊，則跳過他
-        if (puzzleInformation.amount[i] == puzzleInformation.invisiblePuzzle) {
-            // 在renderedPuzzle 中加入該 puzzle
-            puzzleInformation.motionPosition.push(puzzleInformation.amount[i])
+    for (let i = 0; i < puzzleInformation.amount; i++) {
+        // 隨機從 0 ~ 8 選擇一塊生成
+        let randomPick = Math.floor(Math.random() * 9)
+
+        // 若選到已經生成過的，則跳過他
+        if (puzzleInformation.motionPosition.includes(randomPick)) {
+            i--
         }
+
+        // 若選到的是要去掉的那塊，則跳過他
+        else if (randomPick == puzzleInformation.invisiblePuzzle) {
+            // 創建隱藏的 puzzle ，並將其設置看不到
+            puzzleInformation.crop.create(
+                puzzleInformation.standardPosition[i].x,
+                puzzleInformation.standardPosition[i].y,
+                'puzzle',
+                randomPick
+            ).setVisible(false).setScale(puzzleInformation.cropScale)
+            // 在renderedPuzzle 中加入該 puzzle
+            puzzleInformation.motionPosition.push(randomPick)
+        }
+
         // 若無上述問題 則生成該 puzzle
         else {
             let puzzle = puzzleInformation.crop.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
-                puzzleInformation.amount[i]
-            )
-                //將其大小初始設置為 0
-                .setScale(0)
-
-            // 製作一個簡單的小動畫使其放大
-            this.tweens.add({
-                targets: puzzle,
-                delay: 500,
-                duration: 800,
-                ease: 'Power3',
-                scale: puzzleInformation.cropScale,
-            })
+                randomPick
+            ).setScale(puzzleInformation.cropScale)
 
             // 在renderedPuzzle 中加入該 puzzle
-            puzzleInformation.motionPosition.push(puzzleInformation.amount[i])
+            puzzleInformation.motionPosition.push(randomPick)
             // 使 puzzle 能夠互動
             puzzle.setInteractive()
             // 設定 Puzzle 在 pointerup 的監聽事件
             puzzle.on('pointerup', (e) => {
-                puzzleClicking(puzzle, puzzleInformation.amount[i])
+                if (!puzzleInformation.isFinish) {
+                    puzzleClicking(puzzle, randomPick)
+                }
             })
         }
     }
@@ -104,7 +111,7 @@ function puzzleClicking(puzzle, clickId) {
     const moveIndex = puzzleInformation.motionPosition.indexOf(puzzleInformation.invisiblePuzzle) - puzzlePosition
 
     // 先確認該位置上下左右是否能動
-    if (isAllowMove(moveIndex, puzzlePosition) && !puzzleInformation.isFinish) {
+    if (isAllowMove(moveIndex, puzzlePosition)) {
         // 接著獲取要移動的方向 (direction) 以及相差距離 (point)
         // direction 只是一個更直覺的方向，避免你看到 -3 -1 1 3 還要在腦袋中轉換一下
         const { direction, point } = moveDirection(moveIndex)
@@ -114,19 +121,17 @@ function puzzleClicking(puzzle, clickId) {
         movePuzzle(puzzle, clickId, puzzlePosition, moveIndex)
     }
 
-    if (detectFinish(puzzleInformation.motionPosition) && !puzzleInformation.isFinish) {
 
-        const invisiblePosition = puzzleInformation.motionPosition.indexOf(puzzleInformation.invisiblePuzzle)
-
-
-        puzzleInformation.crop.create(
-            puzzleInformation.standardPosition[invisiblePosition].x,
-            puzzleInformation.standardPosition[invisiblePosition].y,
-            'puzzle',
-            puzzleInformation.invisiblePuzzle
-        ).setScale(0.8)
+    if (detectFinish(puzzleInformation.motionPosition)) {
+        // 若發現已完成 就將 isFinish 改為 true
         puzzleInformation.isFinish = true
         window.alert("完成")
+
+        // 將被消失的那張卡牌顯現出來，並擺在正確位置上
+        puzzleInformation.crop.getChildren()[puzzleInformation.invisiblePuzzle]
+            .setPosition(puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].x, puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].y)
+            .setVisible(true)
+            .setDepth(10)
     }
 }
 
@@ -214,28 +219,31 @@ function movePuzzle(puzzle, clickId, puzzlePosition, moveIndex) {
         puzzleInformation.standardPosition[puzzlePosition + moveIndex].y
     )
 
-    // if (puzzleInformation.motionPosition.every((val, i, arr) => !i || val >= arr[i - 1])) {
-    //     const invisiblePosition = puzzleInformation.motionPosition.indexOf(puzzleInformation.invisiblePuzzle)
+    if (puzzleInformation.motionPosition.every((val, i, arr) => !i || val >= arr[i - 1])) {
+        const invisiblePosition = puzzleInformation.motionPosition.indexOf(puzzleInformation.invisiblePuzzle)
 
-    //     puzzleInformation.crop.create(
-    //         puzzleInformation.standardPosition[invisiblePosition].x,
-    //         puzzleInformation.standardPosition[invisiblePosition].y,
-    //         'puzzle',
-    //         puzzleInformation.invisiblePuzzle
-    //     ).setScale(0.8)
+        puzzleInformation.crop.create(
+            puzzleInformation.standardPosition[invisiblePosition].x,
+            puzzleInformation.standardPosition[invisiblePosition].y,
+            'puzzle',
+            puzzleInformation.invisiblePuzzle
+        ).setScale(0.8)
 
-    //     alert('過關!')
-    // }
+        alert('過關!')
+    }
 }
 
 // 是否獲勝
 function detectFinish(motionPosition) {
     // 從第一個跑到最後一個比對陣列是否為升冪排列
     // 若為升冪則能確定已經完成排列
-    if (motionPosition.every((val, i, arr) => !i || val >= arr[i - 1])) {
-        return true
+    for (let puzzle = 0; puzzle < puzzleInformation.amount; puzzle++) {
+        if (motionPosition[puzzle + 1] - motionPosition[puzzle] !== 1) {
+            // 只要有位置不正確 就代表尚未獲勝
+            return false
+        }
     }
-    return false
+    return true
 }
 
 

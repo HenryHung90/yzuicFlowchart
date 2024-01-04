@@ -1,4 +1,4 @@
-// 階段四:隨機挑選一張圖片消失並且點擊四周圖片使其移動到空位
+// 階段四: 能夠成功移動圖片
 // => JS Random 使用、Phaser Interactive、程式邏輯
 let game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -19,8 +19,10 @@ let game = new Phaser.Game({
 
 //定義遊戲變數
 const puzzleInformation = {
+    // 暫存方向
+    moveDirection: null,
     // puzzle 的數量
-    amount: [0, 1, 5, 2, 8, 6, 7, 3, 4],
+    amount: 9,
     // 每一個 puzzle 的大小
     scale: {
         width: 300,
@@ -40,65 +42,74 @@ const puzzleInformation = {
     motionPosition: [],
     // 用於儲存要抹去的 puzzle 編號
     invisiblePuzzle: null,
+    // 用於儲存是否獲勝
+    isFinish: false,
 }
 
-
 function preload() {
-    this.load.spritesheet('puzzle', '../media/img/Aus.jpg', {
+    // 使用 spritesheet 載入
+    this.load.spritesheet('puzzle', '../media/img/pokemon.jpeg', {
+        // 利用設定好的變數設定每個 frame 切割寬高
         frameHeight: puzzleInformation.scale.height,
         frameWidth: puzzleInformation.scale.width,
     })
 }
+
 function create() {
-    //選擇一塊 puzzle 並記住他，在生成時不會生成他
-    puzzleInformation.invisiblePuzzle = 8
+    //隨機選擇一塊 puzzle 並記住他，在生成時不會生成他
+    puzzleInformation.invisiblePuzzle = Math.floor(Math.random() * 9)
     //將 crop 設為 Phaser 的群組
     puzzleInformation.crop = this.add.group()
 
+    for (let i = 0; i < puzzleInformation.amount; i++) {
+        // 隨機從 0 ~ 8 選擇一塊生成
+        let randomPick = Math.floor(Math.random() * 9)
 
-    for (let i = 0; i < puzzleInformation.amount.length; i++) {
+        // 若選到已經生成過的，則跳過他
+        if (puzzleInformation.motionPosition.includes(randomPick)) {
+            i--
+        }
+
         // 若選到的是要去掉的那塊，則跳過他
-        if (puzzleInformation.amount[i] == puzzleInformation.invisiblePuzzle) {
+        else if (randomPick == puzzleInformation.invisiblePuzzle) {
             // 創建隱藏的 puzzle ，並將其設置看不到
             puzzleInformation.crop.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
-                puzzleInformation.amount[i]
+                randomPick
             ).setVisible(false).setScale(puzzleInformation.cropScale)
             // 在renderedPuzzle 中加入該 puzzle
-            puzzleInformation.motionPosition.push(puzzleInformation.amount[i])
+            puzzleInformation.motionPosition.push(randomPick)
         }
+
         // 若無上述問題 則生成該 puzzle
         else {
             let puzzle = puzzleInformation.crop.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
-                puzzleInformation.amount[i]
-            )
-                //將其大小初始設置為 0
-                .setScale(0)
-
-            // 製作一個簡單的小動畫使其放大
-            this.tweens.add({
-                targets: puzzle,
-                delay: 500,
-                duration: 800,
-                ease: 'Power3',
-                scale: puzzleInformation.cropScale,
-            })
-
+                randomPick
+            ).setScale(puzzleInformation.cropScale)
             // 在renderedPuzzle 中加入該 puzzle
-            puzzleInformation.motionPosition.push(puzzleInformation.amount[i])
+            puzzleInformation.motionPosition.push(randomPick)
             // 使 puzzle 能夠互動
             puzzle.setInteractive()
             // 設定 Puzzle 在 pointerup 的監聽事件
             puzzle.on('pointerup', (e) => {
-                puzzleClicking(puzzle, puzzleInformation.amount[i])
+                if (!puzzleInformation.isFinish) {
+                    puzzleClicking(puzzle, randomPick)
+                }
             })
         }
     }
+
+    // 創建移動方向文字
+    puzzleInformation.moveDirection = this.add.text(50, 50, "方向顯示", {
+        fontSize: 48,
+        fontWeight: 'bolder',
+        backgroundColor: 'black'
+    })
 }
 
 //點擊 puzzle 的事件
@@ -113,7 +124,7 @@ function puzzleClicking(puzzle, clickId) {
         // 接著獲取要移動的方向 (direction) 以及相差距離 (point)
         // direction 只是一個更直覺的方向，避免你看到 -3 -1 1 3 還要在腦袋中轉換一下
         const { direction, point } = moveDirection(moveIndex)
-        console.log('方向:' + direction, '位置:' + point)
+        puzzleInformation.moveDirection.setText(direction)
 
         // 讓被點擊的 puzzle 與 被去除的那塊 puzzle 位置交換
         movePuzzle(puzzle, clickId, puzzlePosition, moveIndex)
@@ -173,7 +184,6 @@ function isAllowMove(moveIndex, puzzlePosition) {
         moveIndex == 1
     )
 }
-
 // 移動的方向
 function moveDirection(moveIndex) {
     //-3 向上
@@ -191,7 +201,6 @@ function moveDirection(moveIndex) {
             return { direction: '下', point: moveIndex }
     }
 }
-
 // 交換 puzzle 與 被去除的那塊 puzzle 位置
 function movePuzzle(puzzle, clickId, puzzlePosition, moveIndex) {
     // 交換位置（記錄在motionPosition）
