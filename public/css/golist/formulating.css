@@ -1,7 +1,7 @@
 .formulatingDescription_container,
 .writeFormulatingDescription_container {
     padding: 10px 24px;
-    height: 75vh;
+    height: 80vh;
     overflow-y: auto;
 }
 
@@ -42,12 +42,23 @@
     padding: 5px 20px;
 }
 
-/*write Formulating Description */
-.writeFormulatingButton{
-    margin:20px;
+.formulatingDescription_contentBox_interfacing {
+    padding:10px 10px;
+    justify-content: center;
+}
+.formulatingDescription_interfacing{
+    border:1px solid;
+    padding:0;
+    margin:0;
+    overflow: hidden;
 }
 
-.writeFormulatingDescription_contentCode{
+/*write Formulating Description */
+.writeFormulatingButton {
+    margin: 20px;
+}
+
+.writeFormulatingDescription_contentCode {
     margin: 15px;
 }
 .writeFormulatingDescription_contentTitle {
@@ -57,4 +68,3 @@
     height: 300px;
     margin: 15px;
 }
-

@@ -123,10 +123,11 @@ const __dirname = path.dirname(__filename);
 //     res.sendFile(`${__dirname}/public/access/${req.params.studentId}/${req.params.file}/${req.params.filename}`)
 //     console.log(req.params.file, req.params.filename)
 // })
-//靜態物件取得從public
 app.use(express.json())
+//靜態物件取得從public
 app.use(express.static('public'))
 app.use(express.static(path.join(__dirname, 'public')))
+
 
 //cors
 app.use(cors(

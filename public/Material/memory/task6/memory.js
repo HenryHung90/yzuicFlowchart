@@ -293,7 +293,4 @@ function checkCard(firstCard, secondCard, Tweens) {
             }
         }
     })
-
-   
-
 }

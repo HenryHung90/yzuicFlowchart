@@ -52,9 +52,6 @@ const boardInformation = {
     lockBoard: false,
 }
 
-let CARD_COUNTING = 0
-
-
 function preload() {
     // 預載圖片
     // 0 ~ 12 為黑桃 A ~ K
@@ -82,18 +79,16 @@ function create() {
         30, 30, 36, 36,
         46, 46, 50, 50
     ])
-
-    console.log(cardInformation.cardList)
-
-
     // 建立翻牌 依照設定的順序建立 row * col 的牌組陣列
-    for (let i = 0; i < boardInformation.row; i++) {
-        for (let j = 0; j < boardInformation.col; j++) {
+    for (let row = 0; row < boardInformation.row; row++) {
+        for (let col = 0; col < boardInformation.col; col++) {
             // 建立卡牌生成在指定位置
             cardInformation.cards.create(
-                boardInformation.startX + i * boardInformation.offsetX,
-                boardInformation.startY + j * boardInformation.offsetY, "Cards", cardInformation.cardList[CARD_COUNTING]).setScale(0.3, 0.3)
-            CARD_COUNTING++
+                boardInformation.startX + col * boardInformation.offsetX,
+                boardInformation.startY + row * boardInformation.offsetY,
+                "Cards",
+                cardInformation.cardList[row * 4 + col]
+            ).setScale(0.3, 0.3)
         }
     }
 }

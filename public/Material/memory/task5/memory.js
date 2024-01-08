@@ -1,5 +1,5 @@
-// 階段五:程式能夠判斷是否完成遊戲，並且讓翻牌具有動畫
-// => 程式規劃、程式邏輯、Phaser timeline
+// 階段五: 程式能夠判斷是否完成遊戲
+// => 程式規劃、程式邏輯
 
 let game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -85,15 +85,15 @@ function create() {
     cardInformation.winMatch = boardInformation.row * boardInformation.col / 2
 
     // 建立翻牌 依照設定的順序建立 row * col 的牌組陣列
-    for (let i = 0; i < boardInformation.row; i++) {
-        for (let j = 0; j < boardInformation.col; j++) {
+    for (let row = 0; row < boardInformation.row; row++) {
+        for (let col = 0; col < boardInformation.col; col++) {
             // 建立卡牌生成在指定位置
             let card = cardInformation.cards.create(
-                boardInformation.startX + i * boardInformation.offsetX,
-                boardInformation.startY + j * boardInformation.offsetY, "Cards", 56).setScale(0.3, 0.3)
+                boardInformation.startX + col * boardInformation.offsetX,
+                boardInformation.startY + row * boardInformation.offsetY, "Cards", 56).setScale(0.3, 0.3)
 
             // 在每個 card 的 object 底下定義其 Id 為相對 cardList 上的 Id
-            card.cardId = cardInformation.cardList[i + j * boardInformation.row]
+            card.cardId = cardInformation.cardList[row * boardInformation.row + col]
             // 設定是否處於翻牌狀態
             card.flip = false
             // 設定該 card 具有互動功能
@@ -133,155 +133,43 @@ function flipCard(card, Tweens) {
     // 如果是第一張牌，將其儲存在 firstCard 變數中
     if (!cardInformation.firstCard) {
         cardInformation.firstCard = card
-        // 設定並執行補間動畫
-        Tweens.timeline({
-            // 設定對象為點擊的 card
-            targets: card,
-            // 設定 ease 的效果
-            ease: 'Power2',
-            // 設定要重複幾次
-            loop: 0,
-            // 設定動畫鏈接
-            tweens: [
-                {
-                    scale: 0.35,
-                    duration: 200,
-
-                },
-                {
-                    scaleX: 0,
-                    duration: 200,
-                    //該步驟結束時 將卡牌的 frame 設定該 cardId 的牌面
-                    onComplete: () => {
-                        card.setFrame(card.cardId)
-                    }
-                },
-                {
-                    scaleX: 0.35,
-                    duration: 200,
-                },
-                {
-                    scale: 0.3,
-                    duration: 300,
-                    //補間動畫結束後，解鎖棋盤
-                    onComplete: () => {
-                        boardInformation.lockBoard = false
-                    }
-                }
-            ]
-        })
+        card.setFrame(card.cardId)
+        boardInformation.lockBoard = false
         // 跳出程式
         return
     }
-
     // 如果是第二張牌，將其儲存在 secondCard 變數中
     cardInformation.secondCard = card;
-    Tweens.timeline({
-        targets: card,
-        ease: 'Power2',
-        loop: 0,
-        tweens: [
-            {
-                scale: 0.35,
-                duration: 200,
-
-            },
-            {
-                scaleX: 0,
-                duration: 200,
-                onComplete: () => {
-                    //該步驟結束時 將卡牌的 frame 設定該 cardId 的牌面
-                    card.setFrame(card.cardId)
-                }
-            },
-            {
-                scaleX: 0.35,
-                duration: 200,
-            },
-            {
-                scale: 0.3,
-                duration: 200,
-                //補間動畫結束後，確認兩張卡牌是否相同
-                onComplete: () => {
-                    checkCard(cardInformation.firstCard, cardInformation.secondCard, Tweens)
-                }
-            }
-        ]
-    })
+    card.setFrame(card.cardId)
+    checkCard(cardInformation.firstCard, cardInformation.secondCard, Tweens)
 }
 
 // 檢查卡牌
 function checkCard(firstCard, secondCard, Tweens) {
     // 若兩張牌 cardId 不同，則鎖定棋盤一段時間並重置 firstCard 和 secondCard
-    if (firstCard.cardId !== secondCard.cardId) {
-        Tweens.timeline({
-            //同時指定兩個物件進行補間動畫
-            targets: [firstCard, secondCard],
-            ease: 'Power2',
-            loop: 0,
-            tweens: [
-                {
-                    scale: 0.35,
-                    duration: 200,
-                    delay: 500,
-
-                },
-                {
-                    scaleX: 0,
-                    duration: 200,
-                    // 此步驟時將兩張卡牌的牌面換成卡背的樣式
-                    onComplete: () => {
-                        firstCard.setFrame(56)
-                        secondCard.setFrame(56)
-                    }
-                },
-                {
-                    scaleX: 0.35,
-                    duration: 200,
-                },
-                {
-                    scale: 0.3,
-                    duration: 200,
-                    // 此步驟時將兩張卡牌的 flip 改回 false
-                    // 將紀錄的 firstCard secondCard 清空並解鎖棋盤
-                    onComplete: () => {
-                        firstCard.flip = false
-                        secondCard.flip = false
-                        cardInformation.firstCard = null
-                        cardInformation.secondCard = null
-                        boardInformation.lockBoard = false
-                    }
-                }
-            ]
-        })
-        return
-    }
-    // 如果這兩張牌的 cardId 相同，則增加匹配次數
-    cardInformation.match++
-    Tweens.timeline({
-        targets: [firstCard, secondCard],
-        ease: 'Power2',
-        loop: 2,
-        tweens: [
-            {
-                scale: 0.35,
-                duration: 100,
-            },
-            {
-                scale: 0.3,
-                duration: 100,
-            }
-        ],
-        onComplete: () => {
+    setTimeout(() => {
+        if (firstCard.cardId !== secondCard.cardId) {
+            firstCard.setFrame(56)
+            secondCard.setFrame(56)
+            firstCard.flip = false
+            secondCard.flip = false
             cardInformation.firstCard = null
             cardInformation.secondCard = null
             boardInformation.lockBoard = false
+            return
         }
-    })
+        // 如果這兩張牌的 cardId 相同，則增加匹配次數
+        cardInformation.match++
+        cardInformation.firstCard = null
+        cardInformation.secondCard = null
+        boardInformation.lockBoard = false
 
-    // 如果已經完成所有匹配，顯示遊戲結束訊息
-    if (cardInformation.match === cardInformation.winMatch) {
-        window.alert("遊戲結束！您用了 " + cardInformation.moves + " 次移動完成所有匹配。");
-    }
+        // 如果已經完成所有匹配，顯示遊戲結束訊息
+        if (cardInformation.match === cardInformation.winMatch) {
+            window.alert("遊戲結束！您用了 " + cardInformation.moves + " 次移動完成所有匹配。");
+        }
+    }, 500)
+
+   
 
 }

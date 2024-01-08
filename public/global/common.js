@@ -106,51 +106,103 @@ const categoryBox = {
         }
     },
     Formulating: data => {
-        if (data.message === undefined) {
-            return
-        }
-        if (data.message.content !== undefined) {
-            let index = 0
-            for (const { title, code, description } of data.message.content) {
-                // ContentBox
-                const contentBox = $("<div>")
-                    .prop({
-                        className: "formulatingDescription_contentBox",
-                    })
-                    .appendTo($("#formulatingContent"))
+        if (data.message === undefined) return
+        if (data.message.content === undefined) return
+        console.log(data)
+        let index = 0
+        for (const { title, code, description } of data.message.content) {
+            // ContentBox
+            const contentBox = $("<div>")
+                .prop({
+                    className: "formulatingDescription_contentBox",
+                })
+                .appendTo($("#formulatingContent"))
+            
+            //Description
+            $("<div>")
+                .prop({
+                    className: "formulatingDescription_contentDescription",
+                    innerHTML: `<p>${description}</p>`,
+                })
+                .appendTo(contentBox)
+            
 
-                //Title
-                $("<div>")
-                    .prop({
-                        className: "formulatingDescription_contentTitle",
-                        innerHTML: `<h4>⌨ ${title}</h4>`,
-                    })
-                    .appendTo(contentBox)
+            //interfacing area
+            const contentInterfacingBox = $("<div>").prop({
+                className: "row formulatingDescription_contentBox_interfacing"
+            }).appendTo(contentBox)
+            //Code
+            $("<textarea>")
+                .prop({
+                    className: "col-5 formulatingDescription_contentCode",
+                    id: `code_${index}`,
+                    innerHTML: code,
+                })
+                .appendTo(contentInterfacingBox)
 
-                //Code
-                $("<textarea>")
-                    .prop({
-                        className: "formulatingDescription_contentCode",
-                        id: `code_${index}`,
-                        innerHTML: code,
-                    })
-                    .appendTo(contentBox)
+            CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code, false)
+            $(`#code_${index}`).data("CodeMirror").setSize(600, 500)
+            $(`#code_${index}`)
+                .data("CodeMirror")
+            index++
 
-                CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code, true)
-                $(`#code_${index}`).data("CodeMirror").setSize("auto", "auto")
-                $(`#code_${index}`)
-                    .data("CodeMirror")
-                    .setOption("readOnly", true)
-                index++
+            //interfacing
+            $("<div>").prop({
+                className: "col-5 formulatingDescription_interfacing",
+                id: `code_${index}_interfacing`,
+            }).appendTo(contentInterfacingBox)
 
-                //Description
-                $("<div>")
-                    .prop({
-                        className: "formulatingDescription_contentDescription",
-                        innerHTML: `<p>${description}</p>`,
-                    })
-                    .appendTo(contentBox)
-            }
+            let game = new Phaser.Game({
+                type: Phaser.AUTO,
+                width: 800,
+                height: 800,
+                backgroundColor: '#4488aa',
+                // scene: {
+                //     preload: preload,
+                //     create: create,
+                //     update: update
+                // },
+                scale: {
+                    mode: Phaser.Scale.FIT,
+                    autoCenter: Phaser.Scale.CENTER_BOTH,
+                },
+                parent: `code_${index}_interfacing`,
+            });
+
+
+            //** old version ---------------------------------------------
+            // //Title
+            // $("<div>")
+            //     .prop({
+            //         className: "formulatingDescription_contentTitle",
+            //         innerHTML: `<h4>⌨ ${title}</h4>`,
+            //     })
+            //     .appendTo(contentBox)
+
+            // //Code
+            // $("<textarea>")
+            //     .prop({
+            //         className: "formulatingDescription_contentCode",
+            //         id: `code_${index}`,
+            //         innerHTML: code,
+            //     })
+            //     .appendTo(contentBox)
+
+            // CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code, true)
+            // $(`#code_${index}`).data("CodeMirror").setSize("auto", "auto")
+            // $(`#code_${index}`)
+            //     .data("CodeMirror")
+            //     .setOption("readOnly", true)
+            // index++
+
+            // //Description
+            // $("<div>")
+            //     .prop({
+            //         className: "formulatingDescription_contentDescription",
+            //         innerHTML: `<p>${description}</p>`,
+            //     })
+            //     .appendTo(contentBox)
+            //-----------------------------------------------------------------
         }
     },
     WriteFormulating: data => {
@@ -956,7 +1008,7 @@ const GoListFunc = {
         }
         //formulating (expected bouns formulating)
         async function formulatingContainer() {
-            FormulatingBox(s).appendTo(contentContainer)
+            FormulatingBox().appendTo(contentContainer)
 
             if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 await studentClientConnect.getFormulating(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
@@ -1086,7 +1138,7 @@ const CodeMirrorFunc = {
             //編譯模式
             mode: "text/javascript",
             //主題
-            theme: "material-ocean",
+            theme: "blackboard",
             //是否要行號
             lineNumbers: true,
             //開始行號

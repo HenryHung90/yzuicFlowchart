@@ -895,6 +895,16 @@ router.get('/co/:courseId', async (req, res) => {
         })
     }
 })
+//Admin 修改 cowork understanding
+router.post("/cowork/updatestandardunderstanding", async (req, res) => {
+
+})
+
+//Admin 修改 cowork formulating
+router.post("/cowork/updatestandardformulating", async (req, res) => {
+
+})
+
 
 //Admin 取得學生GoList
 router.post("/getstudentcourse", async (req, res) => {

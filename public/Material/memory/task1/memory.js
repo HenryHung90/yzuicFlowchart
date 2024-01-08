@@ -45,9 +45,9 @@ function create() {
     // 列出所有牌組
     // 每組牌共有 13 張，因此每列 0 ~ 12 共 13 張
     // 四花色 + Joker 等特殊牌組共 5 行
-    for (let row = 0; row < 13; row++) {
-        for (let col = 0; col < 5; col++) {
-            cardInformation.cards.create(100 + row * 50, 100 + col * 80, "Cards", row + col * 13).setScale(0.25, 0.25);
+    for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 13; col++) {
+            cardInformation.cards.create(100 + col * 50, 100 + row * 100, "Cards", row * 13 + col).setScale(0.25, 0.25);
         }
     }
 }

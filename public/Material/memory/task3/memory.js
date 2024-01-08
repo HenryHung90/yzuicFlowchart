@@ -1,5 +1,5 @@
-// 階段三:讓生成的 4*4 卡牌皆為卡背，點擊時會變成正面
-// => Phaser setFrame 使用、Phaser Interactive 使用
+// 階段三: 讓生成的 4*4 卡牌皆為卡背，點擊時會變成正面
+// => Phaser setFrame, Phaser Interactive, Object 應用
 let game = new Phaser.Game({
     type: Phaser.AUTO,
     width: 800,
@@ -81,15 +81,15 @@ function create() {
     ])
 
     // 建立翻牌 依照設定的順序建立 row * col 的牌組陣列
-    for (let i = 0; i < boardInformation.row; i++) {
-        for (let j = 0; j < boardInformation.col; j++) {
+    for (let row = 0; row < boardInformation.row; row++) {
+        for (let col = 0; col < boardInformation.col; col++) {
             // 建立卡牌生成在指定位置
             let card = cardInformation.cards.create(
-                boardInformation.startX + i * boardInformation.offsetX,
-                boardInformation.startY + j * boardInformation.offsetY, "Cards", 56).setScale(0.3, 0.3)
+                boardInformation.startX + col * boardInformation.offsetX,
+                boardInformation.startY + row * boardInformation.offsetY, "Cards", 56).setScale(0.3, 0.3)
 
             // 在每個 card 的 object 底下定義其 Id 為相對 cardList 上的 Id
-            card.cardId = cardInformation.cardList[i + j * boardInformation.row]
+            card.cardId = cardInformation.cardList[row * boardInformation.row + col]
             // 設定是否處於翻牌狀態
             card.flip = false
             // 設定該 card 具有互動功能

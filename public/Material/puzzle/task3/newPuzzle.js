@@ -1,4 +1,4 @@
-// 階段三: 能夠判斷圖片移動方向，並將方向使用
+// 階段三: 能夠判斷圖片移動方向，並將方向使用 text 印在畫面中
 // => Phaser Group 使用, 邏輯判斷
 let game = new Phaser.Game({
     type: Phaser.AUTO,

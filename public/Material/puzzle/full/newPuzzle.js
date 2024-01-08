@@ -1,5 +1,15 @@
+// 階段一: 將遊戲變數定義完成，並能產生一張精靈圖在場上
+// => 程式規劃, sprite 圖片使用
+// 階段二: 將 Puzzle 全部印在場上，並隨機使其中一張消失
+// => random 應用
+// 階段三: 能夠判斷圖片移動方向，並將方向使用 text 印在畫面中
+// => Phaser Interactive, 程式切割, 程式邏輯
+// 階段四: 能夠成功移動圖片
+// => Phaser Interactive、程式邏輯
 // 階段五:程式能夠判斷是否完成遊戲
 // => 程式規劃、程式邏輯
+// 階段六 Bonus: 遊戲開始時牌組能夠彈出顯示
+// => Phaser tweens, 程式規劃, 程式邏輯
 let game = new Phaser.Game({
     type: Phaser.AUTO,
     width: 800,
