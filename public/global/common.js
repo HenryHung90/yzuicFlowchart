@@ -23,6 +23,7 @@ import customizeOperation from "./customizeOperation.js"
 //------------------------------ category Box Function -----------------------------------//
 const categoryBox = {
     Target: data => {
+        console.log(data)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             $(".targetIframe").attr(
                 "src",
@@ -39,9 +40,7 @@ const categoryBox = {
     Start: (data, key) => {
         if (data.message === undefined) {
             $("#startDescription").html(`<h3>Task undefined</h3>`)
-            return
         }
-
         return
     },
     Understanding: data => {
@@ -105,19 +104,26 @@ const categoryBox = {
             })
         }
     },
-    Formulating: data => {
+    Formulating: async (data, s) => {
         if (data.message === undefined) return
         if (data.message.content === undefined) return
-        console.log(data)
         let index = 0
-        for (const { title, code, description } of data.message.content) {
+        for (const { title, editableCode, preloadCode, description } of data.message.content) {
             // ContentBox
             const contentBox = $("<div>")
                 .prop({
                     className: "formulatingDescription_contentBox",
                 })
                 .appendTo($("#formulatingContent"))
-            
+
+            //Title
+            $("<div>")
+                .prop({
+                    className: "formulatingDescription_contentTitle",
+                    innerHTML: `<h4>⌨ ${title}</h4>`,
+                })
+                .appendTo(contentBox)
+
             //Description
             $("<div>")
                 .prop({
@@ -125,7 +131,16 @@ const categoryBox = {
                     innerHTML: `<p>${description}</p>`,
                 })
                 .appendTo(contentBox)
-            
+
+            $("<button>")
+                .prop({
+                    className: "btn btn-success formulatingDescription_launchbtn",
+                    id: `start_launchbtn_${index}`,
+                    innerHTML:
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
+                })
+                .click((e) => launchDemo(s, e, preloadCode))
+                .appendTo(contentBox)
 
             //interfacing area
             const contentInterfacingBox = $("<div>").prop({
@@ -135,41 +150,29 @@ const categoryBox = {
             $("<textarea>")
                 .prop({
                     className: "col-5 formulatingDescription_contentCode",
-                    id: `code_${index}`,
-                    innerHTML: code,
+                    id: `code_${index}`
                 })
                 .appendTo(contentInterfacingBox)
 
-            CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code, false)
+            CodeMirrorFunc.codeMirrorProgram(`code_${index}`, editableCode, false)
             $(`#code_${index}`).data("CodeMirror").setSize(600, 500)
-            $(`#code_${index}`)
-                .data("CodeMirror")
-            index++
 
-            //interfacing
-            $("<div>").prop({
-                className: "col-5 formulatingDescription_interfacing",
-                id: `code_${index}_interfacing`,
+
+
+            const demoSrc = await studentClientConnect.launchFormulatingDemo(s.key + '-' + index, preloadCode + '\n' + editableCode).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) return response.data.message
+            })
+            $('<iframe>').prop({
+                id: `code_${index}_interfacing_demo`,
+                class: 'col-5',
+                src: `../../Access/${customizeOperation.getCookie("studentId")}/${demoSrc}/${demoSrc}.html`,
+                sandBox: "allow-scripts allow-same-origin"
+            }).css({
+                width: '500px',
+                height: '500px',
+                overflow: 'hidden',
             }).appendTo(contentInterfacingBox)
-
-            let game = new Phaser.Game({
-                type: Phaser.AUTO,
-                width: 800,
-                height: 800,
-                backgroundColor: '#4488aa',
-                // scene: {
-                //     preload: preload,
-                //     create: create,
-                //     update: update
-                // },
-                scale: {
-                    mode: Phaser.Scale.FIT,
-                    autoCenter: Phaser.Scale.CENTER_BOTH,
-                },
-                parent: `code_${index}_interfacing`,
-            });
-
-
+            index++
             //** old version ---------------------------------------------
             // //Title
             // $("<div>")
@@ -203,6 +206,13 @@ const categoryBox = {
             //     })
             //     .appendTo(contentBox)
             //-----------------------------------------------------------------
+        }
+        async function launchDemo(s, e, preloadCode) {
+            const launchIndex = e.currentTarget.id.split("_")[2]
+            const demoSrc = await studentClientConnect.launchFormulatingDemo(s.key + '-' + launchIndex, preloadCode + '\n' + $(`#code_${launchIndex}`).data("CodeMirror").getValue()).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) return response.data.message
+            })
+            $(`#code_${launchIndex}_interfacing_demo`).attr('src', `../../Access/${customizeOperation.getCookie("studentId")}/${demoSrc}/${demoSrc}.html`)
         }
     },
     WriteFormulating: data => {
@@ -520,9 +530,8 @@ const GoListFunc = {
     showContainer: async (s, id) => {
         ClickListening("", `打開-Task ${s.key} ${s.text}`)
         // 設定共編進入區域
-        if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
-            socketConnect.cowork.selectionArea = s.key
-        }
+        if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") socketConnect.cowork.selectionArea = s.key
+
         // //取得 Iframe 發出之 Error 警訊
         // const reciveMessage = e => {
         //     e.preventDefault()
@@ -556,9 +565,8 @@ const GoListFunc = {
         const closePage = () => {
             ClickListening("", `離開-${s.text}`)
             // 設定共編進入區域
-            if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
-                socketConnect.cowork.selectionArea = 'golist'
-            }
+            if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") socketConnect.cowork.selectionArea = 'golist'
+
             //關閉自動儲存
             //取得各階段程式碼
             if (
@@ -719,7 +727,7 @@ const GoListFunc = {
                 $(".content_consoleErrorArea").remove()
                 $(".content_dataVisualizationArea").remove()
                 //Programming modal
-                $(".modal").remove()
+                $("#programmingHintModal").remove()
             }, 200)
         }
 
@@ -794,8 +802,8 @@ const GoListFunc = {
             })
             .appendTo(content_iconContainer)
         //------------------------------------------------
+        //rotate Slide Code
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
-            //rotate Slide Code
             const rotateAllIconAndSlideAllCode = () => {
                 const content_codingContainer = [
                     ".content_coding_settingContainer",
@@ -923,7 +931,7 @@ const GoListFunc = {
                     understandingContainer()
                     break
                 case "Formulating":
-                    formulatingContainer()
+                    formulatingContainer(s)
                     break
                 case "Programming":
                     programmingContainer()
@@ -936,7 +944,7 @@ const GoListFunc = {
                     understandingContainer()
                     break
                 case "Completed-Formulating":
-                    formulatingContainer()
+                    formulatingContainer(s)
                     break
                 case "Completed-Programming":
                     programmingContainer()
@@ -1007,20 +1015,20 @@ const GoListFunc = {
             }
         }
         //formulating (expected bouns formulating)
-        async function formulatingContainer() {
+        async function formulatingContainer(s) {
             FormulatingBox().appendTo(contentContainer)
 
             if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 await studentClientConnect.getFormulating(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        categoryBox.Formulating(response.data)
+                        categoryBox.Formulating(response.data, s)
                         customizeOperation.loadingPage(false)
                     }
                 })
             } else {
                 await studentClientConnect.cowork.getFormulating(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        categoryBox.Formulating(response.data)
+                        categoryBox.Formulating(response.data, s)
                         customizeOperation.loadingPage(false)
                     }
                 })
@@ -1257,7 +1265,7 @@ const CodeMirrorFunc = {
                 )
             } else {
                 const coworkCode = $('#coworkArea').data("CodeMirror")
-
+                if (coworkCode === undefined) return
                 studentClientConnect.cowork.saveCode(
                     customizeOperation.getFrontEndCode("courseId"),
                     coworkCode.getValue()
@@ -1291,6 +1299,7 @@ function ClickListening(e, customClick) {
         // go list class //
         ["courseTitle", "點擊-課程名稱"],
         ["studentId", "點擊-自己的ID"],
+        ["LS_closeVotingModal", "關閉-投票"],
         // Start //
         ["start_launchbtn", "重新執行-任務-範例"],
         // Understanding //

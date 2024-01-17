@@ -1582,54 +1582,64 @@ const ReflectionBox = reflectionKey => {
             }
         }
 
-        if ($("#scoringValue").val() !== "0") {
+        if ($("#scoringValue").val() == "0" &&window.confirm("確定要給自己0分ㄇ🧐")) {
             submitFunc()
+            return
         }
-        if (
-            $("#scoringValue").val() == "0" &&
-            window.confirm("確定要給自己0分ㄇ🧐")
-        ) {
-            submitFunc()
-        }
+        submitFunc()
 
         function submitFunc() {
             ClickListening("", `送出-監控反思-${reflectionKey.key}`)
             customizeOperation.loadingPage(true)
-            studentClientConnect
-                .saveReflection(
-                    customizeOperation.getFrontEndCode("courseId"),
-                    reflectionKey.key,
-                    $("#learningValue").val(),
-                    $("#workhardValue").val(),
-                    $("#difficultValue").val(),
-                    $("#scoringValue").val()
-                )
-                .then(response => {
-                    if (customizeOperation.serverResponseErrorDetect(response)) {
-                        window.alert(response.data.message)
-                        customizeOperation.loadingPage(false)
-                        $(".block").fadeOut(200)
-                        $(".contentDiv").fadeOut(200)
-                        //iframe
-                        $(".DemoDiv").fadeOut(200)
-                        $(".content_dataVisualizationArea").fadeOut(200)
-                        $(".content_consoleErrorArea").fadeOut(200)
-                        setTimeout(() => {
-                            $("body").css({
-                                overflow: "auto",
-                            })
-                            $(".contentDiv").remove()
-                            $(".block").remove()
-                            //iframe
-                            $(".DemoDiv").remove()
-                            $(".content_consoleErrorArea").remove()
-                            $(".content_dataVisualizationArea").remove()
-                            //Programming modal
-                            $(".modal").remove()
-                            location.reload()
-                        }, 200)
-                    }
-                })
+            if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
+                studentClientConnect
+                    .cowork.saveReflection(
+                        customizeOperation.getFrontEndCode("courseId"),
+                        reflectionKey.key,
+                        $("#learningValue").val(),
+                        $("#workhardValue").val(),
+                        $("#difficultValue").val(),
+                        $("#scoringValue").val()
+                    )
+                    .then(response => { if (customizeOperation.serverResponseErrorDetect(response)) successSaveing(response) })
+            } else {
+                studentClientConnect
+                    .saveReflection(
+                        customizeOperation.getFrontEndCode("courseId"),
+                        reflectionKey.key,
+                        $("#learningValue").val(),
+                        $("#workhardValue").val(),
+                        $("#difficultValue").val(),
+                        $("#scoringValue").val()
+                    )
+                    .then(response => { if (customizeOperation.serverResponseErrorDetect(response)) successSaveing(response) })
+            }
+
+
+            function successSaveing(response) {
+                window.alert(response.data.message)
+                customizeOperation.loadingPage(false)
+                $(".block").fadeOut(200)
+                $(".contentDiv").fadeOut(200)
+                //iframe
+                $(".DemoDiv").fadeOut(200)
+                $(".content_dataVisualizationArea").fadeOut(200)
+                $(".content_consoleErrorArea").fadeOut(200)
+                setTimeout(() => {
+                    $("body").css({
+                        overflow: "auto",
+                    })
+                    $(".contentDiv").remove()
+                    $(".block").remove()
+                    //iframe
+                    $(".DemoDiv").remove()
+                    $(".content_consoleErrorArea").remove()
+                    $(".content_dataVisualizationArea").remove()
+                    //Programming modal
+                    $(".modal").remove()
+                    location.reload()
+                }, 200)
+            }
         }
     }
 

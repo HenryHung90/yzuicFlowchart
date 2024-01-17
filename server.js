@@ -10,6 +10,7 @@ import launchroutes from './router/launchroutes.js'
 import adminroutes from './router/adminroutes.js'
 import adminlaunchroutes from './router/adminlaunchroutes.js'
 import studentroutes from './router/studentroutes.js'
+import coworkroutes from './router/coworkroutes.js'
 //用於解析json row txt URL-encoded格式
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
@@ -173,7 +174,7 @@ app.get('/home/:studentId', passport.authenticate('token', { session: false }), 
 //routes
 app.use('/launch', passport.authenticate('token', { session: false }), launchroutes)
 app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
-
+app.use('/cowork', passport.authenticate('token', { session: false }), coworkroutes)
 
 
 const httpServer = http.createServer(app)

@@ -27,21 +27,15 @@ const puzzleInformation = {
         height: 300,
     },
     // 用於儲存在遊戲中的 puzzle
-    crop: null,
+    puzzle: null,
     // 用於儲存每片 puzzle 的大小
-    cropScale: 0.8,
+    puzzleScale: 0.8,
     // 用於儲存 九個 puzzle 的位置
     standardPosition: [
         { x: 150, y: 150 }, { x: 400, y: 150 }, { x: 650, y: 150 },
         { x: 150, y: 400 }, { x: 400, y: 400 }, { x: 650, y: 400 },
         { x: 150, y: 650 }, { x: 400, y: 650 }, { x: 650, y: 650 }
     ],
-    // 用於儲存 九個 puzzle 的動態位置
-    motionPosition: [],
-    // 用於儲存要抹去的 puzzle 編號
-    invisiblePuzzle: null,
-    // 用於儲存是否獲勝
-    isFinish: false,
 }
 
 function preload() {
@@ -54,10 +48,10 @@ function preload() {
 }
 
 function create() {
-    //將 crop 設為 Phaser 的群組
-    puzzleInformation.crop = this.add.group()
+    //將 puzzle 設為 Phaser 的群組
+    puzzleInformation.puzzle = this.add.group()
     // 新增一個 Sprite 在場地上 [x位置,y位置,使用的圖片,第幾張]
-    puzzleInformation.crop.create(
+    puzzleInformation.puzzle.create(
                 puzzleInformation.standardPosition[0].x,
                 puzzleInformation.standardPosition[0].y,
                 'puzzle',

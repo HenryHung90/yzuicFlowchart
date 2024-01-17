@@ -27,9 +27,9 @@ const puzzleInformation = {
         height: 300,
     },
     // 用於儲存在遊戲中的 puzzle
-    crop: null,
+    puzzle: null,
     // 用於儲存每片 puzzle 的大小
-    cropScale: 0.8,
+    puzzleScale: 0.8,
     // 用於儲存 九個 puzzle 的位置
     standardPosition: [
         { x: 150, y: 150 }, { x: 400, y: 150 }, { x: 650, y: 150 },
@@ -54,8 +54,8 @@ function preload() {
 function create() {
     //隨機選擇一塊 puzzle 並記住他，在生成時不會生成他
     puzzleInformation.invisiblePuzzle = Math.floor(Math.random() * 9)
-    //將 crop 設為 Phaser 的群組
-    puzzleInformation.crop = this.add.group()
+    //將 puzzle 設為 Phaser 的群組
+    puzzleInformation.puzzle = this.add.group()
 
 
     for (let i = 0; i < puzzleInformation.amount; i++) {
@@ -70,19 +70,19 @@ function create() {
         // 若選到的是要去掉的那塊，則跳過他
         else if (randomPick == puzzleInformation.invisiblePuzzle) {
             // 創建隱藏的 puzzle ，並將其設置看不到
-            puzzleInformation.crop.create(
+            puzzleInformation.puzzle.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
                 randomPick
-            ).setVisible(false).setScale(puzzleInformation.cropScale)
+            ).setVisible(false).setScale(puzzleInformation.puzzleScale)
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
         }
 
         // 若無上述問題 則生成該 puzzle
         else {
-            let puzzle = puzzleInformation.crop.create(
+            let puzzle = puzzleInformation.puzzle.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
@@ -97,7 +97,7 @@ function create() {
                 delay: 500,
                 duration: 800,
                 ease: 'Power3',
-                scale: puzzleInformation.cropScale,
+                scale: puzzleInformation.puzzleScale,
             })
 
             // 在renderedPuzzle 中加入該 puzzle
@@ -139,7 +139,7 @@ function puzzleClicking(puzzle, clickId) {
         window.alert("完成")
 
         // 將被消失的那張卡牌顯現出來，並擺在正確位置上
-        puzzleInformation.crop.getChildren()[puzzleInformation.invisiblePuzzle]
+        puzzleInformation.puzzle.getChildren()[puzzleInformation.invisiblePuzzle]
             .setPosition(puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].x, puzzleInformation.standardPosition[puzzleInformation.invisiblePuzzle].y)
             .setVisible(true)
             .setDepth(10)
@@ -233,12 +233,12 @@ function movePuzzle(puzzle, clickId, puzzlePosition, moveIndex) {
     if (puzzleInformation.motionPosition.every((val, i, arr) => !i || val >= arr[i - 1])) {
         const invisiblePosition = puzzleInformation.motionPosition.indexOf(puzzleInformation.invisiblePuzzle)
 
-        puzzleInformation.crop.create(
+        puzzleInformation.puzzle.create(
             puzzleInformation.standardPosition[invisiblePosition].x,
             puzzleInformation.standardPosition[invisiblePosition].y,
             'puzzle',
             puzzleInformation.invisiblePuzzle
-        ).setScale(0.8)
+        ).setScale(puzzleInformation.puzzleScale)
 
         alert('過關!')
     }

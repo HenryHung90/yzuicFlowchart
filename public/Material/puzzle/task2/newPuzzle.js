@@ -27,9 +27,9 @@ const puzzleInformation = {
         height: 300,
     },
     // 用於儲存在遊戲中的 puzzle
-    crop: null,
+    puzzle: null,
     // 用於儲存每片 puzzle 的大小
-    cropScale: 0.8,
+    puzzleScale: 0.8,
     // 用於儲存 九個 puzzle 的位置
     standardPosition: [
         { x: 150, y: 150 }, { x: 400, y: 150 }, { x: 650, y: 150 },
@@ -40,8 +40,6 @@ const puzzleInformation = {
     motionPosition: [],
     // 用於儲存要抹去的 puzzle 編號
     invisiblePuzzle: null,
-    // 用於儲存是否獲勝
-    isFinish: false,
 }
 
 function preload() {
@@ -56,8 +54,8 @@ function preload() {
 function create() {
     //隨機選擇一塊 puzzle 並記住他，在生成時不會生成他
     puzzleInformation.invisiblePuzzle = Math.floor(Math.random() * 9)
-    //將 crop 設為 Phaser 的群組
-    puzzleInformation.crop = this.add.group()
+    //將 puzzle 設為 Phaser 的群組
+    puzzleInformation.puzzle = this.add.group()
 
     for (let i = 0; i < puzzleInformation.amount; i++) {
         // 隨機從 0 ~ 8 選擇一塊生成
@@ -71,24 +69,24 @@ function create() {
         // 若選到的是要去掉的那塊，則跳過他
         else if (randomPick == puzzleInformation.invisiblePuzzle) {
             // 創建隱藏的 puzzle ，並將其設置看不到
-            puzzleInformation.crop.create(
+            puzzleInformation.puzzle.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
                 randomPick
-            ).setVisible(false).setScale(puzzleInformation.cropScale)
+            ).setVisible(false).setScale(puzzleInformation.puzzleScale)
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
         }
 
         // 若無上述問題 則生成該 puzzle
         else {
-            let puzzle = puzzleInformation.crop.create(
+            let puzzle = puzzleInformation.puzzle.create(
                 puzzleInformation.standardPosition[i].x,
                 puzzleInformation.standardPosition[i].y,
                 'puzzle',
                 randomPick
-            ).setScale(puzzleInformation.cropScale)
+            ).setScale(puzzleInformation.puzzleScale)
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
         }
