@@ -608,6 +608,8 @@ const navButton = {
             if (customizeOperation.serverResponseErrorDetect(response)) return response.data.message
         })
 
+        console.log(coworkData.coworkStatus)
+
         // 成員投票狀態
         const groupMemberContent = $('<div>').prop({
             className: 'voting_memberContent'
@@ -638,6 +640,11 @@ const navButton = {
         }).click(voting).appendTo(voteBtnContent)
 
         function voting() {
+            customizeOperation.loadingPage(true)
+
+
+            socketConnect.cowork.startVoting("前往下一階段")
+            socketConnect.cowork.selectionArea = 'vote'
             $(`#voting_member_${customizeOperation.getFrontEndCode("studentId")}`)
                 .text('✔️')
                 .removeClass('voting_memberContent_memberVoteStatus_noVote')
@@ -655,7 +662,10 @@ const load = async () => {
     if (checkCoworkStatus == 'Y') {
         await studentClientConnect.readCowork(courseId, groupId).then(response => {
             if (customizeOperation.serverResponseErrorDetect(response)) {
-                const process = parseInt(response.data.message.coworkStatus.process || 1)
+                // const process = parseInt(response.data.message.coworkStatus.process || 1)
+                const process = 6
+
+
                 let newNodeData = []
                 let newLinkData = []
 

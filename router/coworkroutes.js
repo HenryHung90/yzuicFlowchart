@@ -42,6 +42,26 @@ function converDangerString(string) {
     })
     return outputString.join("")
 }
+
+function detectCreatingError(res, errorObj, fileId) {
+    for (let value of Object.values(errorObj)) {
+        if (value.status == "失敗") {
+            res.json({
+                message:
+                    `${errorObj[0].name}:${errorObj[0].status}\n` +
+                    `${errorObj[1].name}:${errorObj[1].status}\n` +
+                    `${errorObj[2].name}:${errorObj[2].status}`,
+                status: 500,
+            })
+            break
+        }
+    }
+    res.json({
+        message: fileId,
+        status: 200,
+    })
+}
+
 const fileFilter = (req, file, cb) => {
     // reject a file
     if (

@@ -231,6 +231,7 @@ admin.use('/student', passport.authenticate('admin-token', { session: false }), 
 //Admin 讀取學生GoList頁面
 admin.get("/:studentId/:courseId", async (req, res) => {
     try {
+        console.log(req.params)
         const courseData = await standardcontent.findOne({
             _id: req.params.courseId
         })

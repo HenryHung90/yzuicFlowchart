@@ -60,6 +60,19 @@
             </div>
         </div>
     </div>
+    <!-- toast -->
+    <div class=" position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+        <div class="toast" role="alert" aria-live="assertive" data-bs-autohide="false" data-bs-delay="5000"
+            aria-atomic="true" id="cowork_toast">
+            <div class="toast-header">
+                <strong class="me-auto" id="cowork_toast_title">投票通知</strong>
+                <small id="cowork_toast_subtitle"></small>
+            </div>
+            <div class="toast-body" id="cowork_toast_context"></div>
+
+        </div>
+    </div>
+    <!-- voting -->
     <div class="modal fade" id="votingModal" tabindex="-1" aria-labelledby="votingModal" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">

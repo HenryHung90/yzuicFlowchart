@@ -1,11 +1,9 @@
 import { GoListFunc } from "../../../global/common.js";
-import { chatBoxInit } from "./chatbox.js";
+import chatBoxInit from "./chatbox.js";
 import { adminClientConnect } from "../../../global/axiosconnect.js";
 import customizeOperation from "../../../global/customizeOperation.js";
-
 //init Diagram varible
 let myDiagram
-
 
 customizeOperation.loadingPage(true)
 

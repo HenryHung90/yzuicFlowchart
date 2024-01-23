@@ -219,6 +219,16 @@ router.post('/formulatingdemo', async (req, res) => {
         ]
         //write file
         //user ID file
+        if (!fs.existsSync(`${directName}/public/Access/${req.user.studentId}`)) {
+            fs.mkdirSync(
+                `${directName}/public/Access/${req.user.studentId}`,
+                err => {
+                    if (err) {
+                        fileWritingStatus[0].status = "失敗"
+                    }
+                }
+            )
+        }
         if (!fs.existsSync(`${directName}/public/Access/${req.user.studentId}/${fileId}`)) {
             fs.mkdirSync(
                 `${directName}/public/Access/${req.user.studentId}/${fileId}`,

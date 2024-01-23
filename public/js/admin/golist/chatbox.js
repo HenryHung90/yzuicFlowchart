@@ -1,5 +1,4 @@
-import customizeOperation from "../../../global/customizeOperation"
-
+import customizeOperation from "../../../global/customizeOperation.js"
 const chatBoxInit = async () => {
     const chatBoxMessageContainer = $('<div>').prop({
         className: 'chatBox_MessageContainer'

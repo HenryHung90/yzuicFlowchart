@@ -125,12 +125,14 @@ const categoryBox = {
                 .appendTo(contentBox)
 
             //Description
-            $("<div>")
+            const descriptionLine = description.split("\n")
+            const descriptionDiv = $("<div>")
                 .prop({
                     className: "formulatingDescription_contentDescription",
-                    innerHTML: `<p>${description}</p>`,
                 })
                 .appendTo(contentBox)
+            descriptionLine.forEach((line) => { if (line != '\\n') descriptionDiv.append(`<p>${line}</p>`) })
+
 
             $("<button>")
                 .prop({

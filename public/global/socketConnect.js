@@ -89,12 +89,12 @@ const socketConnect = {
         executor: null,
         changeReceiveMounted: false,
         //偵測滑鼠移動
-        mouseMove: () => {
+        mouseMove: function () {
             $(document).on('mousemove', (e) => {
                 const mousePosition = {
                     chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
                     studentId: customizeOperation.getFrontEndCode('studentId'),
-                    selectionArea: socketConnect.cowork.selectionArea,
+                    selectionArea: this.selectionArea,
                     mouseX: e.clientX,
                     mouseY: e.clientY,
                 }
@@ -182,20 +182,20 @@ const socketConnect = {
             socketConnect.socket.emit("executeProject", JSON.stringify(executeMessage))
         },
         // 收到執行/結束程式
-        receiveExecuteProject: () => {
+        receiveExecuteProject: function () {
             socketConnect.socket.on("re-executeProject", (message) => {
                 const reciveMessage = JSON.parse(message)
 
-                if (socketConnect.cowork.selectionArea.split("-")[1] === '3') {
+                if (this.selectionArea.split("-")[1] === '3') {
                     if (reciveMessage.execute) {
                         renderDemoContainer(reciveMessage.response)
                         $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
-                        socketConnect.cowork.executor = reciveMessage.studentId
-                        console.log("EXE", reciveMessage, socketConnect.cowork.executor = reciveMessage.studentId)
+                        this.executor = this.studentId
+                        console.log("EXE", reciveMessage, this.executor = reciveMessage.studentId)
                     } else {
-                        if (socketConnect.cowork.executor === reciveMessage.studentId) {
+                        if (this.executor === reciveMessage.studentId) {
                             $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
-                            console.log("LEAVE", reciveMessage, socketConnect.cowork.executor = reciveMessage.studentId)
+                            console.log("LEAVE", reciveMessage, this.executor = reciveMessage.studentId)
                         }
                     }
                 }
@@ -287,6 +287,33 @@ const socketConnect = {
         },
 
 
+        // 接收投票通知
+        receiveVoting: function () {
+            socketConnect.socket.on('re-startVoting', (message) => {
+                const votingMessage = JSON.parse(message)
+
+                if (votingMessage.studentId !== customizeOperation.getFrontEndCode("studentId")) {
+                    $('#vote').click()
+                    $(`#voting_member_${votingMessage.studentId}`).text('✔️')
+                        .removeClass('voting_memberContent_memberVoteStatus_noVote')
+                        .addClass('voting_memberContent_memberVoteStatus_Voted')
+                }
+                customizeOperation.activeToast(
+                    '投票通知',
+                    `由 ${votingMessage.studentId} 發起`,
+                    `${votingMessage.studentId} 發起了 ${votingMessage.type} 投票`
+                )
+            })
+        },
+        // 發起投票通知
+        startVoting: function (type = "testing") {
+            const votingMessage = {
+                studentId: customizeOperation.getFrontEndCode('studentId'),
+                vote: true,
+                type: type
+            }
+            socketConnect.socket.emit("startVoting", JSON.stringify(votingMessage))
+        }
     }
 }
 

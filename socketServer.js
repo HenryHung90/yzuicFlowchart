@@ -86,6 +86,11 @@ const socketServer = async (io) => {
             socket.nsp.emit('re-executeProject', message)
         })
 
+        // 收到開始投票事件
+        socket.on("startVoting", async (message) => {
+            socket.nsp.emit('re-startVoting', message)
+        })
+
         // 收到離開房間訊息
         socket.on('disconnect', async (type) => {
             socket.nsp.emit('roomNumber', socketRoomUser.size)

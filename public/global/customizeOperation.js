@@ -90,6 +90,21 @@ const customizeOperation = {
                 XLSX.writeFile(workbook, `${workbookTitle}_${Month}\/${Today}.xls`);
             }
         })
+    },
+    // toast controller
+    activeToast: (title = "通知", subtitle = "--", context = "測試") => {
+        $('#cowork_toast_title').text(title)
+        $('#cowork_toast_subtitle').text(subtitle)
+        $('#cowork_toast_context').text(context)
+        $('#cowork_toast').animate({
+            opacity: 1
+        }, 1000, function () {
+            setTimeout(() => {
+                $(this).animate({
+                    opacity: 0
+                })
+            }, 2000)
+        })
     }
 }
 

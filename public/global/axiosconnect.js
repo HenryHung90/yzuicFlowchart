@@ -381,6 +381,20 @@ const studentClientConnect = {
                 })
             )
         },
+        // 投票註記
+        coworkVote: (courseId, groupId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/cowork/vote',
+                    data: {
+                        courseId: courseId,
+                        groupId: groupId,
+                        studentId: studentId,
+                    }
+                })
+            )
+        },
         //確認資料夾
         createDemo: () => {
             return (
@@ -427,6 +441,7 @@ const studentClientConnect = {
                 })
             )
         },
+        //儲存 Relfection
         saveReflection:
             (courseId, key, learning, workhard, difficult, scoring) => {
                 if (customizeOperation.getCookie("adminId")) {
