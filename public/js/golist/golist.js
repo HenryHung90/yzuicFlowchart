@@ -608,8 +608,6 @@ const navButton = {
             if (customizeOperation.serverResponseErrorDetect(response)) return response.data.message
         })
 
-        console.log(coworkData.coworkStatus)
-
         // 成員投票狀態
         const groupMemberContent = $('<div>').prop({
             className: 'voting_memberContent'
@@ -639,9 +637,9 @@ const navButton = {
             innerHTML: '投票前往下一階段'
         }).click(voting).appendTo(voteBtnContent)
 
+        // voting click 事件
         function voting() {
             customizeOperation.loadingPage(true)
-
 
             socketConnect.cowork.startVoting("前往下一階段")
             socketConnect.cowork.selectionArea = 'vote'

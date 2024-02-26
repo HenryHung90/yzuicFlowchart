@@ -417,13 +417,14 @@ const studentClientConnect = {
             )
         },
         //取得共編程式
-        readCode: (courseId) => {
+        readCode: (courseId, key) => {
             return (
                 axios({
                     method: 'post',
                     url: '/cowork/readcode',
                     data: {
-                        courseId: courseId
+                        courseId: courseId,
+                        key: key
                     }
                 })
             )

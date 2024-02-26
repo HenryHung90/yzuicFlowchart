@@ -105,6 +105,7 @@ function create() {
 
 //點擊 puzzle 的事件
 function puzzleClicking(puzzle, clickId) {
+    puzzleInformation.puzzle.setX(200)
     // 儲存點擊的 puzzle 目前的位置
     const puzzlePosition = puzzleInformation.motionPosition.indexOf(clickId)
     // 儲存點擊的 puzzle 與被去除的那塊 puzzle 之間的距離（在 array 上相差的距離）

@@ -373,24 +373,9 @@ const categoryBox = {
                         .appendTo($(`#programmingHint_${index}`))
                 })
             }
-
-            //初始化 boostrap Tooltip
-            $('[data-bs-toggle="tooltip"]').tooltip({
-                trigger: "click",
-            })
-
-            //點擊時將其他 tooltip 關閉
-            $('[data-bs-toggle="tooltip"]').click(function () {
-                if ($(this).attr("name") === "hint") {
-                    $('[data-bs-toggle="tooltip"]').not(this).tooltip("hide")
-                }
-            })
-
             //Hint tooltip 內容
             $('[data-bs-toggle="tooltip"]').on("shown.bs.tooltip", function () {
-
                 const hintTooltip = $(this)
-
                 if (hintTooltip.attr("name") === "hint") {
                     //Code 展示區
                     $("<textarea>")
@@ -432,10 +417,94 @@ const categoryBox = {
                 }
             })
         } else {
-            CodeMirrorFunc.codeMirrorProgram('coworkArea', data, false)
+            // 製作 Coding 區域
+            CodeMirrorFunc.codeMirrorProgram('coworkArea', data.coworkContent, false)
             $('#coworkArea').data("CodeMirror").setSize("auto", 680)
-        }
 
+            //hint
+            if (data.hintList !== undefined) {
+                data.hintList.forEach((hintContent, index) => {
+                    if (index !== 0) {
+                        $("<div>")
+                            .prop({
+                                className: "programmingDescription_hintArrow",
+                                innerHTML:
+                                    '<img src="../../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg); user-select:none"></img>',
+                            })
+                            .appendTo($("#programmingHint"))
+                    }
+
+                    $("<div>")
+                        .prop({
+                            className: "programmingDescription_hintText",
+                            innerHTML: `<p>👊step ${index + 1}</p>` + hintContent.hintText,
+                            id: `programmingHint_${index}`,
+                        })
+                        .appendTo($("#programmingHint"))
+
+                    $("<div>")
+                        .prop({
+                            className: "programmingDescription_hintCode",
+                            innerHTML:
+                                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="100%" fill="orange"><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>',
+                            id: `programmingHintCode_${index}`,
+                        })
+                        .attr({
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "right",
+                            "data-container": "body",
+                            "data-bs-html": "true",
+                            name: "hint",
+                            title: "<h3>程式碼參考</h3>若無顯示請重新點擊",
+                        })
+                        .appendTo($(`#programmingHint_${index}`))
+                })
+            }
+            //Hint tooltip 內容
+            $('[data-bs-toggle="tooltip"]').on("shown.bs.tooltip", function () {
+                const hintTooltip = $(this)
+                if (hintTooltip.attr("name") === "hint") {
+                    //Code 展示區
+                    $("<textarea>").prop({ id: "hint" }).css({ resize: "none", }).appendTo($(".tooltip-inner"))
+
+                    if (data.hintList !== undefined) {
+                        CodeMirrorFunc.codeMirrorProgram(
+                            "hint",
+                            data.hintList[hintTooltip.attr("id").split("_")[1]].hintCode,
+                            true
+                        )
+                    } else {
+                        CodeMirrorFunc.codeMirrorProgram("hint", "no data", true)
+                    }
+                    $("#hint").data("CodeMirror").setSize('auto', 'auto')
+
+                    //Code 複製 button
+                    $("<button>")
+                        .prop({
+                            id: "hintCopy",
+                            className: "btn btn-primary",
+                            innerHTML: "Copy",
+                        })
+                        .click(e => {
+                            e.stopPropagation()
+                            // console.log(data.hintCode[hintTooltip.attr("id").split("_")[1]])
+                            navigator.clipboard.writeText($('#hint').data("CodeMirror").getValue())
+                        })
+                        .appendTo($(".tooltip-inner"))
+                }
+            })
+        }
+        //初始化 boostrap Tooltip
+        $('[data-bs-toggle="tooltip"]').tooltip({
+            trigger: "click",
+        })
+
+        //點擊時將其他 tooltip 關閉
+        $('[data-bs-toggle="tooltip"]').click(function () {
+            if ($(this).attr("name") === "hint") {
+                $('[data-bs-toggle="tooltip"]').not(this).tooltip("hide")
+            }
+        })
     },
     Reflection: data => {
         if (data == undefined) {
@@ -859,18 +928,17 @@ const GoListFunc = {
             }).appendTo(content_iconContainer)
         }
         //question button
-        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
-            $("<button>")
-                .prop({
-                    className: "col-1 btn btn-warning content_question",
-                    innerHTML:
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
-                    id: "LS_programmingHint",
-                })
-                .attr("data-bs-toggle", "modal")
-                .attr("data-bs-target", "#programmingHintModal")
-                .appendTo(content_iconContainer)
-        }
+        $("<button>")
+            .prop({
+                className: "col-1 btn btn-warning content_question",
+                innerHTML:
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
+                id: "LS_programmingHint",
+            })
+            .attr("data-bs-toggle", "modal")
+            .attr("data-bs-target", "#programmingHintModal")
+            .appendTo(content_iconContainer)
+
         //complete Icon
         $("<div>")
             .prop({
@@ -1059,8 +1127,8 @@ const GoListFunc = {
                 //確認userId資料夾是否建立
                 await studentClientConnect.cowork.createDemo().then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        //讀取該key值的Code內容
-                        studentClientConnect.cowork.readCode(customizeOperation.getFrontEndCode("courseId")).then(response => {
+                        //讀取該key值的Code內容與 Hint 
+                        studentClientConnect.cowork.readCode(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
                             if (customizeOperation.serverResponseErrorDetect(response)) {
                                 categoryBox.Programming(response.data.message)
                                 GoListFunc.saveCodeStatus(false)
@@ -1234,8 +1302,20 @@ const CodeMirrorFunc = {
                         "\t}," +
                         '\tparent: "container",\n' +
                         "};\n\n" +
-                        "const game = new Phaser.Game(config);\n" +
-                        "//請於以下開始您的程式"
+                        "const game = new Phaser.Game(config);\n\n" +
+                        "function preload(){\n" +
+                        "\t// 利用spritesheet 讀入圖片\n" +
+                        "\t// name 請修改成你想在遊戲中讀取該圖片的名稱\n" +
+                        "\t// imageName 請修改成你上傳的圖片名稱+副檔名\n" +
+                        "\tthis.load.spritesheet('name', '../media/imageName',{\n" +
+                        "\t\tframeWidth: 300, // 切割寬度\n" +
+                        "\t\tframeHeight: 300 // 切割高度\n" +
+                        "\t})\n" +
+                        "\n} \n\n" +
+                        "function create(){\n" +
+                        "\n} \n\n" +
+                        "function update(){\n" +
+                        "\n}"
                     )
                     break
                 default:

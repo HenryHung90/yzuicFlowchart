@@ -589,8 +589,7 @@ const ProgrammingBox = programmingKey => {
         className: "row justify-content-left contentColDiv",
     })
     //using Model 互動視窗 from boostrap----------------------------------
-    const modal = $("<div>")
-        .prop({
+    const modal = $("<div>").prop({
             className: "modal fade",
             id: "programmingHintModal",
             tabindex: "-1",
@@ -599,11 +598,9 @@ const ProgrammingBox = programmingKey => {
         .attr("aria-hidden", "true")
         .prependTo($("body"))
 
-    const modalContainer = $("<div>")
-        .prop({
+    const modalContainer = $("<div>").prop({
             className: "modal-dialog modal-dialog-centered",
-        })
-        .appendTo(modal)
+        }).appendTo(modal)
 
     const modalContent = $("<div>")
         .prop({
@@ -1388,7 +1385,7 @@ const ReflectionBox = reflectionKey => {
             className: "col-12 reflectionDescription_learning",
             id: "LS_reflectionDescription_learning",
             innerHTML:
-                "<h4>🔍 你學到了甚麼?</h4><p>Ex: 如何使用...、我發現某 A 與某 B 語法的差異...、我覺得某功能或許還可以...，請舉例說明。</p>",
+                "<h4>🔍 從此次任務中，我學習會了什麼呢？</h4><p>Ex: 如何使用...、我發現某 A 與某 B 語法的差異...、我覺得某功能或許還可以...，請舉例說明。</p>",
         })
         .appendTo(ReflectionContainer)
 
@@ -1403,32 +1400,31 @@ const ReflectionBox = reflectionKey => {
         .appendTo(reflectionLearningContainer)
 
     //workhard--------------------------------------------------------------
-    const reflectionWorkhardContainer = $("<div>")
-        .prop({
-            className: "col-12 reflectionDescription_workhard",
-            id: "LS_reflectionDescription_workhard",
-            innerHTML:
-                "<h4>🔍 你覺得還需要努力甚麼?</h4><p>Ex: 我還可以把某 Function 做得更...、或許可以優化某 Function 的...，請詳細說明。</p>",
-        })
-        .appendTo(ReflectionContainer)
+    // const reflectionWorkhardContainer = $("<div>")
+    //     .prop({
+    //         className: "col-12 reflectionDescription_workhard",
+    //         id: "LS_reflectionDescription_workhard",
+    //         innerHTML:
+    //             "<h4>🔍 你覺得還需要努力甚麼?</h4><p>Ex: 我還可以把某 Function 做得更...、或許可以優化某 Function 的...，請詳細說明。</p>",
+    //     })
+    //     .appendTo(ReflectionContainer)
 
-    $("<div>")
-        .prop({
-            className: "form-floating",
-            id: "workhardDiv",
-            innerHTML:
-                '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="workhardValue"></textarea>' +
-                '<label for="workhardText">努力了...</label>',
-        })
-        .appendTo(reflectionWorkhardContainer)
-
+    // $("<div>")
+    //     .prop({
+    //         className: "form-floating",
+    //         id: "workhardDiv",
+    //         innerHTML:
+    //             '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="workhardValue"></textarea>' +
+    //             '<label for="workhardText">努力了...</label>',
+    //     })
+    //     .appendTo(reflectionWorkhardContainer)
     //difficult--------------------------------------------------------------
     const reflectionDifficultContainer = $("<div>")
         .prop({
             className: "col-12 reflectionDescription_difficult",
             id: "LS_reflectionDescription_difficult",
             innerHTML:
-                "<h4>🔍 你遇到哪些困難?</h4><p>Ex: 我遇到了一種BUG...、我時常把某 A 與某 B 搞混...、在某的邏輯上我...，請詳細說明。</p>",
+                "<h4>🔍 從此次任務中，我遇到了哪些困難？我是如何解決呢？</h4><p>Ex: 我遇到了一種BUG...、我時常把某 A 與某 B 搞混...、在某的邏輯上我...，請詳細說明。</p>",
         })
         .appendTo(ReflectionContainer)
 
@@ -1550,11 +1546,11 @@ const ReflectionBox = reflectionKey => {
                 div: $(".reflectionDescription_learning"),
                 isPass: false,
             },
-            {
-                textarea: $("#workhardValue"),
-                div: $(".reflectionDescription_workhard"),
-                isPass: false,
-            },
+            // {
+            //     textarea: $("#workhardValue"),
+            //     div: $(".reflectionDescription_workhard"),
+            //     isPass: false,
+            // },
             {
                 textarea: $("#difficultValue"),
                 div: $(".reflectionDescription_difficult"),
@@ -1597,7 +1593,7 @@ const ReflectionBox = reflectionKey => {
                         customizeOperation.getFrontEndCode("courseId"),
                         reflectionKey.key,
                         $("#learningValue").val(),
-                        $("#workhardValue").val(),
+                        // $("#workhardValue").val(),
                         $("#difficultValue").val(),
                         $("#scoringValue").val()
                     )

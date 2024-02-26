@@ -206,16 +206,23 @@ router.post('/getcoworkconfig', async (req, res) => {
     }
 })
 //共編模式 code 增刪區域-------------------------------------
-//讀取 code
+//讀取 code & hint
 router.post("/readcode", async (req, res) => {
     try {
+        console.log(req.body.key)
         const coworkData = await coworkconfig.findOne({
             coworkContentId: req.body.courseId,
             groupId: req.user.studentChatRoomId,
         })
 
+        const hintData = await coworkcontent.findOne({
+            _id: req.body.courseId
+        })
         res.json({
-            message: coworkData.coworkContent || "",
+            message: {
+                coworkContent: coworkData.coworkContent || "",
+                hintList: hintData.standardProgramming[req.body.key].hintList,
+            },
             status: 200
         })
     } catch (err) {

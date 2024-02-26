@@ -55,7 +55,7 @@ function create() {
                 puzzleInformation.standardPosition[0].x,
                 puzzleInformation.standardPosition[0].y,
                 'puzzle',
-                0
+                4
             )
 }
 
