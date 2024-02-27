@@ -30,7 +30,8 @@ function preload(){
 function create(){
  	// 新增一個 Sprite 在場地上 [x位置,y位置,使用的圖片,第幾張]
     for(let i = 0; i < 5; i++){
-         this.add.sprite(150 + i * 300, 150, 'puzzle', i + 1).setScale(0.7)
+        this.add.sprite(150 + i * 300, 150, 'puzzle', i + 1).setScale(0.7)
+        
     }
 }
 

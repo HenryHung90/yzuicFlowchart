@@ -230,7 +230,6 @@ router.get("/co/:courseId", async (req, res) => {
         })
     }
 })
-
 //個人模式教材取得區域------------------------------------
 // 學生取得 demo 位置
 router.post("/getmaterial", async (req, res) => {
@@ -261,7 +260,6 @@ router.post("/getmaterial", async (req, res) => {
         })
     }
 })
-
 // 學生取得 start 內容
 // router.post("/getstarting", async (req, res) => {
 //     try {
@@ -353,7 +351,6 @@ router.post("/getformulating", async (req, res) => {
         })
     }
 })
-
 //學生取得 writeFormulating 內容
 router.post("/getwriteformulating", async (req, res) => {
     try {
@@ -455,98 +452,6 @@ router.post("/savewriteformulating", async (req, res) => {
         console.log(err)
         res.json({
             message: "儲存 Bonus表徵制定 失敗，請聯繫管理員(err)",
-            status: 500,
-        })
-    }
-})
-//-------------------------------------------------------
-//共編模式教材取得區域-------------------------------------
-// 學生取得 demo 位置
-router.post('/cowork/getmaterial', async (req, res) => {
-    try {
-        const materialData = await coworkcontent.findOne({
-            _id: req.body.courseId,
-        })
-        console.log(materialData)
-        if (
-            materialData.standardMaterial === undefined ||
-            materialData.standardMaterial === null
-        ) {
-            res.json({
-                message: "查無此demo，請稍後再試",
-                status: 500,
-            })
-            return
-        }
-        res.json({
-            message: materialData.standardMaterial,
-            status: 200,
-        })
-    } catch (err) {
-        console.log(err)
-        res.json({
-            message: "取得 demo 失敗，請聯繫管理員(err)",
-            status: 500,
-        })
-    }
-})
-// 學生取得 understanding 內容
-router.post('/cowork/getunderstanding', async (req, res) => {
-    try {
-        const courseData = await coworkcontent.findOne({
-            _id: req.body.courseId,
-        })
-
-        if (
-            courseData.standardUnderstanding === undefined ||
-            courseData.standardUnderstanding === null
-        ) {
-            res.json({
-                message: "查無 探索理解，請稍後再試",
-                status: 500,
-            })
-            return
-        }
-        res.json({
-            message: {
-                understandingData: courseData.standardUnderstanding[req.body.key],
-                startingData: courseData.standardStarting[req.body.key],
-            },
-            status: 200,
-        })
-    } catch (err) {
-        console.log(err)
-        res.json({
-            message: "取得 探索理解 失敗，請聯繫管理員(err)",
-            status: 500,
-        })
-    }
-})
-//取得 formulating 內容
-router.post('/cowork/getformulating', async (req, res) => {
-    try {
-        const formulatingData = await coworkcontent.findOne({
-            _id: req.body.courseId,
-        })
-
-        if (
-            formulatingData.standardFormulating === undefined ||
-            formulatingData.standardFormulating === null
-        ) {
-            res.json({
-                message: "查無 表徵制定，請稍後再試",
-                status: 500,
-            })
-            return
-        }
-        res.json({
-            message: formulatingData.standardFormulating[req.body.key],
-            status: 200,
-        })
-    } catch (err) {
-        console.log(err)
-        res.json({
-            message: "取得 表徵制定 失敗，請聯繫管理員(err)",
             status: 500,
         })
     }
@@ -773,7 +678,6 @@ router.post("/readcowork", async (req, res) => {
     }
 })
 
-
 //個人模式 code 增刪區域------------------------------------
 //學生讀取 code
 router.post("/readcode", async (req, res) => {
@@ -944,58 +848,6 @@ router.post("/deletecode", async (req, res) => {
         console.log(err)
         res.json({
             message: "刪除失敗，請聯繫管理員 (err)",
-            status: 500,
-        })
-    }
-})
-//-------------------------------------------------------
-//共編模式 code 增刪區域-------------------------------------
-//讀取 code
-router.post("/cowork/readcode", async (req, res) => {
-    try {
-        const coworkData = await coworkconfig.findOne({
-            coworkContentId: req.body.courseId,
-            groupId: req.user.studentChatRoomId,
-        })
-
-        res.json({
-            message: coworkData.coworkContent || "",
-            status: 200
-        })
-    } catch (err) {
-        console.log(err)
-        res.json({
-            message: "讀取 code 失敗，請聯絡管理員 (err)",
-            status: 500,
-        })
-    }
-})
-//儲存 code
-router.post('/cowork/savecode', async (req, res) => {
-    try {
-        await coworkconfig.updateOne({
-            groupId: req.user.studentChatRoomId,
-            coworkContentId: req.body.courseId
-        }, {
-            coworkContent: req.body.coworkContent
-        }).then(response => {
-            if (response.acknowledged) {
-                res.json({
-                    message: "success",
-                    status: 200,
-                })
-            } else {
-                res.json({
-                    message:
-                        "儲存 code 失敗，請記下您當前的 code 並重新整理頁面",
-                    status: 500,
-                })
-            }
-        })
-    } catch (err) {
-        console.log(err)
-        res.json({
-            message: "儲存 code 失敗，請記下您當前的 code 並聯絡管理員 (err)",
             status: 500,
         })
     }

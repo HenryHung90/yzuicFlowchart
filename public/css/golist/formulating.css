@@ -43,14 +43,17 @@
 }
 
 .formulatingDescription_contentBox_interfacing {
-    padding:10px 10px;
+    padding: 10px 10px;
     justify-content: center;
 }
-.formulatingDescription_interfacing{
-    border:1px solid;
-    padding:0;
-    margin:0;
+.formulatingDescription_interfacing {
+    padding: 0;
+    margin: 0;
     overflow: hidden;
+}
+.formulatingDescription_launchbtn {
+    margin: 5px 50px;
+    width: 200px;
 }
 
 /*write Formulating Description */

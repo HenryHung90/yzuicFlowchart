@@ -213,6 +213,18 @@ const studentClientConnect = {
             )
         },
     //demo-----------------------------------------
+    launchFormulatingDemo: (demoId, demoCode) => {
+        return (
+            axios({
+                method: 'post',
+                url: '/launch/formulatingdemo',
+                data: {
+                    demoId: demoId,
+                    demoCode: demoCode,
+                }
+            })
+        )
+    },
     launchDemo:
         (setting, config, preload, create, update, custom) => {
             if (customizeOperation.getCookie('adminId')) {
@@ -323,7 +335,7 @@ const studentClientConnect = {
             return (
                 axios({
                     method: 'post',
-                    url: '/student/cowork/getmaterial',
+                    url: '/cowork/getmaterial',
                     data: {
                         courseId: courseId
                     }
@@ -335,7 +347,7 @@ const studentClientConnect = {
             return (
                 axios({
                     method: 'post',
-                    url: '/student/cowork/getUnderstanding',
+                    url: '/cowork/getUnderstanding',
                     data: {
                         courseId: courseId,
                         key: key
@@ -348,10 +360,37 @@ const studentClientConnect = {
             return (
                 axios({
                     method: "post",
-                    url: '/student/cowork/getformulating',
+                    url: '/cowork/getformulating',
                     data: {
                         courseId: courseId,
                         key: key
+                    }
+                })
+            )
+        },
+        //取得 CoworkConfig
+        getCoworkConfig: (courseId, groupId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/cowork/getcoworkconfig',
+                    data: {
+                        courseId: courseId,
+                        groupId: groupId
+                    }
+                })
+            )
+        },
+        // 投票註記
+        coworkVote: (courseId, groupId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/cowork/vote',
+                    data: {
+                        courseId: courseId,
+                        groupId: groupId,
+                        studentId: studentId,
                     }
                 })
             )
@@ -361,7 +400,7 @@ const studentClientConnect = {
             return (
                 axios({
                     method: 'post',
-                    url: '/launch/cowork/createdemo',
+                    url: '/cowork/createdemo',
                 })
             )
         },
@@ -370,7 +409,7 @@ const studentClientConnect = {
             return (
                 axios({
                     method: 'post',
-                    url: '/launch/cowork/launchdemo',
+                    url: '/cowork/launchdemo',
                     data: {
                         coworkArea: coworkArea
                     }
@@ -378,13 +417,14 @@ const studentClientConnect = {
             )
         },
         //取得共編程式
-        readCode: (courseId) => {
+        readCode: (courseId, key) => {
             return (
                 axios({
                     method: 'post',
-                    url: '/student/cowork/readcode',
+                    url: '/cowork/readcode',
                     data: {
-                        courseId: courseId
+                        courseId: courseId,
+                        key: key
                     }
                 })
             )
@@ -394,7 +434,7 @@ const studentClientConnect = {
             return (
                 axios({
                     method: 'post',
-                    url: '/student/cowork/savecode',
+                    url: '/cowork/savecode',
                     data: {
                         courseId: courseId,
                         coworkContent: coworkContent
@@ -402,12 +442,38 @@ const studentClientConnect = {
                 })
             )
         },
+        //儲存 Relfection
+        saveReflection:
+            (courseId, key, learning, workhard, difficult, scoring) => {
+                if (customizeOperation.getCookie("adminId")) {
+                    return (
+                        axios({
+                            method: 'post',
+                            url: '/admin/skip'
+                        })
+                    )
+                }
+                return (
+                    axios({
+                        method: 'post',
+                        url: '/cowork/savereflection',
+                        data: {
+                            courseId: courseId,
+                            key: key,
+                            learning: learning,
+                            workhard: workhard,
+                            difficult: difficult,
+                            scoring: scoring
+                        }
+                    })
+                )
+            },
         //尋找共編 Media 檔案
         searchFile: () => {
             return (
                 axios({
                     method: 'get',
-                    url: '/launch/cowork/searchmedia',
+                    url: '/cowork/searchmedia',
                 })
             )
         },
@@ -416,7 +482,7 @@ const studentClientConnect = {
             return (
                 axios({
                     method: 'post',
-                    url: '/launch/cowork/uploadimg',
+                    url: '/cowork/uploadimg',
                     data: uploadFile
                 })
             )

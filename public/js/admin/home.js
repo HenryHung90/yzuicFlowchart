@@ -187,6 +187,7 @@ const renderGoList = async () => {
     //生成課程區域
     function renderCourse(courseList, type) {
         courseList.forEach((value, index) => {
+
             const goListContainer = $('<div>').prop({
                 className: 'goListCourse_contentContainer'
             }).click(e => {

@@ -31,9 +31,9 @@ const puzzleInformation = {
         height: 300,
     },
     // 用於儲存在遊戲中的 puzzle
-    crop: null,
+    puzzle: null,
     // 用於儲存每片 puzzle 的大小
-    cropScale: 0.8,
+    puzzleScale: 0.8,
     // 用於儲存 九個 puzzle 的位置
     standardPosition: [
         { x: 150, y: 150 }, { x: 400, y: 150 }, { x: 650, y: 150 },
@@ -44,8 +44,6 @@ const puzzleInformation = {
     motionPosition: [],
     // 用於儲存要抹去的 puzzle 編號
     invisiblePuzzle: null,
-    // 用於儲存是否獲勝
-    isFinish: false,
 }
 
 function preload() {
@@ -60,57 +58,51 @@ function preload() {
 function create() {
     //隨機選擇一塊 puzzle 並記住他，在生成時不會生成他
     puzzleInformation.invisiblePuzzle = Math.floor(Math.random() * 9)
-    //將 crop 設為 Phaser 的群組
-    puzzleInformation.crop = this.add.group()
+    //將 puzzle 設為 Phaser 的群組
+    puzzleInformation.puzzle = this.add.group()
 
-    for (let i = 0; i < puzzleInformation.amount; i++) {
+    let count = 0
+    while (count < puzzleInformation.amount) {
         // 隨機從 0 ~ 8 選擇一塊生成
-        let randomPick = Math.floor(Math.random() * 9)
-
+        const randomPick = Math.floor(Math.random() * 9)
         // 若選到已經生成過的，則跳過他
-        if (puzzleInformation.motionPosition.includes(randomPick)) {
-            i--
-        }
-
+        if (puzzleInformation.motionPosition.includes(randomPick)) continue
         // 若選到的是要去掉的那塊，則跳過他
-        else if (randomPick == puzzleInformation.invisiblePuzzle) {
+        if (randomPick == puzzleInformation.invisiblePuzzle) {
             // 創建隱藏的 puzzle ，並將其設置看不到
-            puzzleInformation.crop.create(
-                puzzleInformation.standardPosition[i].x,
-                puzzleInformation.standardPosition[i].y,
+            puzzleInformation.puzzle.create(
+                puzzleInformation.standardPosition[count].x,
+                puzzleInformation.standardPosition[count].y,
                 'puzzle',
                 randomPick
-            ).setVisible(false).setScale(puzzleInformation.cropScale)
+            ).setVisible(false).setScale(puzzleInformation.puzzleScale)
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
-        }
-
-        // 若無上述問題 則生成該 puzzle
+        } // 若無上述問題 則生成該 puzzle
         else {
-            let puzzle = puzzleInformation.crop.create(
-                puzzleInformation.standardPosition[i].x,
-                puzzleInformation.standardPosition[i].y,
+            let puzzle = puzzleInformation.puzzle.create(
+                puzzleInformation.standardPosition[count].x,
+                puzzleInformation.standardPosition[count].y,
                 'puzzle',
                 randomPick
-            ).setScale(puzzleInformation.cropScale)
+            ).setScale(puzzleInformation.puzzleScale)
             // 在renderedPuzzle 中加入該 puzzle
             puzzleInformation.motionPosition.push(randomPick)
             // 使 puzzle 能夠互動
             puzzle.setInteractive()
             // 設定 Puzzle 在 pointerup 的監聽事件
-            puzzle.on('pointerup', (e) => {
-                if (!puzzleInformation.isFinish) {
-                    puzzleClicking(puzzle, randomPick)
-                }
-            })
+            puzzle.on('pointerup', (e) => { puzzleClicking(puzzle, randomPick) })
         }
+        count++
     }
 
     // 創建移動方向文字
     puzzleInformation.moveDirection.text = this.add.text(50, 50, "方向顯示", {
         fontSize: 48,
         fontWeight: 'bolder',
-        backgroundColor: 'black'
+        backgroundColor: 'black',
+        padding: 10,
+        color: 'orange'
     })
 }
 
@@ -130,6 +122,12 @@ function puzzleClicking(puzzle, clickId) {
     }
 }
 
+
+/**
+@param{number}moveIndex 點擊的 puzzle 與 空格在 array 上相差的距離
+@param{number}puzzlePosition 點擊的 puzzle 目前在 array 上的位置
+@returns{boolean} 返回是否能夠移動
+*/
 // 是否能夠移動
 function isAllowMove(moveIndex, puzzlePosition) {
     //-3 向上

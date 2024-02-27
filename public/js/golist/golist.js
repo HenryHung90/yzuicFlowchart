@@ -531,7 +531,7 @@ const navButton = {
     coworkStatus: customizeOperation.getFrontEndCode('coworkStatus'),
     courseId: customizeOperation.getFrontEndCode('courseId'),
     //save
-    save: async () => {
+    save: async function () {
         customizeOperation.loadingPage(true)
         //Json Parse
         const goData = JSON.parse(MY_DIAGRAM.model.toJson());
@@ -546,48 +546,39 @@ const navButton = {
         goData.linkDataArray = ALLLINK
 
         //存入資料庫
-        if (navButton.coworkStatus === 'Y') {
-
-        } else {
-            await studentClientConnect.saveGoList(goData, customizeOperation.getFrontEndCode('courseId'))
-                .then(response => {
-                    if (customizeOperation.serverResponseErrorDetect(response)) {
-                        customizeOperation.loadingPage(false)
-                        MY_DIAGRAM.isModified = false;
-                    }
-                })
-        }
+        await studentClientConnect.saveGoList(goData, this.courseId)
+            .then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
+                    customizeOperation.loadingPage(false)
+                    MY_DIAGRAM.isModified = false;
+                }
+            })
 
     },
     //restart code & golist
-    restart: async () => {
+    restart: async function () {
         if (window.confirm('確定重整嗎？所有內容將被清除！')) {
             customizeOperation.loadingPage(true)
 
             //重整 goList
-            if (navButton.coworkStatus === 'Y') {
-
-            } else {
-                await studentClientConnect.restartGoList(customizeOperation.getFrontEndCode('courseId'))
-                    .then(response => {
-                        if (customizeOperation.serverResponseErrorDetect(response)) {
-                            ClickListening('', '重整-List')
-                            load()
-                            customizeOperation.loadingPage(false)
-                        }
-                    })
-            }
-
+            await studentClientConnect.restartGoList(this.courseId)
+                .then(response => {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        ClickListening('', '重整-List')
+                        load()
+                        customizeOperation.loadingPage(false)
+                    }
+                })
         }
     },
     //download new golist
-    download: async () => {
+    download: async function () {
         customizeOperation.loadingPage(true)
         //更新 goList
         if (navButton.coworkStatus === 'Y') {
 
         } else {
-            await studentClientConnect.downloadGoList(customizeOperation.getFrontEndCode('courseId')).then(response => {
+            await studentClientConnect.downloadGoList(this.courseId).then(response => {
                 if (customizeOperation.serverResponseErrorDetect(response)) {
                     ClickListening('', '載入最新版本-List')
                     load()
@@ -595,18 +586,68 @@ const navButton = {
                 }
             })
         }
-
     },
     //leave
-    leave: () => {
+    leave: async function () {
         if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
             ClickListening('', '退出-List')
             socketConnect.leaveRoom()
             window.location.href = `/home/${customizeOperation.getCookie('studentId')}`
         }
     },
-    vote: () => {
+    //vote
+    vote: async function () {
+        $('#votingModal_body').empty()
+        ClickListening('', "開啟-投票")
+        $('#navBarOpen_voting').click()
+        //using Model 互動視窗 from boostrap----------------------------------
+        const votingModalBody = $('#votingModal_body')
 
+        //coworkStatus, studentGroup
+        const coworkData = await studentClientConnect.cowork.getCoworkConfig(this.courseId, customizeOperation.getFrontEndCode('chatRoomId')).then(response => {
+            if (customizeOperation.serverResponseErrorDetect(response)) return response.data.message
+        })
+
+        // 成員投票狀態
+        const groupMemberContent = $('<div>').prop({
+            className: 'voting_memberContent'
+        }).appendTo(votingModalBody)
+        coworkData.studentGroup.forEach((student, index) => {
+            const member = $('<div>').prop({ className: 'voting_memberContent_member' }).appendTo(groupMemberContent)
+            $("<div>").prop({
+                className: 'voting_memberContent_memberIcon',
+                innerHTML: '🤓'
+            }).appendTo(member)
+            $('<div>').prop({
+                className: 'voting_memberContent_memberId',
+                innerHTML: student
+            }).appendTo(member)
+            $('<div>').prop({
+                className: 'voting_memberContent_memberVoteStatus_noVote',
+                id: `voting_member_${student}`,
+                innerHTML: '💭'
+            }).appendTo(member)
+        })
+
+        const voteBtnContent = $("<div>").prop({
+            className: 'voting_voteBtnContent'
+        }).appendTo(votingModalBody)
+        $('<button>').prop({
+            className: 'btn btn-outline-info voting_memberContent_voteBtn',
+            innerHTML: '投票前往下一階段'
+        }).click(voting).appendTo(voteBtnContent)
+
+        // voting click 事件
+        function voting() {
+            customizeOperation.loadingPage(true)
+
+            socketConnect.cowork.startVoting("前往下一階段")
+            socketConnect.cowork.selectionArea = 'vote'
+            $(`#voting_member_${customizeOperation.getFrontEndCode("studentId")}`)
+                .text('✔️')
+                .removeClass('voting_memberContent_memberVoteStatus_noVote')
+                .addClass('voting_memberContent_memberVoteStatus_Voted')
+        }
     }
 }
 //load
@@ -619,7 +660,10 @@ const load = async () => {
     if (checkCoworkStatus == 'Y') {
         await studentClientConnect.readCowork(courseId, groupId).then(response => {
             if (customizeOperation.serverResponseErrorDetect(response)) {
-                const process = parseInt(response.data.message.coworkStatus.process || 1)
+                // const process = parseInt(response.data.message.coworkStatus.process || 1)
+                const process = 6
+
+
                 let newNodeData = []
                 let newLinkData = []
 

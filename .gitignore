@@ -1,5 +1,7 @@
 /node_modules
 app.http
 /public/Access
+/public/Cowork
+.env
 .gitignore
 test.html

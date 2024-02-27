@@ -23,6 +23,7 @@ import customizeOperation from "./customizeOperation.js"
 //------------------------------ category Box Function -----------------------------------//
 const categoryBox = {
     Target: data => {
+        console.log(data)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             $(".targetIframe").attr(
                 "src",
@@ -38,9 +39,7 @@ const categoryBox = {
     Start: (data, key) => {
         if (data.message === undefined) {
             $("#startDescription").html(`<h3>Task undefined</h3>`)
-            return
         }
-
         return
     },
     Understanding: data => {
@@ -104,27 +103,45 @@ const categoryBox = {
             })
         }
     },
-    Formulating: data => {
+    Formulating: async (data, s) => {
         if (data.message === undefined) return
         if (data.message.content === undefined) return
-        console.log(data)
         let index = 0
-        for (const { title, code, description } of data.message.content) {
+        for (const { title, editableCode, preloadCode, description } of data.message.content) {
             // ContentBox
             const contentBox = $("<div>")
                 .prop({
                     className: "formulatingDescription_contentBox",
                 })
                 .appendTo($("#formulatingContent"))
-            
-            //Description
+
+            //Title
             $("<div>")
                 .prop({
-                    className: "formulatingDescription_contentDescription",
-                    innerHTML: `<p>${description}</p>`,
+                    className: "formulatingDescription_contentTitle",
+                    innerHTML: `<h4>⌨ ${title}</h4>`,
                 })
                 .appendTo(contentBox)
-            
+
+            //Description
+            const descriptionLine = description.split("\n")
+            const descriptionDiv = $("<div>")
+                .prop({
+                    className: "formulatingDescription_contentDescription",
+                })
+                .appendTo(contentBox)
+            descriptionLine.forEach((line) => { if (line != '\\n') descriptionDiv.append(`<p>${line}</p>`) })
+
+
+            $("<button>")
+                .prop({
+                    className: "btn btn-success formulatingDescription_launchbtn",
+                    id: `start_launchbtn_${index}`,
+                    innerHTML:
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
+                })
+                .click((e) => launchDemo(s, e, preloadCode))
+                .appendTo(contentBox)
 
             //interfacing area
             const contentInterfacingBox = $("<div>").prop({
@@ -134,41 +151,29 @@ const categoryBox = {
             $("<textarea>")
                 .prop({
                     className: "col-5 formulatingDescription_contentCode",
-                    id: `code_${index}`,
-                    innerHTML: code,
+                    id: `code_${index}`
                 })
                 .appendTo(contentInterfacingBox)
 
-            CodeMirrorFunc.codeMirrorProgram(`code_${index}`, code, false)
+            CodeMirrorFunc.codeMirrorProgram(`code_${index}`, editableCode, false)
             $(`#code_${index}`).data("CodeMirror").setSize(600, 500)
-            $(`#code_${index}`)
-                .data("CodeMirror")
-            index++
 
-            //interfacing
-            $("<div>").prop({
-                className: "col-5 formulatingDescription_interfacing",
-                id: `code_${index}_interfacing`,
+
+
+            const demoSrc = await studentClientConnect.launchFormulatingDemo(s.key + '-' + index, preloadCode + '\n' + editableCode).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) return response.data.message
+            })
+            $('<iframe>').prop({
+                id: `code_${index}_interfacing_demo`,
+                class: 'col-5',
+                src: `../../Access/${customizeOperation.getCookie("studentId")}/${demoSrc}/${demoSrc}.html`,
+                sandBox: "allow-scripts allow-same-origin"
+            }).css({
+                width: '500px',
+                height: '500px',
+                overflow: 'hidden',
             }).appendTo(contentInterfacingBox)
-
-            let game = new Phaser.Game({
-                type: Phaser.AUTO,
-                width: 800,
-                height: 800,
-                backgroundColor: '#4488aa',
-                // scene: {
-                //     preload: preload,
-                //     create: create,
-                //     update: update
-                // },
-                scale: {
-                    mode: Phaser.Scale.FIT,
-                    autoCenter: Phaser.Scale.CENTER_BOTH,
-                },
-                parent: `code_${index}_interfacing`,
-            });
-
-
+            index++
             //** old version ---------------------------------------------
             // //Title
             // $("<div>")
@@ -202,6 +207,13 @@ const categoryBox = {
             //     })
             //     .appendTo(contentBox)
             //-----------------------------------------------------------------
+        }
+        async function launchDemo(s, e, preloadCode) {
+            const launchIndex = e.currentTarget.id.split("_")[2]
+            const demoSrc = await studentClientConnect.launchFormulatingDemo(s.key + '-' + launchIndex, preloadCode + '\n' + $(`#code_${launchIndex}`).data("CodeMirror").getValue()).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) return response.data.message
+            })
+            $(`#code_${launchIndex}_interfacing_demo`).attr('src', `../../Access/${customizeOperation.getCookie("studentId")}/${demoSrc}/${demoSrc}.html`)
         }
     },
     WriteFormulating: data => {
@@ -360,24 +372,9 @@ const categoryBox = {
                         .appendTo($(`#programmingHint_${index}`))
                 })
             }
-
-            //初始化 boostrap Tooltip
-            $('[data-bs-toggle="tooltip"]').tooltip({
-                trigger: "click",
-            })
-
-            //點擊時將其他 tooltip 關閉
-            $('[data-bs-toggle="tooltip"]').click(function () {
-                if ($(this).attr("name") === "hint") {
-                    $('[data-bs-toggle="tooltip"]').not(this).tooltip("hide")
-                }
-            })
-
             //Hint tooltip 內容
             $('[data-bs-toggle="tooltip"]').on("shown.bs.tooltip", function () {
-
                 const hintTooltip = $(this)
-
                 if (hintTooltip.attr("name") === "hint") {
                     //Code 展示區
                     $("<textarea>")
@@ -419,10 +416,94 @@ const categoryBox = {
                 }
             })
         } else {
-            CodeMirrorFunc.codeMirrorProgram('coworkArea', data, false)
+            // 製作 Coding 區域
+            CodeMirrorFunc.codeMirrorProgram('coworkArea', data.coworkContent, false)
             $('#coworkArea').data("CodeMirror").setSize("auto", 680)
-        }
 
+            //hint
+            if (data.hintList !== undefined) {
+                data.hintList.forEach((hintContent, index) => {
+                    if (index !== 0) {
+                        $("<div>")
+                            .prop({
+                                className: "programmingDescription_hintArrow",
+                                innerHTML:
+                                    '<img src="../../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg); user-select:none"></img>',
+                            })
+                            .appendTo($("#programmingHint"))
+                    }
+
+                    $("<div>")
+                        .prop({
+                            className: "programmingDescription_hintText",
+                            innerHTML: `<p>👊step ${index + 1}</p>` + hintContent.hintText,
+                            id: `programmingHint_${index}`,
+                        })
+                        .appendTo($("#programmingHint"))
+
+                    $("<div>")
+                        .prop({
+                            className: "programmingDescription_hintCode",
+                            innerHTML:
+                                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="100%" fill="orange"><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>',
+                            id: `programmingHintCode_${index}`,
+                        })
+                        .attr({
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "right",
+                            "data-container": "body",
+                            "data-bs-html": "true",
+                            name: "hint",
+                            title: "<h3>程式碼參考</h3>若無顯示請重新點擊",
+                        })
+                        .appendTo($(`#programmingHint_${index}`))
+                })
+            }
+            //Hint tooltip 內容
+            $('[data-bs-toggle="tooltip"]').on("shown.bs.tooltip", function () {
+                const hintTooltip = $(this)
+                if (hintTooltip.attr("name") === "hint") {
+                    //Code 展示區
+                    $("<textarea>").prop({ id: "hint" }).css({ resize: "none", }).appendTo($(".tooltip-inner"))
+
+                    if (data.hintList !== undefined) {
+                        CodeMirrorFunc.codeMirrorProgram(
+                            "hint",
+                            data.hintList[hintTooltip.attr("id").split("_")[1]].hintCode,
+                            true
+                        )
+                    } else {
+                        CodeMirrorFunc.codeMirrorProgram("hint", "no data", true)
+                    }
+                    $("#hint").data("CodeMirror").setSize('auto', 'auto')
+
+                    //Code 複製 button
+                    $("<button>")
+                        .prop({
+                            id: "hintCopy",
+                            className: "btn btn-primary",
+                            innerHTML: "Copy",
+                        })
+                        .click(e => {
+                            e.stopPropagation()
+                            // console.log(data.hintCode[hintTooltip.attr("id").split("_")[1]])
+                            navigator.clipboard.writeText($('#hint').data("CodeMirror").getValue())
+                        })
+                        .appendTo($(".tooltip-inner"))
+                }
+            })
+        }
+        //初始化 boostrap Tooltip
+        $('[data-bs-toggle="tooltip"]').tooltip({
+            trigger: "click",
+        })
+
+        //點擊時將其他 tooltip 關閉
+        $('[data-bs-toggle="tooltip"]').click(function () {
+            if ($(this).attr("name") === "hint") {
+                $('[data-bs-toggle="tooltip"]').not(this).tooltip("hide")
+            }
+        })
     },
     Reflection: data => {
         if (data == undefined) {
@@ -519,9 +600,8 @@ const GoListFunc = {
     showContainer: async (s, id) => {
         ClickListening("", `打開-Task ${s.key} ${s.text}`)
         // 設定共編進入區域
-        if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
-            socketConnect.cowork.selectionArea = s.key
-        }
+        if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") socketConnect.cowork.selectionArea = s.key
+
         // //取得 Iframe 發出之 Error 警訊
         // const reciveMessage = e => {
         //     e.preventDefault()
@@ -555,9 +635,8 @@ const GoListFunc = {
         const closePage = () => {
             ClickListening("", `離開-${s.text}`)
             // 設定共編進入區域
-            if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
-                socketConnect.cowork.selectionArea = 'golist'
-            }
+            if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") socketConnect.cowork.selectionArea = 'golist'
+
             //關閉自動儲存
             //取得各階段程式碼
             if (
@@ -718,7 +797,7 @@ const GoListFunc = {
                 $(".content_consoleErrorArea").remove()
                 $(".content_dataVisualizationArea").remove()
                 //Programming modal
-                $(".modal").remove()
+                $("#programmingHintModal").remove()
             }, 200)
         }
 
@@ -793,8 +872,8 @@ const GoListFunc = {
             })
             .appendTo(content_iconContainer)
         //------------------------------------------------
+        //rotate Slide Code
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
-            //rotate Slide Code
             const rotateAllIconAndSlideAllCode = () => {
                 const content_codingContainer = [
                     ".content_coding_settingContainer",
@@ -848,18 +927,17 @@ const GoListFunc = {
             }).appendTo(content_iconContainer)
         }
         //question button
-        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
-            $("<button>")
-                .prop({
-                    className: "col-1 btn btn-warning content_question",
-                    innerHTML:
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
-                    id: "LS_programmingHint",
-                })
-                .attr("data-bs-toggle", "modal")
-                .attr("data-bs-target", "#programmingHintModal")
-                .appendTo(content_iconContainer)
-        }
+        $("<button>")
+            .prop({
+                className: "col-1 btn btn-warning content_question",
+                innerHTML:
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C352 78.8 273.2 0 176 0S0 78.8 0 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0C66.5 324.9 86.4 352.1 96 384H256zM176 512c44.2 0 80-35.8 80-80V416H96v16c0 44.2 35.8 80 80 80zM96 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg>',
+                id: "LS_programmingHint",
+            })
+            .attr("data-bs-toggle", "modal")
+            .attr("data-bs-target", "#programmingHintModal")
+            .appendTo(content_iconContainer)
+
         //complete Icon
         $("<div>")
             .prop({
@@ -922,7 +1000,7 @@ const GoListFunc = {
                     understandingContainer()
                     break
                 case "Formulating":
-                    formulatingContainer()
+                    formulatingContainer(s)
                     break
                 case "Programming":
                     programmingContainer()
@@ -935,7 +1013,7 @@ const GoListFunc = {
                     understandingContainer()
                     break
                 case "Completed-Formulating":
-                    formulatingContainer()
+                    formulatingContainer(s)
                     break
                 case "Completed-Programming":
                     programmingContainer()
@@ -1006,20 +1084,20 @@ const GoListFunc = {
             }
         }
         //formulating (expected bouns formulating)
-        async function formulatingContainer() {
+        async function formulatingContainer(s) {
             FormulatingBox().appendTo(contentContainer)
 
             if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 await studentClientConnect.getFormulating(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        categoryBox.Formulating(response.data)
+                        categoryBox.Formulating(response.data, s)
                         customizeOperation.loadingPage(false)
                     }
                 })
             } else {
                 await studentClientConnect.cowork.getFormulating(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        categoryBox.Formulating(response.data)
+                        categoryBox.Formulating(response.data, s)
                         customizeOperation.loadingPage(false)
                     }
                 })
@@ -1048,8 +1126,8 @@ const GoListFunc = {
                 //確認userId資料夾是否建立
                 await studentClientConnect.cowork.createDemo().then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        //讀取該key值的Code內容
-                        studentClientConnect.cowork.readCode(customizeOperation.getFrontEndCode("courseId")).then(response => {
+                        //讀取該key值的Code內容與 Hint 
+                        studentClientConnect.cowork.readCode(customizeOperation.getFrontEndCode("courseId"), s.key).then(response => {
                             if (customizeOperation.serverResponseErrorDetect(response)) {
                                 categoryBox.Programming(response.data.message)
                                 GoListFunc.saveCodeStatus(false)
@@ -1223,8 +1301,20 @@ const CodeMirrorFunc = {
                         "\t}," +
                         '\tparent: "container",\n' +
                         "};\n\n" +
-                        "const game = new Phaser.Game(config);\n" +
-                        "//請於以下開始您的程式"
+                        "const game = new Phaser.Game(config);\n\n" +
+                        "function preload(){\n" +
+                        "\t// 利用spritesheet 讀入圖片\n" +
+                        "\t// name 請修改成你想在遊戲中讀取該圖片的名稱\n" +
+                        "\t// imageName 請修改成你上傳的圖片名稱+副檔名\n" +
+                        "\tthis.load.spritesheet('name', '../media/imageName',{\n" +
+                        "\t\tframeWidth: 300, // 切割寬度\n" +
+                        "\t\tframeHeight: 300 // 切割高度\n" +
+                        "\t})\n" +
+                        "\n} \n\n" +
+                        "function create(){\n" +
+                        "\n} \n\n" +
+                        "function update(){\n" +
+                        "\n}"
                     )
                     break
                 default:
@@ -1256,7 +1346,7 @@ const CodeMirrorFunc = {
                 )
             } else {
                 const coworkCode = $('#coworkArea').data("CodeMirror")
-
+                if (coworkCode === undefined) return
                 studentClientConnect.cowork.saveCode(
                     customizeOperation.getFrontEndCode("courseId"),
                     coworkCode.getValue()
@@ -1290,6 +1380,7 @@ function ClickListening(e, customClick) {
         // go list class //
         ["courseTitle", "點擊-課程名稱"],
         ["studentId", "點擊-自己的ID"],
+        ["LS_closeVotingModal", "關閉-投票"],
         // Start //
         ["start_launchbtn", "重新執行-任務-範例"],
         // Understanding //

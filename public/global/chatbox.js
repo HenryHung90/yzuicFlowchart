@@ -73,6 +73,7 @@ const chatBoxInit = () => {
 
         const chatBox = $(".chatBox")
         chatBox.click(e => {
+            console.log(123)
             if (chatBox.attr("id") === "chatBox_Close") {
                 openChatBox()
             } else {

@@ -282,6 +282,14 @@ body {
     user-select: none;
 }
 
+/* toast */
+#cowork_toast {
+    background-color: orange;
+}
+#cowork_toast_context {
+    font-size: 16px;
+}
+
 #content_status_icon {
     transition-timing-function: ease;
     animation: sync 1s infinite steps(200);
