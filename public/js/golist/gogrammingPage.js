@@ -590,17 +590,17 @@ const ProgrammingBox = programmingKey => {
     })
     //using Model 互動視窗 from boostrap----------------------------------
     const modal = $("<div>").prop({
-            className: "modal fade",
-            id: "programmingHintModal",
-            tabindex: "-1",
-        })
+        className: "modal fade",
+        id: "programmingHintModal",
+        tabindex: "-1",
+    })
         .attr("aria-labelledby", "programmingHintModal")
         .attr("aria-hidden", "true")
         .prependTo($("body"))
 
     const modalContainer = $("<div>").prop({
-            className: "modal-dialog modal-dialog-centered",
-        }).appendTo(modal)
+        className: "modal-dialog modal-dialog-centered",
+    }).appendTo(modal)
 
     const modalContent = $("<div>")
         .prop({
@@ -1371,6 +1371,7 @@ const ReflectionBox = reflectionKey => {
         .appendTo(contentDiv)
 
     //reflection
+    //reflection title
     $("<div>")
         .prop({
             className: "col-12 reflectionDescription_reflection",
@@ -1380,6 +1381,8 @@ const ReflectionBox = reflectionKey => {
         .appendTo(ReflectionContainer)
 
     //Learning--------------------------------------------------------------
+
+    //Learning title
     const reflectionLearningContainer = $("<div>")
         .prop({
             className: "col-12 reflectionDescription_learning",
@@ -1389,6 +1392,7 @@ const ReflectionBox = reflectionKey => {
         })
         .appendTo(ReflectionContainer)
 
+    //Learning context
     $("<div>")
         .prop({
             className: "form-floating",
@@ -1437,8 +1441,8 @@ const ReflectionBox = reflectionKey => {
                 '<label for="difficultText">困難了...</label>',
         })
         .appendTo(reflectionDifficultContainer)
-
-    //scoring--------------------------------------------------------------
+    //scoring self--------------------------------------------------------------
+    //scoring title
     const reflectionScoringContainer = $("<div>")
         .prop({
             className: "col-12 reflectionDescription_scoring",
@@ -1447,7 +1451,8 @@ const ReflectionBox = reflectionKey => {
         })
         .appendTo(ReflectionContainer)
 
-    const scoringContainer = $("<div>")
+    //scoring context
+    const scoringSelfContainer = $("<div>")
         .prop({
             className: "reflectionDescription_scoringContainer",
         })
@@ -1458,7 +1463,7 @@ const ReflectionBox = reflectionKey => {
             id: "scoringText",
             innerHTML: "<p>評分!(最左邊為0分，最右邊為10分)</p>",
         })
-        .appendTo(scoringContainer)
+        .appendTo(scoringSelfContainer)
 
     $("<input>")
         .prop({
@@ -1468,7 +1473,7 @@ const ReflectionBox = reflectionKey => {
             step: "1",
             type: "range",
             value: 0,
-            id: "scoringValue",
+            id: "scoringSelfValue",
         })
         .change(e => {
             switch (e.target.value) {
@@ -1524,8 +1529,119 @@ const ReflectionBox = reflectionKey => {
             }
             ClickListening("", `更改-問題反思-自我評分為 ${e.target.value} 分`)
         })
-        .appendTo(scoringContainer)
+        .appendTo(scoringSelfContainer)
+    //relfection for teammate--------------------------------------------
+    //reflection teammate title
+    if (customizeOperation.getFrontEndCode('coworkStatus') == 'Y') {
+        const reflectionTeammateContainer = $("<div>")
+            .prop({
+                className: "col-12 reflectionDescription_difficult",
+                id: "LS_reflectionDescription_difficult",
+                innerHTML:
+                    "<h4>🔍 從此次任務中，對於你的隊友有甚麼評價？</h4><p>Ex: 他很罩...、他很積極的參與討論...，請詳細說明。</p>",
+            })
+            .appendTo(ReflectionContainer)
 
+        //reflection teammate context
+        $("<div>")
+            .prop({
+                className: "form-floating",
+                id: "teammateDiv",
+                innerHTML:
+                    '<textarea class="form-control reflectionDescription_textarea" placeholder="寫下來..." id="teammateValue"></textarea>' +
+                    '<label for="difficultText">對隊友的感想...</label>',
+            })
+            .appendTo(reflectionTeammateContainer)
+        //scoring teammate---------------------------------------------------
+        //scoring title
+        const scoringTeammateContainer = $("<div>")
+            .prop({
+                className: "col-12 reflectionDescription_scoring",
+                id: "LS_reflectionDescription_scoring",
+                innerHTML: "<h4>💯 同儕評分</h4>",
+            })
+            .appendTo(ReflectionContainer)
+
+        //scoring context
+        const scoringMateContainer = $("<div>")
+            .prop({
+                className: "reflectionDescription_scoringContainer",
+            })
+            .appendTo(scoringTeammateContainer)
+
+        $("<div>")
+            .prop({
+                id: "scoringTeammateText",
+                innerHTML: "<p>請對你的隊友評分!(最左邊為0分，最右邊為10分)</p>",
+            })
+            .appendTo(scoringMateContainer)
+
+        $("<input>")
+            .prop({
+                className: "form-range",
+                min: "0",
+                max: "10",
+                step: "1",
+                type: "range",
+                value: 0,
+                id: "scoringTeammateValue",
+            })
+            .change(e => {
+                switch (e.target.value) {
+                    case "0":
+                        $("#scoringTeammateText").html(
+                            "<p>0分，我完全不滿意他的表現，好爛!</p>"
+                        )
+                        break
+                    case "1":
+                        $("#scoringTeammateText").html("<p>1分，他甚麼都不會😢</p>")
+                        break
+                    case "2":
+                        $("#scoringTeammateText").html(
+                            "<p>2分，我的人生怎麼會遇到這種難題😵</p>"
+                        )
+                        break
+                    case "3":
+                        $("#scoringTeammateText").html(
+                            "<p>3分，他的程式碼跟我的人生一樣，只有一半成功，另一半還在Debug。</p>"
+                        )
+                        break
+                    case "4":
+                        $("#scoringTeammateText").html("<p>4分，感覺有了，但不多</p>")
+                        break
+                    case "5":
+                        $("#scoringTeammateText").html("<p>5分，中規中矩🤏</p>")
+                        break
+                    case "6":
+                        $("#scoringTeammateText").html(
+                            "<p>6分，只要他會動都沒問題👌</p>"
+                        )
+                        break
+                    case "7":
+                        $("#scoringTeammateText").html(
+                            "<p>7分，只要他能夠跟我合作，就OK😎</p>"
+                        )
+                        break
+                    case "8":
+                        $("#scoringTeammateText").html(
+                            "<p>8分，他有沒有問題不重要，能用就好</p>"
+                        )
+                        break
+                    case "9":
+                        $("#scoringTeammateText").html(
+                            "<p>9分，這個世界上只有我搞不定的女生，沒有我搞不定的隊友🤙🤙</p>"
+                        )
+                        break
+                    case "10":
+                        $("#scoringTeammateText").html(
+                            "<p>10分，我的程式碼都是他教我的，呵😎🤏</p>"
+                        )
+                        break
+                }
+                ClickListening("", `更改-問題反思-同儕評分為 ${e.target.value} 分`)
+            })
+            .appendTo(scoringMateContainer)
+    }
     //submit--------------------------------------------------------------
     $("<button>")
         .prop({
@@ -1540,6 +1656,10 @@ const ReflectionBox = reflectionKey => {
         .appendTo(ReflectionContainer)
 
     function submitReflection() {
+        // 填寫欄位 array
+        // textarea = 取得 value 用
+        // div = 取得該 form 的外框, 若無填寫則可透過此處更改 css
+        // isPass = 是否有填入數值
         const formData = [
             {
                 textarea: $("#learningValue"),
@@ -1556,8 +1676,14 @@ const ReflectionBox = reflectionKey => {
                 div: $(".reflectionDescription_difficult"),
                 isPass: false,
             },
+            {
+                textarea: $("#teammateValue"),
+                div: $(".reflectionDescription_difficult"),
+                isPass: customizeOperation.getFrontEndCode('coworkStatus') == 'Y',
+            },
         ]
 
+        // 檢查是否都有填寫完成
         for (const form of formData) {
             if (form.textarea.val() == "") {
                 form.div.css({
@@ -1578,7 +1704,7 @@ const ReflectionBox = reflectionKey => {
             }
         }
 
-        if ($("#scoringValue").val() == "0" &&window.confirm("確定要給自己0分ㄇ🧐")) {
+        if ($("#scoringValue").val() == "0" && window.confirm("確定要給自己0分ㄇ🧐")) {
             submitFunc()
             return
         }
@@ -1588,31 +1714,27 @@ const ReflectionBox = reflectionKey => {
             ClickListening("", `送出-監控反思-${reflectionKey.key}`)
             customizeOperation.loadingPage(true)
             if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
-                studentClientConnect
-                    .cowork.saveReflection(
-                        customizeOperation.getFrontEndCode("courseId"),
-                        reflectionKey.key,
-                        $("#learningValue").val(),
-                        // $("#workhardValue").val(),
-                        $("#difficultValue").val(),
-                        $("#scoringValue").val()
-                    )
-                    .then(response => { if (customizeOperation.serverResponseErrorDetect(response)) successSaveing(response) })
+                studentClientConnect.cowork.saveReflection(
+                    customizeOperation.getFrontEndCode("courseId"),
+                    reflectionKey.key,
+                    $("#learningValue").val(),
+                    $("#difficultValue").val(),
+                    $("#scoringSelfValue").val(),
+                    $("#teammateValue").val(),
+                    $("#scoringTeammateValue").val(),
+                ).then(response => { if (customizeOperation.serverResponseErrorDetect(response)) successSaving(response) })
             } else {
-                studentClientConnect
-                    .saveReflection(
-                        customizeOperation.getFrontEndCode("courseId"),
-                        reflectionKey.key,
-                        $("#learningValue").val(),
-                        $("#workhardValue").val(),
-                        $("#difficultValue").val(),
-                        $("#scoringValue").val()
-                    )
-                    .then(response => { if (customizeOperation.serverResponseErrorDetect(response)) successSaveing(response) })
+                studentClientConnect.saveReflection(
+                    customizeOperation.getFrontEndCode("courseId"),
+                    reflectionKey.key,
+                    $("#learningValue").val(),
+                    $("#difficultValue").val(),
+                    $("#scoringSelfValue").val()
+                ).then(response => { if (customizeOperation.serverResponseErrorDetect(response)) successSaving(response) })
             }
 
 
-            function successSaveing(response) {
+            function successSaving(response) {
                 window.alert(response.data.message)
                 customizeOperation.loadingPage(false)
                 $(".block").fadeOut(200)

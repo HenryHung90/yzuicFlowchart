@@ -464,9 +464,10 @@ router.post("/savereflection", async (req, res) => {
                 studentReflectionData: {
                     [req.body.key]: {
                         learing: converDangerString(req.body.learning) || "",
-                        workhard: converDangerString(req.body.workhard) || "",
                         difficult: converDangerString(req.body.difficult) || "",
                         scoring: req.body.scoring || 0,
+                        teammate: req.body.teammate || "",
+                        teammateScore: req.body.teammateScore || 0
                     },
                 },
             })
@@ -483,9 +484,10 @@ router.post("/savereflection", async (req, res) => {
         //其他
         reflectionData.studentReflectionData[req.body.key] = {
             learing: converDangerString(req.body.learning) || "",
-            workhard: converDangerString(req.body.workhard) || "",
             difficult: converDangerString(req.body.difficult) || "",
             scoring: req.body.scoring || 0,
+            teammate: req.body.teammate || "",
+            teammateScore: req.body.teammateScore || 0
         }
 
         await reflectionconfig

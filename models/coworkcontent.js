@@ -19,7 +19,7 @@ const coworkcontent = new mongoose.Schema({
     },
     standardGoList: {
         type: 'object',
-        required: true,
+        required: false,
     },
     // Demo 位置
     standardMaterial: {

@@ -1,9 +1,15 @@
 import customizeOperation from "./customizeOperation.js"
 
 const studentClientConnect = {
-    // 登入
+    /**
+     * 用於登入本網站
+     * @param {string} account 登入之帳號
+     * @param {string} password 登入之密碼(尚未 hashing)
+     * @returns {object} access/denied 登入操作
+     */
     login:
         (account, password) => {
+
             return (
                 axios({
                     method: 'post',
@@ -15,7 +21,11 @@ const studentClientConnect = {
                 })
             )
         },
-    // 登出
+    /**
+     * 登出本網站
+     * 將清空 cookies & 登入狀態
+     * @returns {none}
+     */
     logout:
         () => {
             return (
@@ -25,7 +35,13 @@ const studentClientConnect = {
                 })
             )
         },
-    // 修改密碼
+    /**
+     * 學生進行更改密碼時使用
+     * @param {string} oldPassword 舊密碼
+     * @param {string} newPassword 新密碼
+     * @returns {boolean} access/denied 更新動作
+     * 若更新失敗請閱讀回傳 message
+     */
     changePassword:
         (oldPassword, newPassword) => {
             return (
@@ -40,7 +56,11 @@ const studentClientConnect = {
                 })
             )
         },
-    // 取得所有課程
+    /**
+     * 取得所有單人教材與連結
+     * @returns {object}
+     * #standardData: 內含所有課程之連結與名稱
+     */
     getAllCourse:
         () => {
             return (
@@ -50,6 +70,11 @@ const studentClientConnect = {
                 })
             )
         },
+    /**
+     * 取得所有多人教材與連結
+     * @returns {object}
+     * coworkData: 內含所有共編課程之連結與名稱
+     */
     // 取得所有共編教材
     getAllCoworkCourse:
         () => {
@@ -61,7 +86,12 @@ const studentClientConnect = {
             )
         },
     //golist-----------------------------------------
-    //讀取 golist
+    /**
+     * 取得欲進入課程之教材內容以及學生儲存狀態
+     * @param {string} courseId 課程id
+     * @returns {object}
+     * message: 課程內容
+     */
     readGoList:
         (courseId) => {
             return (
@@ -74,7 +104,13 @@ const studentClientConnect = {
                 })
             )
         },
-    //儲存 golist
+    /**
+     * 當使用者進行儲存 goList, 即心智圖首頁之框架儲存
+     * 可以使用該 API, 將 goList 儲存至資料庫當中
+     * @param {object} goData goList 的整個內容 
+     * @param {string} courseId 要儲存到哪一個課程當中
+     * @returns access/denied 如果儲存失敗請閱讀回傳 message
+     */
     saveGoList:
         (goData, courseId) => {
             return (
@@ -88,7 +124,14 @@ const studentClientConnect = {
                 })
             )
         },
-    //重整 goList
+    /**
+     * 使用者可以透過該 API 刷新整個 goList
+     * goList 心智圖將會回到最開始的狀態
+     * #該方式不會刪除 relfection 回饋內容, Coding 內容
+     * 僅刷新為原始狀態
+     * @param {string} courseId 要重新啟動的 courseId 
+     * @returns access/denied 如果失敗請閱讀回傳 message
+     */
     restartGoList:
         (courseId) => {
             return (
@@ -101,7 +144,12 @@ const studentClientConnect = {
                 })
             )
         },
-    //下載最新 golist
+    /**
+     * 若教師端有進行 goList 動作
+     * 使用者可透過該 API 取得最新的 goList
+     * @param {string} courseId 要更新的 courseId
+     * @returns access/denied 如果失敗請閱讀回傳 message
+     */
     downloadGoList:
         (courseId) => {
             return (
@@ -114,7 +162,14 @@ const studentClientConnect = {
                 })
             )
         },
-    //取得所有人的Progress
+    /**
+     * 可讀取所有人的 Progress 以及各 Progress 總人數
+     * 用於排行榜的使用
+     * @param {string} courseId 要查找的 courseId
+     * @returns {object}
+     * -count: 該階段的總人數
+     * -member: 該階段的人
+     */
     getAllStudentProgress:
         (courseId) => {
             return (
@@ -128,7 +183,12 @@ const studentClientConnect = {
             )
         },
     //cowork-----------------------------------------
-    //讀取 cowork
+    /**
+     * 用於讀取共編教材的內容
+     * @param {string} courseId 欲取得的 courseId
+     * @param {string} groupId 使用者的 groupId
+     * @returns message: 課程內容
+     */
     readCowork:
         (courseId, groupId) => {
             return (
@@ -444,7 +504,7 @@ const studentClientConnect = {
         },
         //儲存 Relfection
         saveReflection:
-            (courseId, key, learning, workhard, difficult, scoring) => {
+            (courseId, key, learning, difficult, scoring, teammate, teammateScore) => {
                 if (customizeOperation.getCookie("adminId")) {
                     return (
                         axios({
@@ -461,9 +521,10 @@ const studentClientConnect = {
                             courseId: courseId,
                             key: key,
                             learning: learning,
-                            workhard: workhard,
                             difficult: difficult,
-                            scoring: scoring
+                            scoring: scoring,
+                            teammate: teammate,
+                            teammateScore: teammateScore
                         }
                     })
                 )
@@ -573,7 +634,7 @@ const studentClientConnect = {
     //reflection--------------------------------
     // 暫存 Reflection
     tempSaveReflection:
-        (courseId, key, learning, workhard, difficult, scoring) => {
+        (courseId, key, learning, difficult, scoring) => {
             if (customizeOperation.getCookie("adminId")) {
                 return (
                     axios({
@@ -590,7 +651,6 @@ const studentClientConnect = {
                         courseId: courseId,
                         key: key,
                         learning: learning,
-                        workhard: workhard,
                         difficult: difficult,
                         scoring: scoring
                     }
@@ -599,7 +659,7 @@ const studentClientConnect = {
         },
     // 送出 Reflection
     saveReflection:
-        (courseId, key, learning, workhard, difficult, scoring) => {
+        (courseId, key, learning, difficult, scoring) => {
             if (customizeOperation.getCookie("adminId")) {
                 return (
                     axios({
@@ -616,7 +676,6 @@ const studentClientConnect = {
                         courseId: courseId,
                         key: key,
                         learning: learning,
-                        workhard: workhard,
                         difficult: difficult,
                         scoring: scoring
                     }

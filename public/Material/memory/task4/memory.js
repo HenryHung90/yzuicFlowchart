@@ -129,6 +129,8 @@ function flipCard(card, Tweens) {
     // 如果是第二張牌，將其儲存在 secondCard 變數中
     cardInformation.secondCard = card;
     card.setFrame(card.cardId)
+
+    // 檢查兩張卡牌是否相同
     checkCard(cardInformation.firstCard, cardInformation.secondCard, Tweens)
 }
 
@@ -152,5 +154,4 @@ function checkCard(firstCard, secondCard, Tweens) {
         cardInformation.secondCard = null
         boardInformation.lockBoard = false
     }, 500)
-
 }

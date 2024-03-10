@@ -504,6 +504,7 @@ router.post('/createcoworkcourse', async (req, res) => {
             class: req.body.class,
             access: true,
             coworkTitle: req.body.coworkTitle,
+            standardGoList: req.body.standardGoList || {},
             standardMaterial: req.body.standardMaterial || '',
             standardStarting: req.body.standardStarting || { 1: { target: "", material: "" } },
             standardUnderstanding: req.body.standardUnderstanding || { 1: { target: "", operation: "", limit: "" } },
@@ -609,7 +610,7 @@ router.post('/updatestudent', async (req, res) => {
             })
         }
         //增加群組功能 addChatRoom
-        if (req.body.type === 'addChatRoom'){
+        if (req.body.type === 'addChatRoom') {
             await studentConfig.updateOne(
                 { studentId: req.body.studentId, studentClass: req.body.studentClass },
                 { studentChatRoomId: "" }

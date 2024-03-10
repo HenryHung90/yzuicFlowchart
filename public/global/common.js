@@ -513,8 +513,7 @@ const categoryBox = {
         $("#learningValue").val(data.learing)
         $("#workhardValue").val(data.workhard)
         $("#difficultValue").val(data.difficult)
-        $("#scoringValue").val(data.scoring)
-
+        $("#scoringSelfValue").val(data.scoring)
         switch (data.scoring) {
             case "0":
                 $("#scoringText").html(
@@ -566,6 +565,63 @@ const categoryBox = {
                 )
                 break
         }
+
+        if(customizeOperation.getFrontEndCode("coworkStatus") == 'Y'){
+            $("#scoringTeammateValue").val(data.teammateScoring)
+            $("#teammateValue").val(data.temmate)
+            switch (data.teammateScoring) {
+                case "0":
+                    $("#scoringTeammateText").html(
+                        "<p>0分，我完全不滿意他的表現，好爛!</p>"
+                    )
+                    break
+                case "1":
+                    $("#scoringTeammateText").html("<p>1分，他甚麼都不會😢</p>")
+                    break
+                case "2":
+                    $("#scoringTeammateText").html(
+                        "<p>2分，我的人生怎麼會遇到這種難題😵</p>"
+                    )
+                    break
+                case "3":
+                    $("#scoringTeammateText").html(
+                        "<p>3分，他的程式碼跟我的人生一樣，只有一半成功，另一半還在Debug。</p>"
+                    )
+                    break
+                case "4":
+                    $("#scoringTeammateText").html("<p>4分，感覺有了，但不多</p>")
+                    break
+                case "5":
+                    $("#scoringTeammateText").html("<p>5分，中規中矩🤏</p>")
+                    break
+                case "6":
+                    $("#scoringTeammateText").html(
+                        "<p>6分，只要他會動都沒問題👌</p>"
+                    )
+                    break
+                case "7":
+                    $("#scoringTeammateText").html(
+                        "<p>7分，只要他能夠跟我合作，就OK😎</p>"
+                    )
+                    break
+                case "8":
+                    $("#scoringTeammateText").html(
+                        "<p>8分，他有沒有問題不重要，能用就好</p>"
+                    )
+                    break
+                case "9":
+                    $("#scoringTeammateText").html(
+                        "<p>9分，這個世界上只有我搞不定的女生，沒有我搞不定的隊友🤙🤙</p>"
+                    )
+                    break
+                case "10":
+                    $("#scoringTeammateText").html(
+                        "<p>10分，我的程式碼都是他教我的，呵😎🤏</p>"
+                    )
+                    break
+            }
+        }
+
     },
 }
 //------------------------------ Go.js Function -----------------------------------//

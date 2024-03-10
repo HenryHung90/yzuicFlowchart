@@ -689,46 +689,30 @@ router.post("/readcode", async (req, res) => {
             status: 200,
         }
 
-        await studentConfig
-            .findOne({
-                studentClass: req.user.studentClass,
-                studentId: req.user.studentId,
-            })
-            .then(response => {
-                if (
-                    response.studentCodeList === undefined ||
-                    response.studentCodeList === null
-                ) {
+        await studentConfig.findOne({
+            studentClass: req.user.studentClass,
+            studentId: req.user.studentId,
+        }).then(response => {
+            if (response.studentCodeList === undefined || response.studentCodeList === null) {
+                returnData.code = ""
+            } else {
+                if (response.studentCodeList[req.body.courseId] === undefined || response.studentCodeList[req.body.courseId] === null) {
                     returnData.code = ""
                 } else {
-                    if (response.studentCodeList[req.body.courseId] === null) {
-                        returnData.code = ""
-                    } else {
-                        returnData.code =
-                            response.studentCodeList[req.body.courseId][
-                            req.body.keyCode
-                            ]
-                    }
+                    returnData.code = response.studentCodeList[req.body.courseId][req.body.keyCode]
                 }
-            })
+            }
+        })
 
-        await standardcontent
-            .findOne({
-                _id: req.body.courseId,
-            })
-            .then(response => {
-                if (
-                    response.standardProgramming[req.body.keyCode] === undefined
-                ) {
-                    res.json(returnData)
-                } else {
-                    returnData.hint =
-                        response.standardProgramming[req.body.keyCode].hint
-                    returnData.hintCode =
-                        response.standardProgramming[req.body.keyCode].hintCode
-                    res.json(returnData)
-                }
-            })
+        await standardcontent.findOne({ _id: req.body.courseId }).then(response => {
+            if (response.standardProgramming[req.body.keyCode] === undefined) {
+                res.json(returnData)
+            } else {
+                returnData.hint = response.standardProgramming[req.body.keyCode].hint
+                returnData.hintCode = response.standardProgramming[req.body.keyCode].hintCode
+                res.json(returnData)
+            }
+        })
     } catch (err) {
         console.log(err)
         res.json({
@@ -761,7 +745,7 @@ router.post("/savecode", async (req, res) => {
             }
         } else {
             // 後續新增
-            if (studentData.studentCodeList[req.body.courseId] === null) {
+            if (studentData.studentCodeList[req.body.courseId] === undefined || studentData.studentCodeList[req.body.courseId] === null) {
                 studentData.studentCodeList[req.body.courseId] = {
                     [req.body.keyCode]: {
                         setting: req.body.setting,
@@ -871,7 +855,6 @@ router.post("/tempsavereflection", async (req, res) => {
                 studentReflectionData: {
                     [req.body.key]: {
                         learing: converDangerString(req.body.learning) || "",
-                        workhard: converDangerString(req.body.workhard) || "",
                         difficult: converDangerString(req.body.difficult) || "",
                         scoring: req.body.scoring || 0,
                     },
@@ -890,7 +873,6 @@ router.post("/tempsavereflection", async (req, res) => {
         //其他
         reflectionData.studentReflectionData[req.body.key] = {
             learing: converDangerString(req.body.learning) || "",
-            workhard: converDangerString(req.body.workhard) || "",
             difficult: converDangerString(req.body.difficult) || "",
             scoring: req.body.scoring || 0,
         }
@@ -945,7 +927,6 @@ router.post("/savereflection", async (req, res) => {
                 studentReflectionData: {
                     [req.body.key]: {
                         learing: converDangerString(req.body.learning) || "",
-                        workhard: converDangerString(req.body.workhard) || "",
                         difficult: converDangerString(req.body.difficult) || "",
                         scoring: req.body.scoring || 0,
                     },

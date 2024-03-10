@@ -6,10 +6,8 @@
 // => Phaser setFrame, Phaser Interactive, Object 應用
 // 階段四: 點擊兩張卡牌後程式會做比對，正確會保持正面，錯誤則會翻回卡背 並且在比對時鎖定牌面，不能點擊其他卡牌
 // => 程式邏輯, 程式切割
-// 階段五: 程式能夠判斷是否完成遊戲
-// => 程式規劃、程式邏輯
-// 階段六: 翻牌加入動畫
-// => Phaser timeline
+// 階段五: 程式能夠判斷是否完成遊戲，並將翻牌加入動畫
+// => 程式規劃、程式邏輯、Phaser timeline
 
 
 let game = new Phaser.Game({
