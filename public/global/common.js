@@ -35,7 +35,6 @@ const categoryBox = {
                 `../../Material/${data.message}/full/index.html`
             )
         }
-
     },
     Start: (data, key) => {
         if (data.message === undefined) {
