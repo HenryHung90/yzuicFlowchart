@@ -684,8 +684,7 @@ router.post("/readcode", async (req, res) => {
     try {
         const returnData = {
             code: "",
-            hint: "",
-            hintCode: "123",
+            hintList: [],
             status: 200,
         }
 
@@ -708,8 +707,7 @@ router.post("/readcode", async (req, res) => {
             if (response.standardProgramming[req.body.keyCode] === undefined) {
                 res.json(returnData)
             } else {
-                returnData.hint = response.standardProgramming[req.body.keyCode].hint
-                returnData.hintCode = response.standardProgramming[req.body.keyCode].hintCode
+                returnData.hintList = response.standardProgramming[req.body.keyCode].hintList
                 res.json(returnData)
             }
         })
@@ -1135,7 +1133,6 @@ router.post("/listener", async (req, res) => {
             studentName: req.user.studentName,
         })
 
-        //time, courseTitle, operation, keyName, detail, description
 
         if (listenerData == null) {
             const newListenerData = new listenerconfig({
@@ -1144,13 +1141,12 @@ router.post("/listener", async (req, res) => {
                 studentId: req.user.studentId,
                 listenerData: [
                     {
-                        "時間": req.body.time,
-                        "遊戲標題": req.body.courseTitle,
-                        "操作": req.body.operation,
-                        "Task": req.body.task,
-                        "項目": req.body.keyName,
-                        "細節": req.body.detail,
-                        "簡易描述": req.body.description,
+                        "頁面": req.body.page,
+                        "主項": req.body.mainTag,
+                        "小項": req.body.subTag,
+                        "子項": req.body.aidTag,
+                        "描述": req.body.description,
+                        "時間": req.body.time
                     },
                 ],
             })
@@ -1163,13 +1159,12 @@ router.post("/listener", async (req, res) => {
             })
         } else {
             listenerData.listenerData.push({
-                "時間": req.body.time,
-                "遊戲標題": req.body.courseTitle,
-                "操作": req.body.operation,
-                "Task": req.body.task,
-                "項目": req.body.keyName,
-                "細節": req.body.detail,
-                "簡易描述": req.body.description,
+                "頁面": req.body.page,
+                "主項": req.body.mainTag,
+                "小項": req.body.subTag,
+                "子項": req.body.aidTag,
+                "描述": req.body.description,
+                "時間": req.body.time
             })
 
             await listenerconfig

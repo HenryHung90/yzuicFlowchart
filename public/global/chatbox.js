@@ -126,7 +126,7 @@ const chatBoxInit = () => {
         // send message
         const sendMessage = () => {
             if ($("#Message").val() !== "") {
-                ClickListening("", `傳送訊息--內容為:${$("#Message").val()}`)
+                ClickListening("", `FlowChart-傳送訊息-${$("#courseTitle").text().replace(/\s/g, "")}-${$("#Message").val()}`)
                 socketConnect.sendMessage($("#Message").val())
                 $("#Message").val("")
             }

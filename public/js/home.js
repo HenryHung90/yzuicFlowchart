@@ -114,7 +114,7 @@ const changePassword = () => {
         }
         customizeOperation.loadingPage(true)
         studentClientConnect.changePassword(OP, NP_2).then(async response => {
-            ClickListening('', `確認修改-密碼-新密碼為 ${NP_1}`)
+            ClickListening('', `主頁-修改密碼-更新密碼成功`)
             if (customizeOperation.serverResponseErrorDetect(response)) {
                 window.alert(response.data.message)
                 customizeOperation.loadingPage(false)
@@ -145,7 +145,7 @@ const homeInit = async () => {
     await studentClientConnect.getAllCourse().then(response => {
         if (customizeOperation.serverResponseErrorDetect(response)) {
             if (response.data.standardData !== null || response.data.standardData !== undefined) {
-                renderCourse(response.data.standardData, 'course')
+                renderCourse(response.data.standardData, 'personal')
             }
         }
     })
@@ -169,9 +169,9 @@ const homeInit = async () => {
             const goListContainer = $('<div>').prop({
                 className: 'goListCourse_contentContainer',
             }).click(e => {
-                enterClass(value._id, type)
                 // 進入課程LS
-                ClickListening('', `進入課程-${type == 'cowork' ? value.coworkTitle : value.goListTitle}`)
+                ClickListening('', `主頁-進入課程-${type == 'cowork' ? value.coworkTitle : value.goListTitle}-${type}`)
+                enterClass(value._id, type)
             }).appendTo(courseContainer)
 
             //Image Box

@@ -518,6 +518,7 @@ const leaderBoardInit = () => {
                 .attr("id", "leaderBoard_Open")
                 .css({ transform: "translateX(0)" })
         } else {
+
             $('.leaderBoardBar')
                 .attr("id", "leaderBoard_Close")
                 .css({ transform: "translateX(36vw)" })
@@ -537,7 +538,7 @@ const navButton = {
         const goData = JSON.parse(MY_DIAGRAM.model.toJson());
         //刪除 * 字號
         let idx = document.title.indexOf("*");
-        ClickListening('', '儲存-List')
+        ClickListening('', `FlowChart-儲存Chart-${$("#courseTitle").text().replace(/\s/g, "") }`)
 
         document.title = document.title.slice(0, idx);
 
@@ -564,7 +565,7 @@ const navButton = {
             await studentClientConnect.restartGoList(this.courseId)
                 .then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        ClickListening('', '重整-List')
+                        ClickListening('', `FlowChart-儲存Chart-${$("#courseTitle").text().replace(/\s/g, "")}`)
                         load()
                         customizeOperation.loadingPage(false)
                     }
@@ -576,11 +577,12 @@ const navButton = {
         customizeOperation.loadingPage(true)
         //更新 goList
         if (navButton.coworkStatus === 'Y') {
-
+            alert('目前功能不可用')
+            customizeOperation.loadingPage(false)
         } else {
             await studentClientConnect.downloadGoList(this.courseId).then(response => {
                 if (customizeOperation.serverResponseErrorDetect(response)) {
-                    ClickListening('', '載入最新版本-List')
+                    ClickListening('', `FlowChart-載入Chart-${$("#courseTitle").text().replace(/\s/g, "")}`)
                     load()
                     customizeOperation.loadingPage(false)
                 }
@@ -590,7 +592,7 @@ const navButton = {
     //leave
     leave: async function () {
         if (window.confirm("確定退出嗎？退出前請記得儲存內容喔!")) {
-            ClickListening('', '退出-List')
+            ClickListening('', `FlowChart-離開課程-${$("#courseTitle").text().replace(/\s/g, "")}`)
             socketConnect.leaveRoom()
             window.location.href = `/home/${customizeOperation.getCookie('studentId')}`
         }

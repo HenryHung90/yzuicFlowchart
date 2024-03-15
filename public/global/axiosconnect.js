@@ -710,20 +710,30 @@ const studentClientConnect = {
             )
         },
     //listener---------------------------------
+    /**
+     * 用於儲存用戶監聽事件，需紀錄以下所有事件
+     * @param {string} page 目前所在頁面
+     * @param {string} mainTag 主要點擊項目描述
+     * @param {string} subTag 副點擊項目描述
+     * @param {string} aidTag 輔助點擊項目描述
+     * @param {string} description 點擊項目描述
+     * @param {string} time 點擊時間
+     * @returns 
+     */
     listenerUpload:
-        (time, courseTitle, operation, task, keyName, detail, description) => {
+        (page, mainTag, subTag, aidTag, description, time) => {
             return (
                 axios({
                     method: 'post',
                     url: '/student/listener',
                     data: {
-                        time: time,
-                        courseTitle: courseTitle,
-                        operation: operation,
-                        task: task,
+                        page: page,
+                        mainTag: mainTag,
+                        subTag: subTag,
+                        aidTag: aidTag,
                         keyName: keyName,
-                        detail: detail,
                         description: description,
+                        time: time,
                     }
                 })
             )

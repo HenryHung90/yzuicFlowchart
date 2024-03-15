@@ -269,7 +269,7 @@ const CommentBox = () => {
     return contentDiv
 }
 //UnderstandingBox return function
-const UnderstandingBox = () => {
+const UnderstandingBox = key => {
     // 把 Sync 字樣刪除
     $(".content_complete").remove()
     // 把 收合 字樣刪除
@@ -303,8 +303,9 @@ const UnderstandingBox = () => {
             id: "start_launchbtn",
             innerHTML:
                 '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
-        })
-        .appendTo(understandingDemoContainer)
+        }).click(e => {
+            ClickListening('', `探索理解-重新執行範例-${$("#courseTitle").text().replace(/\s/g, "")}-任務${key.split("-")[0]}`)
+        }).appendTo(understandingDemoContainer)
 
     //container
     const content_codingContainer = $("<div>")
@@ -584,6 +585,8 @@ const WriteFormulatingBox = () => {
 
 //Programming return function
 const ProgrammingBox = programmingKey => {
+    const courseTitle = $("#courseTitle").text().replace(/\s/g, "")
+    const missonNumber = programmingKey.split("-")[0]
     //Content Row 分行器
     const contentRowDiv = $("<div>").prop({
         className: "row justify-content-left contentColDiv",
@@ -760,7 +763,6 @@ const ProgrammingBox = programmingKey => {
     $("<button>")
         .prop({
             className: "btn btn-success content_launchbtn",
-            id: "LS_programmingLaunchDemo",
             innerHTML:
                 '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
         })
@@ -959,7 +961,7 @@ const ProgrammingBox = programmingKey => {
     //Launch demo function
     async function launchDemo() {
         customizeOperation.loadingPage(true)
-        ClickListening("", "執行-計畫執行-Code")
+        ClickListening("", `計畫執行-執行程式-${courseTitle}-任務${missonNumber}`)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //取得各階段程式碼
             const settingCode = $("#setting").data("CodeMirror")
@@ -1012,7 +1014,7 @@ const ProgrammingBox = programmingKey => {
     //rotate
     async function rotateIconAndSlideCode(container, icon, title) {
         if (container.attr("id") === "open") {
-            ClickListening("", `收合-計畫執行-程式之${title}`)
+            ClickListening("", `計畫執行-收合${title}程式-${courseTitle}-任務${missonNumber}`)
 
             container.attr("id", "close").slideUp(300)
             icon.css(
@@ -1022,7 +1024,7 @@ const ProgrammingBox = programmingKey => {
                 200
             )
         } else {
-            ClickListening("", `展開-計畫執行-程式之${title}`)
+            ClickListening("", `計畫執行-展開${title}程式-${courseTitle}-任務${missonNumber}`)
 
             container.attr("id", "open").slideDown(300)
             icon.css(
@@ -1036,7 +1038,7 @@ const ProgrammingBox = programmingKey => {
     //save code function
     async function saveCode() {
         GoListFunc.saveCodeStatus(true)
-        ClickListening("", "儲存-計畫執行-Code")
+        ClickListening("", `計畫執行-儲存程式-${courseTitle}-任務${missonNumber}`)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //取得各階段程式碼
             const settingCode = $("#setting").data("CodeMirror")
@@ -1047,7 +1049,7 @@ const ProgrammingBox = programmingKey => {
             const customCode = $("#custom").data("CodeMirror")
 
 
-            const keyCode = programmingKey.key
+            const keyCode = programmingKey
             await studentClientConnect
                 .saveCode(
                     settingCode.getValue(),
@@ -1082,7 +1084,7 @@ const ProgrammingBox = programmingKey => {
         customizeOperation.loadingPage(true)
         let uploadFile = new FormData()
 
-        ClickListening("", `上傳-計畫執行-檔案，名稱為${files[0].name}`)
+        ClickListening("", `計畫執行-上傳檔案-${courseTitle}-${files[0].name}`)
 
         for (let file of files) {
             const extension = file.name
@@ -1253,10 +1255,7 @@ const ProgrammingBox = programmingKey => {
         if (window.confirm(`確定刪除圖像 ${file[0].name} ?`)) {
             studentClientConnect.deleteFile(file[0].name).then(response => {
                 if (customizeOperation.serverResponseErrorDetect(response)) {
-                    ClickListening(
-                        "",
-                        `刪除-計畫執行-檔案，名稱為${file[0].name}`
-                    )
+                    ClickListening("", `計畫執行-刪除檔案-${courseTitle}-${file[0].name}`)
                     file.remove()
                 }
             })
@@ -1527,7 +1526,7 @@ const ReflectionBox = reflectionKey => {
                     )
                     break
             }
-            ClickListening("", `更改-問題反思-自我評分為 ${e.target.value} 分`)
+            ClickListening("", `監控反思-輸入自我評分${e.target.value}分-${$("#courseTitle").text().replace(/\s/g, "")}`)
         })
         .appendTo(scoringSelfContainer)
     //relfection for teammate--------------------------------------------
@@ -1535,8 +1534,8 @@ const ReflectionBox = reflectionKey => {
     if (customizeOperation.getFrontEndCode('coworkStatus') == 'Y') {
         const reflectionTeammateContainer = $("<div>")
             .prop({
-                className: "col-12 reflectionDescription_difficult",
-                id: "LS_reflectionDescription_difficult",
+                className: "col-12 reflectionDescription_teamDifficult",
+                id: "LS_reflectionDescription_teamDifficult",
                 innerHTML:
                     "<h4>🔍 從此次任務中，對於你的隊友有甚麼評價？</h4><p>Ex: 他很罩...、他很積極的參與討論...，請詳細說明。</p>",
             })
@@ -1557,7 +1556,7 @@ const ReflectionBox = reflectionKey => {
         const scoringTeammateContainer = $("<div>")
             .prop({
                 className: "col-12 reflectionDescription_scoring",
-                id: "LS_reflectionDescription_scoring",
+                id: "LS_reflectionDescription_teamScoring",
                 innerHTML: "<h4>💯 同儕評分</h4>",
             })
             .appendTo(ReflectionContainer)
@@ -1638,7 +1637,7 @@ const ReflectionBox = reflectionKey => {
                         )
                         break
                 }
-                ClickListening("", `更改-問題反思-同儕評分為 ${e.target.value} 分`)
+                ClickListening("", `監控反思-輸入隊友評分${e.target.value}分-${$("#courseTitle").text().replace(/\s/g, "")}`)
             })
             .appendTo(scoringMateContainer)
     }
@@ -1678,7 +1677,7 @@ const ReflectionBox = reflectionKey => {
             },
             {
                 textarea: $("#teammateValue"),
-                div: $(".reflectionDescription_difficult"),
+                div: $(".reflectionDescription_teamDifficult"),
                 isPass: customizeOperation.getFrontEndCode('coworkStatus') == 'Y',
             },
         ]
@@ -1711,7 +1710,7 @@ const ReflectionBox = reflectionKey => {
         submitFunc()
 
         function submitFunc() {
-            ClickListening("", `送出-監控反思-${reflectionKey.key}`)
+            ClickListening("", `監控反思-送出反思-${$("#courseTitle").text().replace(/\s/g, "")}-任務${reflectionKey.key.split("-")[0]}`)
             customizeOperation.loadingPage(true)
             if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") {
                 studentClientConnect.cowork.saveReflection(

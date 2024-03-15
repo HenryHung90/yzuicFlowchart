@@ -28,6 +28,9 @@ import { passport, signIn, signInAdmin } from './database/passportjwt.js'
 import socketServer from './socketServer.js'
 import { Server } from 'socket.io'
 import http from 'http'
+import https from 'https'
+//fs
+import fs from 'fs'
 
 //mongodb
 import standardcontent from './models/standardcontent.js'
@@ -176,13 +179,6 @@ app.use('/launch', passport.authenticate('token', { session: false }), launchrou
 app.use('/student', passport.authenticate('token', { session: false }), studentroutes)
 app.use('/cowork', passport.authenticate('token', { session: false }), coworkroutes)
 
-
-const httpServer = http.createServer(app)
-const io = new Server(httpServer)
-//socket server management
-socketServer(io)
-
-
 //404
 app.use((req, res, next) => {
     res.status(404).render('./404page')
@@ -193,7 +189,6 @@ app.use((err, req, res, next) => {
 })
 
 //admin routes
-
 admin.use(bodyParser.json())
 admin.use(urlencodedParser)
 admin.use(cookieParser())
@@ -239,7 +234,8 @@ admin.get("/:studentId/:courseId", async (req, res) => {
         res.cookie('studentId', req.params.studentId, { maxAge: 60 * 60 * 1000 }).render('./admin/golist_studentdemo', {
             studentId: req.params.studentId,
             courseTitle: courseData.goListTitle,
-            courseId: req.params.courseId
+            courseId: req.params.courseId,
+            coworkStatus: "N"
         })
     } catch (err) {
         console.log(err)
@@ -260,10 +256,35 @@ admin.use((err, req, res, next) => {
     res.status(500).render('./500error')
 })
 
+// main creating Server Site----------------------------------
+// const certKeyOption = {
+//     cert: fs.readFileSync('/etc/letsencrypt/live/ccj.infocom.yzu.edu.tw/fullchain.pem'),
+//     key: fs.readFileSync('/etc/letsencrypt/live/ccj.infocom.yzu.edu.tw/privkey.pem')
+// }
 
-httpServer.listen(process.env.PORT_1, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_1) })
-// httpServer.listen(process.env.PORT_2, () => { console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_2) })
-admin.listen(process.env.ADMIN_PORT, () => { console.log("admin is running at " + process.env.HOST + ":" + process.env.ADMIN_PORT) })
+// const httpsServer = https.createServer(certKeyOption, app).listen(process.env.PORT_1, () => {
+//     console.log("Server is runing at " + process.env.CORS_ALLOW_CAST_MAIN + ":" + process.env.PORT_1)
+// })
+// const io = new Server(httpsServer)
+// //socket server management
+// socketServer(io)
+
+// https.createServer(certKeyOption, admin).listen(process.env.ADMIN_PORT, () => {
+//     console.log("Server is runing at " + process.env.CORS_ALLOW_CAST_MAIN + ":" + process.env.ADMIN_PORT)
+// })
+//--------------------------------------------------------------
+// testing Server Site------------------------------------------
+const httpServer = http.createServer(app).listen(process.env.PORT_TEST, () => {
+    console.log("Server is runing at " + process.env.HOST + ":" + process.env.PORT_TEST)
+})
+const io = new Server(httpServer)
+//socket server management
+socketServer(io)
+
+http.createServer(admin).listen(process.env.ADMIN_PORT, () => {
+    console.log("Server is runing at " + process.env.HOST + ":" + process.env.ADMIN_PORT)
+})
+
 
 
 // status sign meaning

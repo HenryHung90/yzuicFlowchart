@@ -11,6 +11,7 @@
 .reflectionDescription_learning,
 .reflectionDescription_workhard,
 .reflectionDescription_difficult,
+.reflectionDescription_teamDifficult,
 .reflectionDescription_scoring {
     margin: 15px auto;
     padding: 12px 20px;
@@ -20,16 +21,17 @@
 }
 
 .reflectionDescription_learning h4,
-.reflectionDescription_workhard h4,
 .reflectionDescription_difficult h4,
+.reflectionDescription_teamDifficult h4,
 .reflectionDescription_scoring h4 {
     font-weight: bolder;
     margin-bottom: 10px;
     font-size: 30px;
 }
 .reflectionDescription_learning p,
-.reflectionDescription_workhard p,
-.reflectionDescription_difficult p {
+.reflectionDescription_difficult p,
+.reflectionDescription_teamDifficult p,
+.reflectionDescription_teamScoring p {
     margin: 15px;
     font-size: 20px;
 }
@@ -51,5 +53,5 @@
 .reflectionDescription_submit {
     width: 20%;
     margin: 50px auto;
-    filter: drop-shadow(0 0 3px green)
+    filter: drop-shadow(0 0 3px green);
 }

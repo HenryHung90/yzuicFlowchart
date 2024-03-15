@@ -105,6 +105,18 @@ const customizeOperation = {
                 })
             }, 2000)
         })
+    },
+    // taskNumber 轉 taskName
+    taskNumberToTaskName: (mission, task) => {
+        let optTaskName = ""
+        // Assert that mission is "02"
+        if (mission !== 0) optTaskName += "任務" + mission.split("-")[0]
+        if (mission === "02") optTaskName = ""
+
+
+        if (optTaskName !== undefined) optTaskName += "/" + task
+
+        return optTaskName
     }
 }
 

@@ -23,7 +23,6 @@ import customizeOperation from "./customizeOperation.js"
 //------------------------------ category Box Function -----------------------------------//
 const categoryBox = {
     Target: data => {
-        console.log(data)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             $(".targetIframe").attr(
                 "src",
@@ -36,12 +35,12 @@ const categoryBox = {
             )
         }
     },
-    Start: (data, key) => {
-        if (data.message === undefined) {
-            $("#startDescription").html(`<h3>Task undefined</h3>`)
-        }
-        return
-    },
+    // Start: (data, key) => {
+    //     if (data.message === undefined) {
+    //         $("#startDescription").html(`<h3>Task undefined</h3>`)
+    //     }
+    //     return
+    // },
     Understanding: data => {
         if (data.message === undefined) {
             $("#understandingDescription").html(
@@ -140,7 +139,10 @@ const categoryBox = {
                     innerHTML:
                         '<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="20px" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>',
                 })
-                .click((e) => launchDemo(s, e, preloadCode))
+                .click((e) => {
+                    ClickListening('', `表徵制定-執行範例-${$("#courseTitle").text().replace(/\s/g, "")}-${title}`)
+                    launchDemo(s, e, preloadCode)
+                })
                 .appendTo(contentBox)
 
             //interfacing area
@@ -334,14 +336,14 @@ const categoryBox = {
             //-----------------------------------------------------
 
             //hint
-            if (data.hint !== undefined) {
-                data.hint.split("\n").forEach((hint, index) => {
+            if (data.hintList !== undefined) {
+                data.hintList.forEach((hintContent, index) => {
                     if (index !== 0) {
                         $("<div>")
                             .prop({
                                 className: "programmingDescription_hintArrow",
                                 innerHTML:
-                                    '<img src="../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg); user-select:none"></img>',
+                                    '<img src="../../media/img/arrow.gif" width="50px" height="50px" style="transform:rotate(90deg); user-select:none"></img>',
                             })
                             .appendTo($("#programmingHint"))
                     }
@@ -349,7 +351,7 @@ const categoryBox = {
                     $("<div>")
                         .prop({
                             className: "programmingDescription_hintText",
-                            innerHTML: `<p>👊step ${index + 1}</p>` + hint,
+                            innerHTML: `<p>👊step ${index + 1}</p>` + hintContent.hintText,
                             id: `programmingHint_${index}`,
                         })
                         .appendTo($("#programmingHint"))
@@ -377,26 +379,18 @@ const categoryBox = {
                 const hintTooltip = $(this)
                 if (hintTooltip.attr("name") === "hint") {
                     //Code 展示區
-                    $("<textarea>")
-                        .prop({
-                            id: "hint",
-                        })
-                        .css({
-                            resize: "none",
-                        })
-                        .appendTo($(".tooltip-inner"))
+                    $("<textarea>").prop({ id: "hint" }).css({ resize: "none", }).appendTo($(".tooltip-inner"))
 
-                    if (data.hintCode !== undefined) {
+                    if (data.hintList !== undefined) {
                         CodeMirrorFunc.codeMirrorProgram(
                             "hint",
-                            data.hintCode[hintTooltip.attr("id").split("_")[1]] ||
-                            "no data",
+                            data.hintList[hintTooltip.attr("id").split("_")[1]].hintCode,
                             true
                         )
                     } else {
                         CodeMirrorFunc.codeMirrorProgram("hint", "no data", true)
                     }
-                    $("#hint").data("CodeMirror").setSize("auto", "auto")
+                    $("#hint").data("CodeMirror").setSize('auto', 'auto')
 
                     //Code 複製 button
                     $("<button>")
@@ -408,9 +402,7 @@ const categoryBox = {
                         .click(e => {
                             e.stopPropagation()
                             // console.log(data.hintCode[hintTooltip.attr("id").split("_")[1]])
-                            navigator.clipboard.writeText(
-                                data.hintCode[hintTooltip.attr("id").split("_")[1]]
-                            )
+                            navigator.clipboard.writeText($('#hint').data("CodeMirror").getValue())
                         })
                         .appendTo($(".tooltip-inner"))
                 }
@@ -565,7 +557,7 @@ const categoryBox = {
                 break
         }
 
-        if(customizeOperation.getFrontEndCode("coworkStatus") == 'Y'){
+        if (customizeOperation.getFrontEndCode("coworkStatus") == 'Y') {
             $("#scoringTeammateValue").val(data.teammateScoring)
             $("#teammateValue").val(data.temmate)
             switch (data.teammateScoring) {
@@ -654,7 +646,7 @@ const GoListFunc = {
     },
     //show Each Box
     showContainer: async (s, id) => {
-        ClickListening("", `打開-Task ${s.key} ${s.text}`)
+        ClickListening("", `FlowChart-進入Task-${$("#courseTitle").text().replace(/\s/g, "")}-${customizeOperation.taskNumberToTaskName(s.key, s.text)}`)
         // 設定共編進入區域
         if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") socketConnect.cowork.selectionArea = s.key
 
@@ -689,7 +681,7 @@ const GoListFunc = {
         // }
         //click close function
         const closePage = () => {
-            ClickListening("", `離開-${s.text}`)
+            ClickListening("", `FlowChart-離開Task-${$("#courseTitle").text().replace(/\s/g, "")}-${customizeOperation.taskNumberToTaskName(s.key, s.text)}`)
             // 設定共編進入區域
             if (customizeOperation.getFrontEndCode('coworkStatus') === "Y") socketConnect.cowork.selectionArea = 'golist'
 
@@ -817,7 +809,7 @@ const GoListFunc = {
             // console.log(s.category)
             //Auto save For Reflection and Bonus-Reflection----------
             if (s.category === "Reflection" || s.category === "Bonus-Reflection" || s.category === "Completed-Reflection") {
-                ClickListening("", `暫存-監控反思`)
+                ClickListening("", `監控反思-暫存反思-${$("#courseTitle").text().replace(/\s/g, "")}-任務${s.key.split("-")[0]}`)
                 customizeOperation.loadingPage(true)
                 studentClientConnect.tempSaveReflection(
                     customizeOperation.getFrontEndCode("courseId"),
@@ -941,7 +933,7 @@ const GoListFunc = {
                 ]
 
                 if ($(".content_slide").attr("id") === "open") {
-                    ClickListening("", `全部收合-${s.text}-Code`)
+                    ClickListening("", `計畫執行-收合全部程式-${$("#courseTitle").text().replace(/\s/g, "")}-任務${s.key.split("-")[0]}`)
                     for (const codeContainer of content_codingContainer) {
                         if ($(codeContainer).attr("id") === "open") {
                             $(codeContainer).attr("id", "close").slideUp(300)
@@ -956,7 +948,7 @@ const GoListFunc = {
                         }
                     }
                 } else {
-                    ClickListening("", `全部展開-${s.text}-Code`)
+                    ClickListening("", `計畫執行-展開全部程式-${$("#courseTitle").text().replace(/\s/g, "")}-任務${s.key.split("-")[0]}`)
                     for (const codeContainer of content_codingContainer) {
                         if ($(codeContainer).attr("id") === "close") {
                             $(codeContainer).attr("id", "open").slideDown(300)
@@ -1116,7 +1108,7 @@ const GoListFunc = {
 
         //understanding
         async function understandingContainer() {
-            UnderstandingBox().appendTo(contentContainer)
+            UnderstandingBox(s.key).appendTo(contentContainer)
 
             if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 await studentClientConnect
@@ -1162,7 +1154,7 @@ const GoListFunc = {
         }
         //programming
         async function programmingContainer() {
-            ProgrammingBox(s).appendTo(contentContainer)
+            ProgrammingBox(s.key).appendTo(contentContainer)
 
             if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
                 //確認userId資料夾是否建立
@@ -1418,73 +1410,65 @@ const CodeMirrorFunc = {
     },
 }
 //------------------------------ Clicking Listening Function ------------------------------//
+/**
+ * 
+ * @param {object} e 若直接使用 DOM listener 則使用點擊物件尋找 id 以辨別點擊事件
+ * @param {string} customClick 自行設定 頁面-主項-小項-子項
+ * @returns 
+ */
 function ClickListening(e, customClick) {
-    if (customizeOperation.getCookie("adminId")) {
-        return
-    }
+    if (customizeOperation.getCookie("adminId")) return
     // /\s/g 是一個正則表達式，表示匹配所有空格字符。g 是全局匹配，會匹配到所有空格字符。
     // 把所有空格刪掉
     const courseTitle = $("#courseTitle").text().replace(/\s/g, "")
 
     const clickingOperationMap = new Map([
         // home page //
-        ["logout", "登出"],
-        ["settingDropDown", "點擊-設定"],
-        ["changePassword", "開啟-修改密碼"],
-        ["LS_ComfirmChangePassword", "送出-修改密碼"],
-        ["LS_CancelChangePassword", "取消-修改密碼"],
+        ["logout", "主頁-登出"],
+        ["settingDropDown", "主頁-開啟設定"],
+        ["changePassword", "主頁-修改密碼-進入修改密碼"],
+        ["LS_ComfirmChangePassword", "主頁-修改密碼-取消修改密碼"],
+        ["LS_CancelChangePassword", "主頁-修改密碼-取消修改密碼"],
         // go list class //
-        ["courseTitle", "點擊-課程名稱"],
-        ["studentId", "點擊-自己的ID"],
+        ["courseTitle", `FlowChart-點擊課程名稱-${courseTitle}`],
+        ["studentId", `FlowChart-自己的ID-${courseTitle}`],
         ["LS_closeVotingModal", "關閉-投票"],
-        // Start //
-        ["start_launchbtn", "重新執行-任務-範例"],
+        ['leaderBoard_Close', `FlowChart-打開排行榜-${courseTitle}`],
+        ['leaderBoard_Open', `FlowChart-關閉排行榜-${courseTitle}`],
         // Understanding //
-        ["understandingDescription", "點擊-探索理解-標題"],
-        ["understandingOperation", "點擊-探索理解-操作"],
-        ["understandingLimit", "點擊-探索理解-限制"],
+        ["understandingDescription", `探索理解-點擊標題-${courseTitle}`],
+        ["understandingOperation", `探索理解-點擊\'操作\'-${courseTitle}`],
+        ["understandingLimit", `探索理解-點擊\'限制\'-${courseTitle}`],
         // Formulating //
-        ["formulatingDescription", "點擊-表徵制定-標題"],
-        ["formulatingContent", "點擊-表徵制定-內容"],
+        ["formulatingDescription", `表徵制定-點擊標題-${courseTitle}`],
+        ["formulatingContent", `表徵制定-點擊內容-${courseTitle}`],
         // Programming //
-        ["LS_programmingLaunchDemo", "執行-計畫執行-Code"],
-        ["LS_programmingHint", "打開-計畫執行-Hint"],
-        ["programmingHintModal", "關閉-計畫執行-Hint"],
-        ["LS_closeProgrammingModal", "關閉-計畫執行-Hint"],
-        ["LS_programmingVisualizationArea", "點擊-計畫執行-檔案區"],
-        ["LS_programmingVisualizationArea_up", "點擊-計畫執行-檔案區"],
-        ["LS_programmingVisualizationArea_down", "點擊-計畫執行-檔案區"],
-        [
-            "LS_programmingVisualizationArea_indexFileIcon",
-            "點擊-計畫執行-檔案區 index檔案夾"
-        ],
-        [
-            "LS_programmingVisualizationArea_htmlIcon",
-            "點擊-計畫執行-檔案區 html檔案",
-        ],
-        [
-            "LS_programmingVisualizationArea_jsIcon",
-            "點擊-計畫執行-檔案區 js檔案",
-        ],
-        [
-            "LS_programmingVisualizationArea_fileIcon",
-            "點擊-計畫執行-檔案區 file檔案",
-        ],
-        ["LS_programmingDemoContent_up", "打開-計畫執行-程式執行結果畫面"],
-        ["LS_programmingDemoContent_down", "關閉-計畫執行-程式執行結果畫面"],
+        ["LS_programmingHint", `計畫執行-打開Hint-${courseTitle}`],
+        ["programmingHintModal", `計畫執行-關閉Hint-${courseTitle}`],
+        ["LS_closeProgrammingModal", `計畫執行-關閉Hint-${courseTitle}`],
+        ["LS_programmingVisualizationArea", `計畫執行-點擊檔案區-${courseTitle}`],
+        ["LS_programmingVisualizationArea_up", `計畫執行-點擊檔案區-${courseTitle}`],
+        ["LS_programmingVisualizationArea_down", `計畫執行-點擊檔案區-${courseTitle}`],
+        ["LS_programmingVisualizationArea_indexFileIcon", `計畫執行-點擊index資料夾-${courseTitle}`],
+        ["LS_programmingVisualizationArea_htmlIcon", `計畫執行-點擊html檔案-${courseTitle}`],
+        ["LS_programmingVisualizationArea_jsIcon", `計畫執行-點擊js檔案-${courseTitle}`],
+        ["LS_programmingVisualizationArea_fileIcon", `計畫執行-點擊media檔案夾-${courseTitle}`],
+        ["LS_programmingDemoContent_up", `計畫執行-打開執行結果畫面-${courseTitle}`],
+        ["LS_programmingDemoContent_down", `計畫執行-關閉執行結果畫面-${courseTitle}`],
         // Reflection //
-        ["LS_reflectionDescription_title", "點擊-問題反思-標題"],
-        ["LS_reflectionDescription_learning", "點擊-問題反思-學到了甚麼"],
-        ["LS_reflectionDescription_workhard", "點擊-問題反思-還要努力甚麼"],
-        ["LS_reflectionDescription_difficult", "點擊-問題反思-遇到那些困難"],
-        ["LS_reflectionDescription_scoring", "點擊-問題反思-自我評分"],
-        ["scoringText", "點擊-問題反思-自我評分敘述"],
-        ["learningValue", "點擊-問題反思-學到了甚麼輸入框"],
-        ["workhardValue", "點擊-問題反思-還要努力甚麼輸入框"],
-        ["difficultValue", "點擊-問題反思-遇到那些困難輸入框"],
+        ["LS_reflectionDescription_title", `監控反思-點擊標題-${courseTitle}`],
+        ["LS_reflectionDescription_learning", `監控反思-點擊學到甚麼-${courseTitle}`],
+        ["LS_reflectionDescription_difficult", `監控反思-點擊困難解決-${courseTitle}`],
+        ["LS_reflectionDescription_scoring", `監控反思-點擊自我評分-${courseTitle}`],
+        ["LS_reflectionDescription_teamDifficult", `監控反思-點擊評價隊友-${courseTitle}`],
+        ["LS_reflectionDescription_teamScoring", `監控反思-點擊評分隊友-${courseTitle}`],
+        ["learningValue", `監控反思-輸入學到甚麼敘述-${courseTitle}`],
+        ["difficultValue", `監控反思-輸入困難解決敘述-${courseTitle}`],
+        ["teammateValue", `監控反思-輸入評價隊友敘述-${courseTitle}`],
+
         // ChatBox //
-        ["chatBox_Close", "打開-聊天室"],
-        ["chatBox_Open", "關閉-聊天室"],
+        ["chatBox_Close", `FlowChart-打開聊天室-${courseTitle}`],
+        ["chatBox_Open", `FlowChart-關閉聊天室-${courseTitle}`],
     ])
 
     const time = customizeOperation.getNowTime("FullTime")
@@ -1507,31 +1491,16 @@ function ClickListening(e, customClick) {
             const ProgrammingMediaAry = PathingId.split("___")
             //Programming Hint特殊區域----------------------------------------------------
             if (ProgrammingHintAry[0] === "programmingHint") {
-                operation =
-                    "點擊-計畫執行-第 " +
-                    (parseInt(ProgrammingHintAry[1]) + 1) +
-                    " 的Hint"
+                operation = "計畫執行-點擊Hint-" + courseTitle + "-" + (parseInt(ProgrammingHintAry[1]) + 1)
             } else if (ProgrammingHintAry[0] === "programmingHintCode") {
-                operation =
-                    "打開-計畫執行-第 " +
-                    (parseInt(ProgrammingHintAry[1]) + 1) +
-                    " 個Hint的Code"
+                operation = "計畫執行-複製HintCode-" + courseTitle + "-" + (parseInt(ProgrammingHintAry[1]) + 1)
             } else if (ProgrammingMediaAry[0] === "programmingFile") {
-                operation = `點擊-計畫執行-檔案之${ProgrammingMediaAry[1]}`
-            } else {
+                operation = `計畫執行-點擊檔案-${courseTitle}-${ProgrammingMediaAry[1]}`
+            }
+            else {
                 if (PathingId !== "") {
                     checkingMap = clickingOperationMap.get(PathingId)
-                    // console.log(
-                    //     "clicking :",
-                    //     PathingId,
-                    //     " ",
-                    //     "Mapping: ",
-                    //     checkingMap || null,
-                    //     `[${courseTitle || null}]`
-                    // )
-
                     if (checkingMap === undefined) return
-
                     operation = checkingMap
                 }
             }
@@ -1540,70 +1509,22 @@ function ClickListening(e, customClick) {
         }
     }
 
-    if (
-        operation === "undefined[null]" ||
-        operation === undefined ||
-        operation === null
-    )
-        return
+    if (operation === "undefined[null]" || operation === undefined || operation === null) return
+    console.log(operation)
 
-    // operation => [0]operation , [1]keyName , [2]detail
-
-    const description = `${customizeOperation.getCookie("studentId")} 在 ${time} ${courseTitle} ${operation}`
-
-    const tempOperation = operation.split("-")
-    operation = tempOperation[0]
-
-    // console.log(tempOperation)
-    // 若傳入值的[1] 為 標示進入 Task 則儲存該 Task 至 sessionStorage 內
-    if (tempOperation[1].split(" ")[0] == "Task") {
-        sessionStorage.setItem("ListeningTask", tempOperation[1])
-    }
-
-    const task = sessionStorage.getItem("ListeningTask") || ''
-    const keyName = () => {
-        let keyName
-        if (tempOperation[1].split(" ")[0] == "Task") {
-            keyName = tempOperation[2]
-        } else {
-            keyName = tempOperation[1]
-        }
-        return keyName
-    }
-
-    const detail = () => {
-        let detail
-        if (keyName() === tempOperation[2]) {
-            detail = ""
-        } else {
-            detail = tempOperation[2]
-        }
-
-        return detail
-    }
-    // console.table({
-    //     "操作": operation,
-    //     "Task": task,
-    //     "keyName": keyName,
-    //     "detail": detail
-    // })
-    // console.warn(description)
-
-    studentClientConnect
-        .listenerUpload(
-            time,
-            courseTitle,
-            operation,
-            task,
-            keyName(),
-            detail(),
-            description
-        )
-        .then(response => {
-            if (customizeOperation.serverResponseErrorDetect(response)) {
-                return
-            }
-        })
+    // studentClientConnect
+    //     .listenerUpload(
+    //         time,
+    //         courseTitle,
+    //         operation,
+    //         task,
+    //         keyName(),
+    //         detail(),
+    //         description
+    //     )
+    //     .then(response => {
+    //         if (customizeOperation.serverResponseErrorDetect(response)) return
+    //     })
 }
 
 export { GoListFunc, CodeMirrorFunc, ClickListening }

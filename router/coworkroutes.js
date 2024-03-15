@@ -209,7 +209,6 @@ router.post('/getcoworkconfig', async (req, res) => {
 //讀取 code & hint
 router.post("/readcode", async (req, res) => {
     try {
-        console.log(req.body.key)
         const coworkData = await coworkconfig.findOne({
             coworkContentId: req.body.courseId,
             groupId: req.user.studentChatRoomId,
