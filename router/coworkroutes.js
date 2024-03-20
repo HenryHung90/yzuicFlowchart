@@ -205,6 +205,41 @@ router.post('/getcoworkconfig', async (req, res) => {
         })
     }
 })
+// 學生取得所有 Group 進度
+router.post('/getallgroupprogess', async (req, res) => {
+    try {
+        const coworkData = await coworkconfig.find({ coworkContentId: req.body.courseId })
+
+        const returnData = []
+        for (const { studentGroup, coworkStatus } of coworkData) {
+            if (studentGroup !== undefined) {
+                const coworkProcess = coworkStatus.process || 0
+
+                if (coworkProcess > returnData.length) {
+                    for (let i = returnData.length; i <= coworkProcess; i++) {
+                        returnData.push({ count: 0, member: [] })
+                    }
+                }
+
+                if (coworkProcess !== 0) {
+                    returnData[coworkProcess - 1].count++
+                    returnData[coworkProcess - 1].member.push(studentGroup.join(","))
+                }
+            }
+        }
+
+        res.json({
+            message: returnData,
+            status: 200
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "取得 Progress 失敗，請聯繫管理員(err)",
+            status: 500
+        })
+    }
+})
 //共編模式 code 增刪區域-------------------------------------
 //讀取 code & hint
 router.post("/readcode", async (req, res) => {
@@ -521,5 +556,6 @@ router.post("/savereflection", async (req, res) => {
         })
     }
 })
+//-----------------------------------------------------------
 
 export default router

@@ -402,6 +402,17 @@ const studentClientConnect = {
                 })
             )
         },
+        getAllGroupProgess: (courseId) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/cowork/getallgroupprogess',
+                    data: {
+                        courseId: courseId
+                    }
+                })
+            )
+        },
         //取得探索理解
         getUnderstanding: (courseId, key) => {
             return (

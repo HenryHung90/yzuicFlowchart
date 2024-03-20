@@ -1,4 +1,5 @@
 import chatroomconfig from './models/chatroomconfig.js'
+import coworkconfig from './models/coworkconfig.js';
 import createDOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
 
@@ -88,12 +89,51 @@ const socketServer = async (io) => {
 
         // 收到開始投票事件
         socket.on("startVoting", async (message) => {
-            socket.nsp.emit('re-startVoting', message)
+            const votingMessage = JSON.parse(message)
+            const votingData = await coworkconfig.findOne({ groupId: votingMessage.chatRoomId })
+
+            let isComplete = false
+
+            // 填入投票訊息，並確認是否所有人都進行投票過
+            for (const index in votingData.coworkStatus.completeVote) {
+                if (votingData.coworkStatus.completeVote[index] == votingMessage.studentId) {
+                    break
+                }
+                if (!votingData.coworkStatus.completeVote[index]) {
+                    votingData.coworkStatus.completeVote[index] = votingMessage.studentId
+                    if (index == votingData.coworkStatus.completeVote.length - 1) isComplete = true
+                    break
+                }
+            }
+            // 完成投票額外告知完成投票
+            if (isComplete) {
+                setTimeout(async () => {
+                    if (votingData.coworkStatus.process < 6) {
+                        votingData.coworkStatus.process++
+                    } else {
+                        votingData.coworkStatus.isComplete = true
+                    }
+                    votingData.coworkStatus.completeVote = new Array(votingData.coworkStatus.completeVote.length).fill(false)
+                    await coworkconfig.updateOne({ groupId: votingMessage.chatRoomId }, { coworkStatus: votingData.coworkStatus })
+                }, 500)
+                socket.nsp.emit('completeVoting', message)
+            } else {
+                // 更新 database 投票資料
+                await coworkconfig.updateOne({ groupId: votingMessage.chatRoomId }, { coworkStatus: votingData.coworkStatus })
+                // 回傳投票資訊
+                socket.nsp.emit('re-startVoting', message)
+            }
+
         })
 
         // 收到離開房間訊息
         socket.on('disconnect', async (type) => {
             socket.nsp.emit('roomNumber', socketRoomUser.size)
+        })
+
+        // 收到取消投票事件
+        socket.on("endVoting", async (message) => {
+
         })
     })
 }

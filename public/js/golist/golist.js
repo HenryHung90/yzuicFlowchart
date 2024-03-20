@@ -487,26 +487,50 @@ const navInit = () => {
 }
 
 const leaderBoardInit = () => {
-    studentClientConnect.getAllStudentProgress(customizeOperation.getFrontEndCode('courseId')).then(response => {
-        if (customizeOperation.serverResponseErrorDetect(response)) {
-            let taskCount = 1
+    if (customizeOperation.getFrontEndCode("coworkStatus") === "Y") {
+        studentClientConnect.cowork.getAllGroupProgess(customizeOperation.getFrontEndCode('courseId')).then(response => {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
+                let taskCount = 1
 
-            for (const { count, member } of response.data.message) {
-                $(`#task_${taskCount}_count`).html(count)
+                for (const { count, member } of response.data.message) {
+                    $(`#task_${taskCount}_count`).html(count)
 
 
-                for (let i = 0; i < member.length; i++) {
-                    $('<div>').prop({
-                        className: 'taskMemberIcon',
-                        innerHTML: '🧍'
-                    }).appendTo($(`#task_${taskCount}_member`))
+                    for (let i = 0; i < member.length; i++) {
+                        $('<div>').prop({
+                            className: 'taskMemberIcon',
+                            innerHTML: '🧑‍🤝‍🧑'
+                        }).appendTo($(`#task_${taskCount}_member`))
+                    }
+
+                    $(`#task_${taskCount}_member`).attr("data-bs-original-title", member.join("、"))
+                    taskCount++
                 }
-
-                $(`#task_${taskCount}_member`).attr("data-bs-original-title", member.join("、"))
-                taskCount++
             }
-        }
-    })
+        })
+    } else {
+        studentClientConnect.getAllStudentProgress(customizeOperation.getFrontEndCode('courseId')).then(response => {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
+                let taskCount = 1
+
+                for (const { count, member } of response.data.message) {
+                    $(`#task_${taskCount}_count`).html(count)
+
+
+                    for (let i = 0; i < member.length; i++) {
+                        $('<div>').prop({
+                            className: 'taskMemberIcon',
+                            innerHTML: '🧍'
+                        }).appendTo($(`#task_${taskCount}_member`))
+                    }
+
+                    $(`#task_${taskCount}_member`).attr("data-bs-original-title", member.join("、"))
+                    taskCount++
+                }
+            }
+        })
+    }
+
 
 
     // 控制開關
@@ -538,7 +562,7 @@ const navButton = {
         const goData = JSON.parse(MY_DIAGRAM.model.toJson());
         //刪除 * 字號
         let idx = document.title.indexOf("*");
-        ClickListening('', `FlowChart-儲存Chart-${$("#courseTitle").text().replace(/\s/g, "") }`)
+        ClickListening('', `FlowChart-儲存Chart-${$("#courseTitle").text().replace(/\s/g, "")}`)
 
         document.title = document.title.slice(0, idx);
 
@@ -624,11 +648,19 @@ const navButton = {
                 className: 'voting_memberContent_memberId',
                 innerHTML: student
             }).appendTo(member)
-            $('<div>').prop({
-                className: 'voting_memberContent_memberVoteStatus_noVote',
-                id: `voting_member_${student}`,
-                innerHTML: '💭'
-            }).appendTo(member)
+            if (coworkData.coworkStatus.completeVote.find((id) => { return id == student }) !== undefined) {
+                $('<div>').prop({
+                    className: 'voting_memberContent_memberVoteStatus_Voted',
+                    id: `voting_member_${student}`,
+                    innerHTML: '✔️'
+                }).appendTo(member)
+            } else {
+                $('<div>').prop({
+                    className: 'voting_memberContent_memberVoteStatus_noVote',
+                    id: `voting_member_${student}`,
+                    innerHTML: '💭'
+                }).appendTo(member)
+            }
         })
 
         const voteBtnContent = $("<div>").prop({
@@ -641,8 +673,8 @@ const navButton = {
 
         // voting click 事件
         function voting() {
-            customizeOperation.loadingPage(true)
-
+            // customizeOperation.loadingPage(true)
+            alert('投票後請等待隊友，請勿關閉視窗!')
             socketConnect.cowork.startVoting("前往下一階段")
             socketConnect.cowork.selectionArea = 'vote'
             $(`#voting_member_${customizeOperation.getFrontEndCode("studentId")}`)
@@ -662,8 +694,8 @@ const load = async () => {
     if (checkCoworkStatus == 'Y') {
         await studentClientConnect.readCowork(courseId, groupId).then(response => {
             if (customizeOperation.serverResponseErrorDetect(response)) {
-                // const process = parseInt(response.data.message.coworkStatus.process || 1)
-                const process = 6
+                const process = parseInt(response.data.message.coworkStatus.process || 1)
+                // const process = 6
 
 
                 let newNodeData = []

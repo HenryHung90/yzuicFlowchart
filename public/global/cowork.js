@@ -12,8 +12,9 @@ const coworkInit = () => {
     socketConnect.cowork.receiveMouseMove()
     // 監聽是否有人按下執行程式
     socketConnect.cowork.receiveExecuteProject()
-    // 監聽投票
+    // 監聽投票事件
     socketConnect.cowork.receiveVoting()
+
 }
 
 export { coworkInit }

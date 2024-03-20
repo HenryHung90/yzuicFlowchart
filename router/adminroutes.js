@@ -283,6 +283,7 @@ router.post('/addchatroom', async (req, res) => {
             messageHistory: []
         }).save()
 
+        // 將學生加入群組
         for (const studentId of req.body.studentGroup) {
             await studentConfig.updateOne(
                 { studentClass: req.body.studentClass, studentId: studentId },
@@ -298,7 +299,7 @@ router.post('/addchatroom', async (req, res) => {
             })
         }
 
-        //尋找共編教材
+        //尋找共編教材，並將教材配發給該群組
         const coworkContentData = await coworkcontent.find({ class: req.body.studentClass })
         if (coworkContentData !== null) {
             for (const { _id, coworkTitle } of coworkContentData) {
@@ -306,7 +307,7 @@ router.post('/addchatroom', async (req, res) => {
                     class: req.body.studentClass,
                     coworkTitle: coworkTitle,
                     coworkContentId: _id,
-                    coworkStatus: { process: 0, completeVote: new Array(req.body.studentGroup.length).fill(false), Iscomplete: false },
+                    coworkStatus: { process: 0, completeVote: new Array(req.body.studentGroup.length).fill(false), isComplete: false },
                     groupId: chatRoomId,
                     studentGroup: req.body.studentGroup,
                     coworkContent: {},
@@ -521,7 +522,7 @@ router.post('/createcoworkcourse', async (req, res) => {
                 class: req.body.class,
                 coworkTitle: req.body.coworkTitle,
                 coworkContentId: coworkContentId._id,
-                coworkStatus: { process: 1, completeVote: new Array(studentGroup.length).fill(false), Iscomplete: false },
+                coworkStatus: { process: 1, completeVote: new Array(studentGroup.length).fill(false), isComplete: false },
                 groupId: chatRoomId,
                 studentGroup: studentGroup,
                 coworkContent: {},

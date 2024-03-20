@@ -286,34 +286,61 @@ const socketConnect = {
             }
         },
 
-
         // 接收投票通知
         receiveVoting: function () {
             socketConnect.socket.on('re-startVoting', (message) => {
                 const votingMessage = JSON.parse(message)
-
-                if (votingMessage.studentId !== customizeOperation.getFrontEndCode("studentId")) {
+                if (votingMessage.studentId !== customizeOperation.getFrontEndCode("studentId") && this.selectionArea !== 'vote') {
                     $('#vote').click()
-                    $(`#voting_member_${votingMessage.studentId}`).text('✔️')
+                    setTimeout(() => {
+                        $(`#voting_member_${votingMessage.studentId}`)
+                            .text('✔️')
+                            .removeClass('voting_memberContent_memberVoteStatus_noVote')
+                            .addClass('voting_memberContent_memberVoteStatus_Voted')
+                    }, 500)
+                    customizeOperation.activeToast(
+                        '投票通知',
+                        `由 ${votingMessage.studentId} 發起`,
+                        `${votingMessage.studentId} 發起了 ${votingMessage.type} 投票`
+                    )
+                } else if (votingMessage.studentId !== customizeOperation.getFrontEndCode("studentId") && this.selectionArea == 'vote') {
+                    $(`#voting_member_${votingMessage.studentId}`)
+                        .text('✔️')
                         .removeClass('voting_memberContent_memberVoteStatus_noVote')
                         .addClass('voting_memberContent_memberVoteStatus_Voted')
+                    customizeOperation.activeToast(
+                        '投票通知',
+                        `${votingMessage.studentId} 同意`,
+                        `${votingMessage.studentId} 同意了 ${votingMessage.type} 投票`
+                    )
                 }
+            })
+            // 完成投票通知
+            socketConnect.socket.on('completeVoting', (message) => {
+                const votingMessage = JSON.parse(message)
                 customizeOperation.activeToast(
                     '投票通知',
-                    `由 ${votingMessage.studentId} 發起`,
-                    `${votingMessage.studentId} 發起了 ${votingMessage.type} 投票`
+                    `投票完成`,
+                    `${votingMessage.type} 投票已通過`
                 )
+                setTimeout(() => {
+                    if (votingMessage.type === '前往下一階段') {
+                        alert("開啟下一階段")
+                        location.reload()
+                    }
+                }, 1000)
             })
         },
         // 發起投票通知
         startVoting: function (type = "testing") {
             const votingMessage = {
                 studentId: customizeOperation.getFrontEndCode('studentId'),
+                chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
                 vote: true,
                 type: type
             }
             socketConnect.socket.emit("startVoting", JSON.stringify(votingMessage))
-        }
+        },
     }
 }
 
