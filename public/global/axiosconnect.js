@@ -9,7 +9,6 @@ const studentClientConnect = {
      */
     login:
         (account, password) => {
-
             return (
                 axios({
                     method: 'post',
@@ -751,15 +750,21 @@ const studentClientConnect = {
         },
     /**
      * 用於與 chatGPT 進行溝通
+     * @param {string} sendTime 送出時間
+     * @param {string} message 使用者發送的訊息
+     * @param {string} courseId 所在課程ID
+     * @param {string} courseName 所在課程名稱
      */
     connectChatGPT:
-        (sendTime, message) => {
+        (sendTime, message, courseId, courseName) => {
             return axios({
                 method: 'post',
                 url: '/chatGPT/chat',
                 data: {
                     sendTime: sendTime,
-                    message: message
+                    message: message,
+                    courseId: courseId,
+                    courseName: courseName
                 }
             })
         }

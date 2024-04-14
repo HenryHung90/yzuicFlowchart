@@ -1,7 +1,13 @@
+import chatGPTconfig from '../models/chatGPTconfig.js'
 import express from 'express'
 import openAI from 'openai'
 import dotenv from 'dotenv'
+import createDOMPurify from 'dompurify'
+import { JSDOM } from 'jsdom'
+
 const router = express.Router()
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 
 //.env config
 dotenv.config()
@@ -9,6 +15,26 @@ dotenv.config()
 //     organization: process.env.OPENAI_ORG
 // })
 const openai = new openAI({ apiKey: process.env.OPENAI_KEY })
+
+function converDangerString(string) {
+    let clean = DOMPurify.sanitize(string)
+    let outputString = []
+
+    const converString = new Map(
+        [
+            ["\<", "&lt;"],
+            ["\>", "&gt;"],
+            ["\&", "$amp;"],
+            ["\"", "&quot;"],
+            ["\'", "&#039;"]
+        ]
+    )
+
+    clean.split("").map((value) => {
+        converString.get(value) == undefined ? outputString.push(value) : outputString.push(converString.get(value))
+    })
+    return outputString.join("")
+}
 
 router.post('/chat', async (req, res) => {
     try {
@@ -19,41 +45,62 @@ router.post('/chat', async (req, res) => {
         //     ],
         //     model: "gpt-3.5-turbo",
         // });
+        const userMsg = converDangerString(req.body.message)
         const completion = await openai.chat.completions.create({
             messages: [
                 { role: "system", content: "You are ChatGPT helping the User with coding.\n\t You are intelligent, helpful and an expert developer, who always gives the correct answer and only does what instructed. You always answer truthfully and don't make things up. When responding to the following prompt, please make sure to properly style your response using Github Flavored Markdown. Use markdown syntax for things like headings, lists, colored text, code blocks, highlights etc. Make sure not to mention markdown or styling in your actual response" },
-                { role: "user", content: req.body.message }
+                { role: "user", content: userMsg }
             ],
             model: "gpt-3.5-turbo",
             max_tokens: 1024,
         });
+
+        const chatGPTData = await chatGPTconfig.findOne({
+            class: req.user.studentClass,
+            studentId: req.user.studentId,
+            courseId: req.body.courseId
+        })
+
+        if (chatGPTData == null) {
+            new chatGPTconfig({
+                class: req.user.studentClass,
+                studentId: req.user.studentId,
+                courseId: req.body.courseId,
+                courseName: req.body.courseName,
+                messageHistory: [{
+                    studentId: req.user.studentId,
+                    sendTime: req.body.sendTime,
+                    message: userMsg
+                }]
+            }).save()
+        } else {
+            chatGPTData.messageHistory.push({
+                studentId: req.user.studentId,
+                sendTime: req.body.sendTime,
+                message: userMsg
+            })
+
+            await chatGPTconfig.updateOne({
+                class: req.user.studentClass,
+                studentId: req.user.studentId,
+                courseId: req.body.courseId
+            }, {
+                messageHistory: chatGPTData.messageHistory
+            })
+        }
         res.json({
             status: 200,
-            message: completion.choices[0]
+            message: {
+                userMsg: userMsg,
+                GPTreply: completion.choices[0]
+            }
         })
-//         res.json({
-//             status:200,
-//             message: {
-//                 message: `當然，這裡有一段簡單的 JavaScript 代碼示例，這段代碼會將兩個變數相加並將結果輸出到控制台：
-
-// \`\`\`javascript
-// // 定義兩個變數
-// let num1 = 5;
-// let num2 = 10;
-
-// // 將兩個變數相加並儲存結果
-// let sum = num1 + num2;
-
-// // 輸出結果到控制台
-// console.log('Sum:', sum);
-// \`\`\`
-
-// 這段代碼將會輸出 \`Sum: 15\` 到控制台，代表將 5 和 10 相加的結果。 如果你有任何問題或需要進一步幫助，請隨時告訴我!`}
-//         })
-
     } catch (err) {
         console.log(err)
-
+        res.json({
+            status: 500,
+            message: "課程助理 AmumAmum 無法連線，請聯繫管理員(err)"
+        })
     }
 })
 

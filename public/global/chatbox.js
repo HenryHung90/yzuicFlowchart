@@ -2,7 +2,7 @@ import { socketConnect, MessageType } from "../../global/socketConnect.js"
 import { ClickListening } from "../../global/common.js"
 import { studentClientConnect } from "../../global/axiosconnect.js"
 import customizeOperation from "./customizeOperation.js"
-hljs.initHighlightingOnLoad()
+
 const chatBoxInit = () => {
     if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
         renderChatBox("person")
@@ -36,7 +36,7 @@ function renderChatBox(status = "cowork") {
     $("<div>")
         .prop({
             className: "chatBox_MessageTitle",
-            innerHTML: "<h3>聊天</h3>",
+            innerHTML: status == "cowork" ? "<h3>聊天</h3>" : "<h3>程式助理：阿姆阿姆</h3>",
         })
         .appendTo(chatBoxMessageContainer)
 
@@ -136,19 +136,17 @@ function renderChatBox(status = "cowork") {
             if (status === "cowork") {
                 socketConnect.sendMessage($("#Message").val())
             } else {
-                MessageType.sendMessage({
-                    studentId: customizeOperation.getFrontEndCode('studentId'),
-                    sendTime: customizeOperation.getNowTime('SecondTime'),
-                    message: $("#Message").val()
-                })
                 MessageType.receiveMessage({
-                    studentId: 'ChatGPT',
+                    studentId: '阿姆阿姆',
                     sendTime: customizeOperation.getNowTime('SecondTime'),
-                    message: "請稍等..."
+                    message: "請稍等...正在處理你的問題..."
                 }, true)
-
-
-                studentClientConnect.connectChatGPT(customizeOperation.getNowTime("FullTime"), $("#Message").val()).then(response => {
+                studentClientConnect.connectChatGPT(
+                    customizeOperation.getNowTime("FullTime"),
+                    $("#Message").val(),
+                    customizeOperation.getFrontEndCode("courseId"),
+                    $("#courseTitle").text().replace(/\s/g, "")
+                ).then(response => {
                     // 引入 markedHightlight
                     // 使用 Markdown 解析 chatGPT 回傳字串
                     // Ref -=-
@@ -156,6 +154,11 @@ function renderChatBox(status = "cowork") {
                     // hightlightJS:　https://highlightjs.org/#usage
                     // Markdown: https://marked.js.org/
                     // markedHightlight: https://www.npmjs.com/package/marked-highlight
+                    MessageType.sendMessage({
+                        studentId: customizeOperation.getFrontEndCode('studentId'),
+                        sendTime: customizeOperation.getNowTime('SecondTime'),
+                        message: response.data.message.userMsg
+                    })
                     const { markedHighlight } = globalThis.markedHighlight
                     const { Marked } = globalThis.marked
                     const marked = new Marked(
@@ -168,9 +171,9 @@ function renderChatBox(status = "cowork") {
                         })
                     );
                     MessageType.receiveMessage({
-                        studentId: 'ChatGPT',
+                        studentId: '阿姆阿姆',
                         sendTime: customizeOperation.getNowTime('SecondTime'),
-                        message: marked.parse(response.data.message.message.content)
+                        message: marked.parse(response.data.message.GPTreply.message.content)
                         // message: marked.parse(response.data.message.message)
                     })
                     $('#bubbleText').remove()
@@ -183,8 +186,8 @@ function renderChatBox(status = "cowork") {
     //重新整理次數記錄
     let freshCount = 2
     $(MessageContent).on("scroll", () => {
-        if (status === 'cowork') {
-            if ($(MessageContent).scrollTop() === 0) {
+        if ($(MessageContent).scrollTop() === 0) {
+            if (status === 'cowork') {
                 studentClientConnect.getMessageHistory(freshCount, customizeOperation.getFrontEndCode("chatRoomId"))
                     .then(response => {
                         if (customizeOperation.serverResponseErrorDetect(response)) {
@@ -203,11 +206,10 @@ function renderChatBox(status = "cowork") {
                             freshCount++
                         }
                     })
+            } else {
+
             }
-        } else {
-
         }
-
     })
 }
 
