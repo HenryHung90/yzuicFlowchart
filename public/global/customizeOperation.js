@@ -40,7 +40,14 @@ const customizeOperation = {
         let parts = value.split("; " + name + "=")
         if (parts.length == 2) return parts.pop().split(";").shift()
     },
-    //取得 當前時間
+    /**
+     * 取得當前時間
+     * @param {string} type 
+     * Simple Time: h:m, 
+     * SecondTime: h:m:s, 
+     * FullTime: y/m/d h:m:s 
+     * @returns 
+     */
     getNowTime: type => {
         const date = new Date()
         let hour = date.getHours()

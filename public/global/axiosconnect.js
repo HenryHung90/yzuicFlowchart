@@ -749,6 +749,20 @@ const studentClientConnect = {
                 })
             )
         },
+    /**
+     * 用於與 chatGPT 進行溝通
+     */
+    connectChatGPT:
+        (sendTime, message) => {
+            return axios({
+                method: 'post',
+                url: '/chatGPT/chat',
+                data: {
+                    sendTime: sendTime,
+                    message: message
+                }
+            })
+        }
 }
 
 const adminClientConnect = {

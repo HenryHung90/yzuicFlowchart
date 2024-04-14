@@ -27,7 +27,7 @@
 
 .chatBox_MessageContainer {
     pointer-events: all;
-    width: 400px;
+    width: 500px;
     height: 650px;
     margin-bottom: 80px;
     overflow: auto;
@@ -39,7 +39,7 @@
     opacity: 0;
 }
 .chatBox_MessageTitle {
-    height: 7%;
+    height: 50px;
     font-size: 2rem;
     width: 100%;
     padding: 10px 10px;
@@ -50,20 +50,21 @@
 }
 .chatBox_MessageBox {
     overflow: hidden;
-    height: 93%;
+    height: 600px;
 }
 .chatBox_MessageContent {
-    height: 92%;
+    height: 560px;
     overflow-y: auto;
 }
 
 .chatBox_MessageEnterBox {
-    height: 8%;
+    height: 40px;
     position: sticky;
     align-self: flex-end;
+    margin: 0 auto;
 }
 .chatBox_MessageEnterBox_Input {
-    font-size: 15px;
+    font-size: 20px;
 }
 
 .chatBox_enterMessage {
@@ -92,7 +93,7 @@
 }
 .chatBox_sendMessage_messageBox {
     font-size: 14px;
-    line-height: 10px;
+    line-height: 14px;
     font-weight: bold;
     padding: 10px 15px;
     word-break: break-all;
@@ -146,10 +147,21 @@
 }
 
 #Message {
+    min-height:40px;
+    height: 40px !important;
     resize: none;
     word-wrap: break-word;
     font-size: 20px;
-    line-height: 10px;
+    line-height: 20px;
+}
+
+#sendMessage {
+    height: 40px;
+}
+
+#Message:focus {
+    border: 2px solid rgb(13, 90, 255) !important;
+    box-shadow: none;
 }
 
 @keyframes fadeInAndUp {

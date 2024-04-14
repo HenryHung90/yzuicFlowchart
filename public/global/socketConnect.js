@@ -389,10 +389,12 @@ const MessageType = {
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
     },
     //別人傳送的訊息
-    receiveMessage: (message) => {
+    receiveMessage: (message, typingbubble = false) => {
         const sendMessageBox = $('<div>').prop({
             className: 'chatBox_receiveMessageBox'
         }).appendTo($('.chatBox_MessageContent'))
+
+        if(typingbubble) sendMessageBox.attr('id','bubbleText')
 
         //student Id
         $('<div>').prop({
@@ -413,53 +415,7 @@ const MessageType = {
         }).appendTo(sendMessageBox)
 
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
-    },
-    sendMessage_History: (message) => {
-        const sendMessageBox = $('<div>').prop({
-            className: 'chatBox_sendMessageBox'
-        }).prependTo($('.chatBox_MessageContent'))
-
-        //student Id
-        $('<div>').prop({
-            className: 'chatBox_sendMessageBox_studentId',
-            innerHTML: `<div>${message.studentId}</div>`
-        }).appendTo(sendMessageBox)
-
-        //Message
-        $('<div>').prop({
-            className: 'chatBox_sendMessage_messageBox',
-            innerHTML: `<span>${message.message}</span>`
-        }).appendTo(sendMessageBox)
-
-        //send Time
-        $('<div>').prop({
-            className: 'chatBox_sendMessage_sendTime',
-            innerHTML: `<div>${message.sendTime}</div>`
-        }).appendTo(sendMessageBox)
-    },
-    receiveMessage_History: (message) => {
-        const sendMessageBox = $('<div>').prop({
-            className: 'chatBox_receiveMessageBox'
-        }).prependTo($('.chatBox_MessageContent'))
-
-        //student Id
-        $('<div>').prop({
-            className: 'chatBox_receiveMessageBox_studentId',
-            innerHTML: `<div>${message.studentId}</div>`
-        }).appendTo(sendMessageBox)
-
-        //Message
-        $('<div>').prop({
-            className: 'chatBox_receiveMessage_messageBox',
-            innerHTML: `<span>${message.message}</span>`
-        }).appendTo(sendMessageBox)
-
-        //send Time
-        $('<div>').prop({
-            className: 'chatBox_receiveMessage_sendTime',
-            innerHTML: `<div>${message.sendTime}</div>`
-        }).appendTo(sendMessageBox)
-    },
+    }
 }
 
 const MouseType = {
