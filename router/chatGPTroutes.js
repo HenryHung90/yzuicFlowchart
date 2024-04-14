@@ -71,6 +71,10 @@ router.post('/chat', async (req, res) => {
                     studentId: req.user.studentId,
                     sendTime: req.body.sendTime,
                     message: userMsg
+                }, {
+                    studentId: 'AmumAmum',
+                    sendTime: req.body.sendTime,
+                    message: completion.choices[0].message.content
                 }]
             }).save()
         } else {
@@ -78,6 +82,11 @@ router.post('/chat', async (req, res) => {
                 studentId: req.user.studentId,
                 sendTime: req.body.sendTime,
                 message: userMsg
+            })
+            chatGPTData.messageHistory.push({
+                studentId: 'AmumAmum',
+                sendTime: req.body.sendTime,
+                message: completion.choices[0].message.content
             })
 
             await chatGPTconfig.updateOne({
