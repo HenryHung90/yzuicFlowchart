@@ -1,5 +1,6 @@
+.env.local
+.env.staging
 .env
-env
 /node_modules
 app.http
 /public/Access
