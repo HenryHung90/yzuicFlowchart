@@ -741,7 +741,6 @@ const studentClientConnect = {
                         mainTag: mainTag,
                         subTag: subTag,
                         aidTag: aidTag,
-                        keyName: keyName,
                         description: description,
                         time: time,
                     }

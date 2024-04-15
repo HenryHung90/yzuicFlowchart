@@ -1510,21 +1510,21 @@ function ClickListening(e, customClick) {
     }
 
     if (operation === "undefined[null]" || operation === undefined || operation === null) return
-    console.log(operation)
+    operation = operation.split("-")
+    // console.log(operation)
 
-    // studentClientConnect
-    //     .listenerUpload(
-    //         time,
-    //         courseTitle,
-    //         operation,
-    //         task,
-    //         keyName(),
-    //         detail(),
-    //         description
-    //     )
-    //     .then(response => {
-    //         if (customizeOperation.serverResponseErrorDetect(response)) return
-    //     })
+    studentClientConnect
+        .listenerUpload(
+            operation[0],
+            operation[1],
+            operation[2],
+            operation[3] || null,
+            operation,
+            customizeOperation.getNowTime("FullTime")
+        )
+        .then(response => {
+            if (customizeOperation.serverResponseErrorDetect(response)) return
+        })
 }
 
 export { GoListFunc, CodeMirrorFunc, ClickListening }
