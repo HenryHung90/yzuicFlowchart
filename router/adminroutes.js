@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 const router = express.Router()
 
 // import adminConfig from '../models/adminconfig.js'
-import studentConfig from '../models/studentconfig.js'
 import standardcontent from '../models/standardcontent.js'
 import chatroomconfig from '../models/chatroomconfig.js'
 import listenerConfig from '../models/listenerconfig.js'
 import reflectionconfig from '../models/reflectionconfig.js'
 import coworkconfig from '../models/coworkconfig.js'
 import coworkcontent from '../models/coworkcontent.js';
+import studentconfig from '../models/studentconfig.js';
 
 
 const saltRound = 10
@@ -64,12 +64,12 @@ router.post('/addstudent', async (req, res) => {
         }
 
 
-        await studentConfig.findOne({ studentId: req.body.studentId, studentClass: req.body.studentClass }).then(response => {
+        await studentconfig.findOne({ studentId: req.body.studentId, studentClass: req.body.studentClass }).then(response => {
             if (response == null) {
                 bcrypt.hash(tempPassword, saltRound, async (err, hashedPassword) => {
                     if (err) throw 'bad hash'
 
-                    const newStudent = new studentConfig({
+                    const newStudent = new studentconfig({
                         studentClass: req.body.studentClass,
                         studentId: req.body.studentId,
                         studentPassword: hashedPassword,
@@ -98,64 +98,6 @@ router.post('/addstudent', async (req, res) => {
         })
     }
 
-})
-// 批量新增學生
-router.post('/updatestudentlist', async (req, res) => {
-    try {
-        if (req.body.studentList !== null || req.body.studentList !== undefined) {
-            const studentData = await studentConfig.find({ studentClass: req.body.studentClass })
-
-            const studentCheckMap = new Map()
-            studentData.forEach(student => {
-                studentCheckMap.set(student.studentId, student.studentName)
-            })
-
-            //檢測是否有錯
-            let errorStudentId = []
-            req.body.studentList.forEach(student => {
-                console.log(student.studentId)
-                if (studentCheckMap.has(student.studentId)) {
-                    errorStudentId.push(student.studentId)
-                }
-            })
-            if (errorStudentId.length > 0) {
-                res.json({
-                    message: `${errorStudentId.join(",")} 學生已存在`,
-                    status: 501
-                })
-                return
-            }
-
-            //批量新增學生
-            req.body.studentList.forEach(student => {
-                if (student.studentPassword == "" || student.studentPassword == null) student.studentPassword = student.studentId
-
-                bcrypt.hash(student.studentPassword, saltRound, async (err, hashedPassword) => {
-                    if (err) throw 'bad hash'
-
-                    await new studentConfig({
-                        studentClass: student.studentClass,
-                        studentId: student.studentId,
-                        studentPassword: hashedPassword,
-                        studentName: student.studentName,
-                        studentAccess: true,
-                        studentGoList: {},
-                        studentCodeList: {}
-                    }).save()
-                })
-            })
-            res.json({
-                message: 'success',
-                status: 200
-            })
-        }
-    } catch (err) {
-        console.log(err)
-        res.json({
-            message: '批量上傳學生錯誤，請聯繫管理員(err)',
-            status: 500
-        })
-    }
 })
 
 //新增 goList Standard 各項內容
@@ -285,7 +227,7 @@ router.post('/addchatroom', async (req, res) => {
 
         // 將學生加入群組
         for (const studentId of req.body.studentGroup) {
-            await studentConfig.updateOne(
+            await studentconfig.updateOne(
                 { studentClass: req.body.studentClass, studentId: studentId },
                 { studentChatRoomId: chatRoomId }
             ).then(response => {
@@ -393,7 +335,7 @@ router.post('/updatechatroom', async (req, res) => {
             { studentGroup: req.body.studentGroup }
         )
         for (const studentId of req.body.studentGroup) {
-            await studentConfig.updateOne(
+            await studentconfig.updateOne(
                 { studentClass: req.body.studentClass, studentId: studentId },
                 { studentChatRoomId: req.body.studentChatRoomId || "" }
             ).then(response => {
@@ -446,31 +388,77 @@ router.get('/getallcourse', async (req, res) => {
 // Admin 新增課程
 router.post('/createcourse', async (req, res) => {
     try {
-        const checkData = await standardcontent.findOne({ goListTitle: req.body.courseName })
+        if (req.body.courseType === 'cowork') {
+            const checkData = await coworkcontent.findOne({ coworkTitle: req.body.couseName })
 
-        if (checkData !== null) {
-            res.json({
+            if (checkData !== null) return res.json({
                 message: "該名字已存在，請輸入別的名字",
                 status: 500
             })
-            return
+
+            const newCourse = new coworkcontent({
+                class: req.body.courseClass,
+                coworkTitle: req.body.courseName,
+                access: true
+            })
+
+            // 儲存新課程之後
+            // 將該課程同步分配給屬於該屆次的所有組別
+            newCourse.save().then(result => {
+                chatroomconfig.find({ class: req.body.courseClass })
+                    .then(response => {
+                        response.forEach((info, index) => {
+                            new coworkconfig({
+                                class: req.body.courseClass,
+                                coworkTitle: req.body.courseName,
+                                coworkContentId: result._id,
+                                coworkStatus: { process: 0, completeVote: new Array(info.studentGroup.length).fill(false), isComplete: false },
+                                groupId: info.chatRoomId,
+                                studentGroup: info.studentGroup,
+                                coworkContent: {},
+                                coworkTimesheet: { time: getNowTime("FullTime"), student: "Admin", coworkContent: "initialzed" }
+                            }).save()
+                        })
+                        return response
+                    })
+                    .then(response => {
+                        res.json({
+                            message: {
+                                _id: result._id,
+                                goListTitle: result.coworkTitle
+                            },
+                            status: 200
+                        })
+                    })
+            })
+        } else {
+            const checkData = await standardcontent.findOne({ goListTitle: req.body.courseName })
+
+            if (checkData !== null) {
+                res.json({
+                    message: "該名字已存在，請輸入別的名字",
+                    status: 500
+                })
+                return
+            }
+
+            const newCourse = new standardcontent({
+                class: req.body.courseClass,
+                goListTitle: req.body.courseName,
+                access: true
+            })
+
+            newCourse.save().then(response => {
+                res.json({
+                    message: {
+                        _id: response._id,
+                        goListTitle: response.goListTitle
+                    },
+                    status: 200
+                })
+            })
         }
 
-        const newCourse = new standardcontent({
-            class: req.body.courseClass,
-            goListTitle: req.body.courseName,
-            access: true
-        })
-
-        newCourse.save().then(response => {
-            res.json({
-                message: {
-                    _id: response._id,
-                    goListTitle: response.goListTitle
-                },
-                status: 200
-            })
-        })
     } catch (err) {
         console.log(err)
         res.json({
@@ -555,7 +543,7 @@ router.post('/createcoworkcourse', async (req, res) => {
 // Admin 取得所有學生
 router.get('/getallstudent', async (req, res) => {
     try {
-        const studentData = await studentConfig.find({})
+        const studentData = await studentconfig.find({})
 
         let returnStudentData = []
 
@@ -588,12 +576,71 @@ router.get('/getallstudent', async (req, res) => {
         })
     }
 })
+// 批量新增學生
+router.post('/updatestudentlist', async (req, res) => {
+    try {
+        if (req.body.studentList !== null || req.body.studentList !== undefined) {
+            console.log(req.body.studentList)
+            // const studentData = await studentconfig.find({ studentClass: req.body.studentClass })
+
+            // const studentCheckMap = new Map()
+            // studentData.forEach(student => {
+            //     studentCheckMap.set(student.studentId, student.studentName)
+            // })
+
+            // //檢測是否有錯
+            // let errorStudentId = []
+            // req.body.studentList.forEach(student => {
+            //     console.log(student.studentId)
+            //     if (studentCheckMap.has(student.studentId)) {
+            //         errorStudentId.push(student.studentId)
+            //     }
+            // })
+            // if (errorStudentId.length > 0) {
+            //     res.json({
+            //         message: `${errorStudentId.join(",")} 學生已存在`,
+            //         status: 501
+            //     })
+            //     return
+            // }
+
+            // //批量新增學生
+            // req.body.studentList.forEach(student => {
+            //     if (student.studentPassword == "" || student.studentPassword == null) student.studentPassword = student.studentId
+
+            //     bcrypt.hash(student.studentPassword, saltRound, async (err, hashedPassword) => {
+            //         if (err) throw 'bad hash'
+
+            //         await new studentconfig({
+            //             studentClass: student.studentClass,
+            //             studentId: student.studentId,
+            //             studentPassword: hashedPassword,
+            //             studentName: student.studentName,
+            //             studentAccess: true,
+            //             studentGoList: {},
+            //             studentCodeList: {}
+            //         }).save()
+            //     })
+            // })
+            res.json({
+                message: 'success',
+                status: 200
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: '批量上傳學生錯誤，請聯繫管理員(err)',
+            status: 500
+        })
+    }
+})
 // Admin 修改學生
 router.post('/updatestudent', async (req, res) => {
     try {
         //刪除群組功能 removeChatRoom
         if (req.body.type === 'removeChatRoom') {
-            await studentConfig.updateOne(
+            await studentconfig.updateOne(
                 { studentId: req.body.studentId, studentClass: req.body.studentClass },
                 { studentChatRoomId: "" }
             ).then(response => {
@@ -612,13 +659,14 @@ router.post('/updatestudent', async (req, res) => {
         }
         //增加群組功能 addChatRoom
         if (req.body.type === 'addChatRoom') {
-            await studentConfig.updateOne(
+            const coworkData = await coworkconfig.find({ groupId: req.body.studentChatRoomId })
+            await studentconfig.updateOne(
                 { studentId: req.body.studentId, studentClass: req.body.studentClass },
-                { studentChatRoomId: "" }
+                { studentChatRoomId: req.body.studentChatRoomId }
             ).then(response => {
                 if (!response.acknowledged) {
                     res.json({
-                        message: "刪除失敗",
+                        message: "新增失敗",
                         status: 500
                     })
                     return
@@ -632,12 +680,11 @@ router.post('/updatestudent', async (req, res) => {
         // 合作功能開啟/關閉 switchCowork
         if (req.body.type === 'switchCowork') {
             req.body.studentId.forEach(async (studentId, index) => {
-                await studentConfig.updateOne(
+                await studentconfig.updateOne(
                     { studentId: studentId, studentClass: req.body.studentClass },
                     { studentAccess: !req.body.switchConfirm[index] }
                 ).then(response => {
                     if (!response.acknowledged) {
-                        console.log(studentId, response)
                         res.json({
                             message: "更改失敗",
                             status: 500
@@ -659,11 +706,71 @@ router.post('/updatestudent', async (req, res) => {
         })
     }
 })
+// Admin 批量/單一刪除學生
+router.post('/deletestudent', async (req, res) => {
+    try {
+        req.body.studentList.forEach(async studentId => {
+            const studentData = await studentconfig.findOne({ studentId: studentId, studentClass: req.body.studentClass })
+            const studentChatRoomData = await chatroomconfig.findOne({ chatRoomId: studentData.studentChatRoomId, class: req.body.studentClass })
+            const studentCoworkCourseData = await coworkconfig.findOne({ groupId: studentData.studentChatRoomId, class: req.body.studentClass })
+            // 刪除有該學生之群組名單
+            studentChatRoomData.studentGroup = studentChatRoomData.studentGroup.filter(studentIdData => studentIdData !== studentId)
+            console.log(studentChatRoomData.studentGroup)
+            // await chatroomconfig.updateOne({ chatRoomId: studentData.studentChatRoomId }, {
+            //     studentGroup: studentChatRoomData.studentGroup
+            // }).then(response => {
+            //     if (!response.acknowledged) {
+            //         res.json({
+            //             message: `刪除 ${studentId} 群組名單時失敗，請再試一次`,
+            //             status: 500
+            //         })
+            //         return
+            //     }
+            // })
+            // 刪除有該學生之合作課程名單
+            // studentCoworkCourseData.studentGroup.filter(studentIdData => studentIdData !== studentId)
+            // studentCoworkCourseData.coworkStatus.completeVote = new Array(studentCoworkCourseData.studentGroup.length)
+            // console.log(studentCoworkCourseData.studentGroup)
+            // console.log(studentCoworkCourseData.coworkStatus)
+            // await coworkconfig.updateMany({ groupId: studentData.studentChatRoomId, class: req.body.studentClass }, {
+            //     studentGroup: studentCoworkCourseData.studentGroup, coworkStatus: studentCoworkCourseData.coworkStatus
+            // }).then(response => {
+            //     if (!response.acknowledged) {
+            //         res.json({
+            //             message: `刪除 ${studentId} 合作課程名單時失敗，請再試一次`,
+            //             status: 500
+            //         })
+            //         return
+            //     }
+            // })
+            // 刪除學生
+            // await studentconfig.deleteOne({ studentId: studentId, studentClass: req.body.studentClass }).then(response => {
+            //     if (!response.acknowledged) {
+            //         res.json({
+            //             message: `刪除 ${studentId} 帳號時失敗，請再試一次`,
+            //             status: 500
+            //         })
+            //         return
+            //     }
+            // })
+        })
+        res.json({
+            message: "success",
+            status: 200
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "刪除學生失敗，請聯繫管理員(err)",
+            status: 500
+        })
+    }
+})
 
 //Admin 取得所有學生 from 特殊值
 router.post('/getallstudentbylimit', async (req, res) => {
     try {
-        const studentData = await studentConfig.find({})
+        const studentData = await studentconfig.find({})
 
         switch (req.body.limit) {
             case 'course':
@@ -701,7 +808,7 @@ router.post('/getallstudentbylimit', async (req, res) => {
         console.log(err)
         res.json({
             message: "取得學生時發生錯誤，請聯繫管理員(err)",
-            status: 500,
+            status: 500
         })
     }
 })
@@ -910,7 +1017,7 @@ router.post("/cowork/updatestandardformulating", async (req, res) => {
 //Admin 取得學生GoList
 router.post("/getstudentcourse", async (req, res) => {
     try {
-        const studentData = await studentConfig.findOne({
+        const studentData = await studentconfig.findOne({
             studentId: req.body.studentId,
             studentClass: req.body.studentClass
         })
@@ -942,7 +1049,7 @@ router.post("/getstudentcourse", async (req, res) => {
 //Admin 讀取學生GoList
 router.post('/readstudentcourse', async (req, res) => {
     try {
-        const studentData = await studentConfig.findOne({
+        const studentData = await studentconfig.findOne({
             studentId: req.body.studentId,
         })
 
@@ -1144,7 +1251,7 @@ router.post('/readcode', async (req, res) => {
             status: 200,
         }
 
-        await studentConfig
+        await studentconfig
             .findOne({
                 studentId: req.body.studentId,
             })

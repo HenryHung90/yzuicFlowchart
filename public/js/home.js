@@ -142,13 +142,15 @@ const homeInit = async () => {
         innerHTML: "一般課程"
     }).appendTo(courseContainer)
 
-    await studentClientConnect.getAllCourse().then(response => {
-        if (customizeOperation.serverResponseErrorDetect(response)) {
-            if (response.data.standardData !== null || response.data.standardData !== undefined) {
-                renderCourse(response.data.standardData, 'personal')
+    if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
+        await studentClientConnect.getAllCourse().then(response => {
+            if (customizeOperation.serverResponseErrorDetect(response)) {
+                if (response.data.standardData !== null || response.data.standardData !== undefined) {
+                    renderCourse(response.data.standardData, 'personal')
+                }
             }
-        }
-    })
+        })
+    }
     //共編課程區-------------------------------------------------------
     $('<h2>').prop({
         className: "goListCourse_contentTitle",
@@ -163,7 +165,15 @@ const homeInit = async () => {
             }
         })
     }
-
+    //確認使用者身分
+    await studentClientConnect.getPermission().then(response => {
+        if (customizeOperation.serverResponseErrorDetect(response)) {
+            if (response.data.message) {
+                $('.dropdown-menu').append("<li><a class='dropdown-item' id='adminCenter'>Admin Center</a></li>")
+                $("#adminCenter").click((e) => { window.location.port = '28102' })
+            }
+        }
+    })
     function renderCourse(courseList, type) {
         courseList.forEach((value, index) => {
             const goListContainer = $('<div>').prop({

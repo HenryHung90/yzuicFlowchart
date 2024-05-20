@@ -558,9 +558,9 @@ const categoryBox = {
         }
 
         if (customizeOperation.getFrontEndCode("coworkStatus") == 'Y') {
-            $("#scoringTeammateValue").val(data.teammateScoring)
-            $("#teammateValue").val(data.temmate)
-            switch (data.teammateScoring) {
+            $("#teammateValue").val(data.teammate)
+            $("#scoringTeammateValue").val(data.teammateScore)
+            switch (data.teammateScore) {
                 case "0":
                     $("#scoringTeammateText").html(
                         "<p>0分，我完全不滿意他的表現，好爛!</p>"
@@ -811,18 +811,35 @@ const GoListFunc = {
             if (s.category === "Reflection" || s.category === "Bonus-Reflection" || s.category === "Completed-Reflection") {
                 ClickListening("", `監控反思-暫存反思-${$("#courseTitle").text().replace(/\s/g, "")}-任務${s.key.split("-")[0]}`)
                 customizeOperation.loadingPage(true)
-                studentClientConnect.tempSaveReflection(
-                    customizeOperation.getFrontEndCode("courseId"),
-                    s.key,
-                    $("#learningValue").val(),
-                    $("#workhardValue").val(),
-                    $("#difficultValue").val(),
-                    $("#scoringValue").val()
-                ).then(response => {
-                    if (customizeOperation.serverResponseErrorDetect(response)) {
-                        customizeOperation.loadingPage(false)
-                    }
-                })
+                if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
+                    studentClientConnect.tempSaveReflection(
+                        customizeOperation.getFrontEndCode("courseId"),
+                        s.key,
+                        $("#learningValue").val(),
+                        $("#workhardValue").val(),
+                        $("#difficultValue").val(),
+                        $("#scoringValue").val()
+                    ).then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            customizeOperation.loadingPage(false)
+                        }
+                    })
+                } else {
+                    studentClientConnect.cowork.saveReflection(
+                        customizeOperation.getFrontEndCode("courseId"),
+                        s.key,
+                        $("#learningValue").val(),
+                        $("#difficultValue").val(),
+                        $("#scoringSelfValue").val(),
+                        $("#teammateValue").val(),
+                        $("#scoringTeammateValue").val()
+                    ).then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            customizeOperation.loadingPage(false)
+                        }
+                    })
+                }
+
             }
             //-------------------------------------------------------
 

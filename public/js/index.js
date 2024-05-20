@@ -1,4 +1,4 @@
-import { studentClientConnect } from '../global/axiosconnect.js'
+import { studentClientConnect, adminClientConnect } from '../global/axiosconnect.js'
 import customizeOperation from '../global/customizeOperation.js'
 
 $('#formSubmit').click((e) => {
@@ -16,7 +16,7 @@ $(document).on('mousemove', (e) => {
     })
 })
 
-const login = (e) => {
+const login = async (e) => {
     customizeOperation.loadingPage(true)
     const account = $('#account').val()
     const password = $('#password').val()
@@ -37,4 +37,7 @@ const login = (e) => {
             window.location.href = `/home/${response.data.studentId}`
         }
     })
+
+
+
 }

@@ -137,8 +137,24 @@ app.use(express.static(path.join(__dirname, 'public')))
 //cors
 app.use(cors(
     {
-        origin: [process.env.CORS_ALLOW_CAST_TEST, process.env.CORS_ALLOW_CAST_MAIN],
-        methods: ['GET']
+        origin: [
+            process.env.CORS_ALLOW_CAST_TEST_1,
+            process.env.CORS_ALLOW_CAST_TEST_2,
+            process.env.CORS_ALLOW_CAST_MAIN,
+            process.env.CORS_ALLOW_CAST_SUB
+        ],
+        methods: ['GET', 'POST']
+    }
+))
+admin.use(cors(
+    {
+        origin: [
+            process.env.CORS_ALLOW_CAST_TEST_1,
+            process.env.CORS_ALLOW_CAST_TEST_2,
+            process.env.CORS_ALLOW_CAST_MAIN,
+            process.env.CORS_ALLOW_CAST_SUB
+        ],
+        methods: ['GET', 'POST']
     }
 ))
 
@@ -203,7 +219,9 @@ admin.use(express.static(path.join(__dirname, 'public')))
 
 admin.get('/', async (req, res) => {
     if (req.cookies['tokenADMIN'] == undefined) {
-        res.render('./admin/index')
+        res.render('./admin/index', {
+            adminId: req.cookies.studentId
+        })
     } else {
         res.redirect(`./home/${req.cookies.adminId}`)
     }

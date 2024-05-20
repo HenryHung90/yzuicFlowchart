@@ -16,6 +16,7 @@ import reflectionconfig from "../models/reflectionconfig.js"
 import listenerconfig from "../models/listenerconfig.js"
 import formulatingconfig from "../models/formulatingconfig.js"
 import coworkcontent from "../models/coworkcontent.js"
+import adminconfig from "../models/adminconfig.js"
 
 function converDangerString(string) {
     let clean = DOMPurify.sanitize(string)
@@ -124,7 +125,9 @@ router.get('/getallcoworkcourse', async (req, res) => {
             })
             return
         }
+
         const coworkData = await coworkconfig.find({ groupId: req.user.studentChatRoomId })
+
         res.json({
             coworkData: coworkData,
             status: 200
@@ -306,7 +309,6 @@ router.post("/getunderstanding", async (req, res) => {
             })
             return
         }
-        console.log(courseData.standardStarting[req.body.key])
         res.json({
             message: {
                 understandingData: courseData.standardUnderstanding[req.body.key],
@@ -649,7 +651,6 @@ router.post("/downloadgolist", async (req, res) => {
         })
     }
 })
-
 //學生讀取 cowork
 router.post("/readcowork", async (req, res) => {
     try {
@@ -1048,7 +1049,8 @@ router.post("/getallstudentprogress", async (req, res) => {
 
         for (const { studentName, studentGoList } of studentConfigs) {
             if (studentGoList !== undefined) {
-                if (studentGoList[req.body.courseId] !== undefined) {
+                if (studentGoList[req.body.courseId] !== undefined && studentGoList[req.body.courseId] !== null) {
+                    console.log(123)
                     const studentProgress = studentGoList[req.body.courseId].progress || 0
 
                     if (studentProgress > returnData.length) {
@@ -1196,6 +1198,30 @@ router.post("/listener", async (req, res) => {
         console.log(err)
         res.json({
             message: "DOM 監聽事件失敗，請重新整理網頁",
+            status: 501,
+        })
+    }
+})
+//確認使用者身分
+router.post('/getpermission', async (req, res) => {
+    try {
+        const adminConfig = await adminconfig.findOne({ adminId: req.user.studentId })
+        if (adminConfig === null) return res.json({ message: false, status: 200 })
+        if (adminConfig.adminId == req.user.studentId) {
+            res.json({
+                message: true,
+                status: 200,
+            })
+        } else {
+            res.json({
+                message: false,
+                status: 200
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "無法確認使用者身分，請聯繫管理員(err)",
             status: 501,
         })
     }

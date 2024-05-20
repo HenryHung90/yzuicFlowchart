@@ -84,6 +84,15 @@ const studentClientConnect = {
                 })
             )
         },
+    getPermission:
+        () => {
+            return (
+                axios({
+                    method: 'POST',
+                    url: '/student/getpermission'
+                })
+            )
+        },
     //golist-----------------------------------------
     /**
      * 取得欲進入課程之教材內容以及學生儲存狀態
@@ -814,7 +823,15 @@ const adminClientConnect = {
                 })
             )
         },
-    // 更新學生資料
+    /**
+     * 更新學生資料
+     * @param {string} type 確認欲進行的功能以及更新資料的動作 
+     * @param {string} studentId 學生學號
+     * @param {string} studentClass 學生屆數
+     * @param {boolean} switchConfirm 是否變更其個人/合作
+     * @param {string} studentChatRoomId 學生群組ID 
+     * @returns 
+     */
     updateStudent:
         (type, studentId, studentClass, switchConfirm, studentChatRoomId) => {
             // type
@@ -824,13 +841,31 @@ const adminClientConnect = {
             return (
                 axios({
                     method: 'post',
-                    url: '/admin/updateStudent',
+                    url: '/admin/updatestudent',
                     data: {
                         type: type,
                         studentId: studentId,
                         studentClass: studentClass,
                         switchConfirm: switchConfirm || null,
                         studentChatRoomId: studentChatRoomId
+                    }
+                })
+            )
+        },
+    /**
+     * 批量或單一刪除學生皆可以使用
+     * @param {array} studentList 學生學號串列 
+     * @returns 
+     */
+    deleteStudent:
+        (studentList, studentClass) => {
+            return (
+                axios({
+                    method: "post",
+                    url: '/admin/deleteStudent',
+                    data: {
+                        studentList: studentList,
+                        studentClass: studentClass
                     }
                 })
             )
@@ -851,14 +886,15 @@ const adminClientConnect = {
         },
     // 創建新的課程:
     createCourse:
-        (courseName, courseClass) => {
+        (courseName, courseClass, courseType) => {
             return (
                 axios({
                     method: 'post',
                     url: '/admin/createcourse',
                     data: {
                         courseName: courseName,
-                        courseClass: courseClass
+                        courseClass: courseClass,
+                        courseType: courseType
                     }
                 })
             )

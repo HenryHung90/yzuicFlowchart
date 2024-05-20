@@ -5,6 +5,7 @@ customizeOperation.loadingPage(true)
 //----click function----//
 $('#logout').click(e => logout())
 $('#changePassword').click(e => changePassword())
+$('#studentCenter').click(e => { window.location.port = 5003 })
 $('.goListTitle_Selection').click(e => changeSelection(e.currentTarget))
 
 
@@ -187,7 +188,6 @@ const renderGoList = async () => {
     //生成課程區域
     function renderCourse(courseList, type) {
         courseList.forEach((value, index) => {
-
             const goListContainer = $('<div>').prop({
                 className: 'goListCourse_contentContainer'
             }).click(e => {
@@ -207,23 +207,22 @@ const renderGoList = async () => {
             }).appendTo(goListContainer)
         })
 
+        // 新增課程按鈕---------------------
         const AddButton = $('<div>').prop({
-            className: 'goListCourse_contentContainer'
-        }).click(e => {
-            type == 'cowork' ? null : addClass()
-        }).appendTo(courseContainer)
+            className: 'goListCourse_contentContainer ' + (type == 'cowork' ? 'goListCourse_addCoworkCourse' : 'goListCourse_addNormalCourse')
+        }).click(e => { type == 'cowork' ? addCoworkClass() : addNormalClass() }).appendTo(courseContainer)
         //Image Box
         $('<div>').prop({
             className: 'goListCourse_contentImageBox',
             // innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="60%" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>'
             innerHTML: '<img src="../media/img/add.svg" alt="home" style="width:170px;height: 180px">'
         }).appendTo(AddButton)
-
         //Title Detail
         $('<div>').prop({
             className: 'goListCourse_contentTitle',
             innerHTML: '新增課程'
         }).appendTo(AddButton)
+        //---------------------------------
 
         const enterClass = (id) => {
             window.location.href = `/admin/${id}`
@@ -233,18 +232,20 @@ const renderGoList = async () => {
             window.location.href = `/admin/co/${id}`
         }
 
-        const addClass = () => {
+        // 增加單人課程
+        function addNormalClass() {
             const courseName = window.prompt("請輸入您的課程名稱", "")
             const courseClass = window.prompt("請輸入適用屆數", "")
 
             if (courseName !== null) {
-                adminClientConnect.createCourse(courseName, courseClass).then(response => {
+                adminClientConnect.createCourse(courseName, courseClass, 'standard').then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
+                        alert(`創建成功!名稱為${response.data.message.goListTitle}`)
                         const goListContainer = $('<div>').prop({
                             className: 'goListCourse_contentContainer'
                         }).click(e => {
                             enterClass(response.data.message._id)
-                        }).insertBefore($('.goListCourse_addCourse'))
+                        }).insertBefore($('.goListCourse_addNormalCourse'))
 
                         //Image Box
                         $('<div>').prop({
@@ -262,6 +263,36 @@ const renderGoList = async () => {
             }
         }
 
+        // 增加合作課程
+        function addCoworkClass() {
+            const courseName = window.prompt("請輸入您的課程名稱", "")
+            const courseClass = window.prompt("請輸入適用屆數", "")
+
+            if (courseName !== null) {
+                adminClientConnect.createCourse(courseName, courseClass, 'cowork').then(response => {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        alert(`創建成功!名稱為${response.data.message.goListTitle}`)
+                        const goListContainer = $('<div>').prop({
+                            className: 'goListCourse_contentContainer'
+                        }).click(e => {
+                            enterClass(response.data.message._id)
+                        }).insertBefore($('.goListCourse_addCoworkCourse'))
+
+                        //Image Box
+                        $('<div>').prop({
+                            className: 'goListCourse_contentImageBox',
+                            innerHTML: '<img src="../media/img/amumamum.PNG" alt="home" style="width:100%;height: 60%">'
+                        }).appendTo(goListContainer)
+
+                        //Title Detail
+                        $('<div>').prop({
+                            className: 'goListCourse_contentTitle',
+                            innerHTML: response.data.message.goListTitle
+                        }).appendTo(goListContainer)
+                    }
+                })
+            }
+        }
     }
 }
 
@@ -272,6 +303,7 @@ const renderStudentList = async () => {
     const courseContainer = $('.goListCourse')
     courseContainer.css({ 'display': 'inline-block' })
     // Button 專區------------------------------------------------------------------
+
     //下載所有事件紀錄----------------------------------------------------------------
     $('<h3>').prop({
         className: 'studentList_operationButtonContainer_title',
@@ -287,6 +319,7 @@ const renderStudentList = async () => {
         innerHTML: "下載所有事件紀錄"
     }).click(downloadAllListening).appendTo(operationButtonContainer)
     //-----------------------------------------------------------------------------
+
     //下載單一課程所有反思----------------------------------------------------------------
     const reflectionGroup = $('<div>').prop({ className: 'input-group col-4' }).css('width', '300px').appendTo(operationButtonContainer)
     const relfectionCourse = $('<select>').prop({ className: 'form-select', id: 'reflectionCourse' }).appendTo(reflectionGroup)
@@ -344,16 +377,26 @@ const renderStudentList = async () => {
         innerHTML: '<input type="file" class="form-control" id="studentListFile">'
     }).change(uploadStudentList).css('width', '300px').appendTo(studentClassContainer)
     $('<hr>').appendTo(courseContainer)
-    //--------------------------------------------------------------------------------
-    // Table 標頭---------------------------------------------------------------------
+    //----------------------------------------------------------------
+
+    // Table 操作功能
     const studentControlContainer = $('<div>').prop({
         className: 'studentList_operationButtonContainer container-lg row'
     }).appendTo(courseContainer)
+
     //開啟/關閉合作功能
     $('<button>').prop({
         className: 'btn btn-primary studentList_operationButtonContainer_btn',
         innerHTML: "開啟/關閉合作"
     }).click(switchCoworkSetting).css('width', '150px').appendTo(studentControlContainer)
+    //批量刪除學生
+    $('<button>').prop({
+        className: 'btn btn-primary studentList_operationButtonContainer_btn',
+        innerHTML: '批量刪除學生'
+    }).click(deleteStudent).css('width', '150px').appendTo(studentControlContainer)
+    //--------------------------------------------------------------------------------
+
+    // Table 標頭---------------------------------------------------------------------
     const studentList_Container = $('<div>').prop({
         className: 'studentList_studentContainer container-lg'
     }).appendTo(courseContainer)
@@ -415,6 +458,7 @@ const renderStudentList = async () => {
         customizeOperation.loadingPage(false)
     })
     //----------------------------------------------------
+
     // 下載所有事件紀錄
     function downloadAllListening() {
         customizeOperation.loadingPage(true)
@@ -517,10 +561,7 @@ const renderStudentList = async () => {
                 confirmList.push($(`#studentList_studentAccess_${studentId}`).html() == "合作" ? true : false)
             }
         })
-        if (studentList.length == 0) {
-            alert("尚未選擇學生")
-            return
-        }
+        if (studentList.length == 0) return alert("尚未選擇學生")
 
         if (confirm(studentList.map((studentId, index) => {
             if (confirmList[index]) {
@@ -528,15 +569,30 @@ const renderStudentList = async () => {
             } else {
                 return `${studentId}:個人 -> 合作\n`
             }
-        }
-        ) + '請確認以上操作')) {
+        }) + '請確認以上操作')) {
             customizeOperation.loadingPage(true)
             adminClientConnect.updateStudent('switchCowork', studentList, classSelector.val(), confirmList).then(response => {
                 if (customizeOperation.serverResponseErrorDetect(response)) window.location.reload()
             })
-        } else {
-            alert('cancel')
-        }
+        } else alert('cancel')
+
+    }
+
+    // 批量刪除學生
+    function deleteStudent() {
+        // 取得所有已勾選人員
+        let studentList = new Array(...$('.studentAccess_checkbox').filter((index, element) => element.checked).map((index, element) => element.id.split("_")[1].toString()))
+        if (studentList.length == 0) return alert("尚未選擇學生")
+
+        if (confirm("確認刪除以下學生?\n" + studentList.map(value => value))) {
+            customizeOperation.loadingPage(true)
+            adminClientConnect.deleteStudent(studentList, $('#classSelector').val()).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) {
+                    alert(response.data.message)
+                    window.location.reload()
+                }
+            })
+        } else alert("cancel")
     }
 
     // 產生學生名單
@@ -704,7 +760,6 @@ const renderStudentList = async () => {
                 customizeOperation.loadingPage(true)
                 adminClientConnect.getSingleStudentReflection(studentClass, studentId).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        console.log(response.data.message)
                         customizeOperation.downloadDataToExcel(`${studentId}_reflectionData`, response.data.message.sheetData, response.data.message.sheetName)
                         customizeOperation.loadingPage(false)
                     }
@@ -904,7 +959,6 @@ const renderGroup = async () => {
                 return
             }
             if (confirm('確定送出?')) {
-                console.log(123)
                 adminClientConnect.addNewStudentGroup($('#classSelectorInput').val(), studentList).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
                         alert(response.data.message)
@@ -1058,6 +1112,7 @@ const renderGroup = async () => {
     }
 }
 
+// 選擇生成哪一個部分
 const homRenderInit = () => {
     if (window.location.hash == '#Student') {
         window.location.href = '#Student'

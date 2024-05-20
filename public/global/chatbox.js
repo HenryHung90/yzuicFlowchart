@@ -79,7 +79,6 @@ function renderChatBox(status = "cowork") {
 
     const chatBox = $(".chatBox")
     chatBox.click(e => {
-        console.log(123)
         if (chatBox.attr("id") === "chatBox_Close") {
             openChatBox()
         } else {
@@ -112,6 +111,10 @@ function renderChatBox(status = "cowork") {
                 sendMessage()
             }
         })
+
+        //reset 未讀訊息
+        $('.chatBox').removeClass("unreadMessage")
+        $('.chatBox_unreadCount').text("0").css('opacity', 0)
     }
     const closeChatBox = () => {
         chatBox.attr("id", "chatBox_Close")
@@ -136,6 +139,11 @@ function renderChatBox(status = "cowork") {
             if (status === "cowork") {
                 socketConnect.sendMessage($("#Message").val())
             } else {
+                MessageType.sendMessage({
+                    studentId: customizeOperation.getFrontEndCode('studentId'),
+                    sendTime: customizeOperation.getNowTime('SecondTime'),
+                    message: $("#Message").val()
+                })
                 MessageType.receiveMessage({
                     studentId: '阿姆阿姆',
                     sendTime: customizeOperation.getNowTime('SecondTime'),
@@ -154,11 +162,6 @@ function renderChatBox(status = "cowork") {
                     // hightlightJS:　https://highlightjs.org/#usage
                     // Markdown: https://marked.js.org/
                     // markedHightlight: https://www.npmjs.com/package/marked-highlight
-                    MessageType.sendMessage({
-                        studentId: customizeOperation.getFrontEndCode('studentId'),
-                        sendTime: customizeOperation.getNowTime('SecondTime'),
-                        message: response.data.message.userMsg
-                    })
                     const { markedHighlight } = globalThis.markedHighlight
                     const { Marked } = globalThis.marked
                     const marked = new Marked(
@@ -191,15 +194,16 @@ function renderChatBox(status = "cowork") {
                 studentClientConnect.getMessageHistory(freshCount, customizeOperation.getFrontEndCode("chatRoomId"))
                     .then(response => {
                         if (customizeOperation.serverResponseErrorDetect(response)) {
+                            if (response.data.message == undefined) return
                             const reverseMessage = response.data.message.reverse()
                             const OffsetScrollTop = $(".chatBox_MessageContent")[0].scrollHeight
 
                             for (let messageHistory of reverseMessage) {
                                 if (messageHistory.studentId === customizeOperation.getCookie("studentId")) {
-                                    MessageType.sendMessage_History(messageHistory)
+                                    MessageType.sendMessage(messageHistory, true)
                                 } else {
                                     //別人傳則使用別人傳的模型
-                                    MessageType.receiveMessage_History(messageHistory)
+                                    MessageType.receiveMessage(messageHistory, false, true)
                                 }
                             }
                             $(".chatBox_MessageContent").scrollTop($(".chatBox_MessageContent")[0].scrollHeight - OffsetScrollTop - 100)

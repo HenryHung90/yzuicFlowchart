@@ -61,11 +61,10 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                 } else {
                     console.log('user', user.studentId, 'get in at', Time)
 
-                    const listenerData = await listenerconfig.findOne(
-                        {
-                            studentId: user.studentId,
-                            studentClass: user.studentClass,
-                        })
+                    const listenerData = await listenerconfig.findOne({
+                        studentId: user.studentId,
+                        studentClass: user.studentClass,
+                    })
 
                     if (listenerData == null) {
                         const newListenerData = new listenerconfig({
@@ -96,7 +95,6 @@ passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordFi
                             listenerData: listenerData.listenerData
                         })
                     }
-
 
                     const returnUser = {
                         _id: user._id,

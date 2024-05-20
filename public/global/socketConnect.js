@@ -33,10 +33,10 @@ const socketConnect = {
             if (receiveMessage.chatRoomId === undefined) {
                 for (let message of receiveMessage) {
                     if (message.studentId === customizeOperation.getFrontEndCode('studentId')) {
-                        MessageType.sendMessage(message)
+                        MessageType.sendMessage(message, true)
                     } else {
                         //別人傳則使用別人傳的模型
-                        MessageType.receiveMessage(message)
+                        MessageType.receiveMessage(message, false, true)
                     }
                 }
             }
@@ -191,11 +191,11 @@ const socketConnect = {
                         renderDemoContainer(reciveMessage.response)
                         $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
                         this.executor = this.studentId
-                        console.log("EXE", reciveMessage, this.executor = reciveMessage.studentId)
+                        // console.log("EXE", reciveMessage, this.executor = reciveMessage.studentId)
                     } else {
                         if (this.executor === reciveMessage.studentId) {
                             $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
-                            console.log("LEAVE", reciveMessage, this.executor = reciveMessage.studentId)
+                            // console.log("LEAVE", reciveMessage, this.executor = reciveMessage.studentId)
                         }
                     }
                 }
@@ -362,59 +362,82 @@ const MessageType = {
 
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
     },
+
+    /**
+     * 
+     * @param {string} message 傳出訊息
+     * @param {boolean} history 是否為歷史回顧訊息
+     */
     // 自己傳送的訊息
-    sendMessage: (message) => {
-        const sendMessageBox = $('<div>').prop({
+    sendMessage: (message, history = false) => {
+        const messageBox = $('<div>').prop({
             className: 'chatBox_sendMessageBox'
-        }).appendTo($('.chatBox_MessageContent'))
+        })
+
+        history ? messageBox.prependTo($('.chatBox_MessageContent')) : messageBox.appendTo($('.chatBox_MessageContent'))
 
         //student Id
         $('<div>').prop({
             className: 'chatBox_sendMessageBox_studentId',
             innerHTML: `<div>${message.studentId}</div>`
-        }).appendTo(sendMessageBox)
+        }).appendTo(messageBox)
 
         //Message
         $('<div>').prop({
             className: 'chatBox_sendMessage_messageBox',
             innerHTML: `<span>${message.message}</span>`
-        }).appendTo(sendMessageBox)
+        }).appendTo(messageBox)
 
         //send Time
         $('<div>').prop({
             className: 'chatBox_sendMessage_sendTime',
             innerHTML: `<div>${message.sendTime}</div>`
-        }).appendTo(sendMessageBox)
+        }).appendTo(messageBox)
 
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
+        if (!history) $('#sendMsg')[0].play()
     },
     //別人傳送的訊息
-    receiveMessage: (message, typingbubble = false) => {
-        const sendMessageBox = $('<div>').prop({
+    /**
+     * 
+     * @param {string} message 傳入訊息
+     * @param {boolean} typingbubble 是否是正在輸入的氣泡訊息
+     * * @param {boolean} history 是否為歷史回顧訊息
+     */
+    receiveMessage: (message, typingbubble = false, history = false) => {
+        const messageBox = $('<div>').prop({
             className: 'chatBox_receiveMessageBox'
-        }).appendTo($('.chatBox_MessageContent'))
+        })
 
-        if(typingbubble) sendMessageBox.attr('id','bubbleText')
+        history ? messageBox.prependTo($('.chatBox_MessageContent')) : messageBox.appendTo($('.chatBox_MessageContent'))
+
+        if (typingbubble) messageBox.attr('id', 'bubbleText')
 
         //student Id
         $('<div>').prop({
             className: 'chatBox_receiveMessageBox_studentId',
             innerHTML: `<div>${message.studentId}</div>`
-        }).appendTo(sendMessageBox)
+        }).appendTo(messageBox)
 
         //Message
         $('<div>').prop({
             className: 'chatBox_receiveMessage_messageBox',
             innerHTML: `<span>${message.message}</span>`
-        }).appendTo(sendMessageBox)
+        }).appendTo(messageBox)
 
         //send Time
         $('<div>').prop({
             className: 'chatBox_receiveMessage_sendTime',
             innerHTML: `<div>${message.sendTime}</div>`
-        }).appendTo(sendMessageBox)
+        }).appendTo(messageBox)
 
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
+        if (!history) $('#reciveMsg')[0].play()
+        if ($('.chatBox').attr("id") === 'chatBox_Close' && !history) {
+            // 顯示未讀訊息
+            $('.chatBox').addClass("unreadMessage")
+            $('.chatBox_unreadCount').text(parseInt($('.chatBox_unreadCount').text()) + 1).css('opacity', '1')
+        }
     }
 }
 

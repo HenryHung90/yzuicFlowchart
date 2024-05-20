@@ -121,7 +121,6 @@ function update() {
 
 }
 
-
 // 翻牌函數
 function flipCard(card, Tweens) {
     // 如果已鎖定棋盤或點擊的牌已翻過，則不執行任何動作
