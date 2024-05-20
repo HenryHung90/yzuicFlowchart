@@ -712,21 +712,22 @@ router.post('/deletestudent', async (req, res) => {
         req.body.studentList.forEach(async studentId => {
             const studentData = await studentconfig.findOne({ studentId: studentId, studentClass: req.body.studentClass })
             const studentChatRoomData = await chatroomconfig.findOne({ chatRoomId: studentData.studentChatRoomId, class: req.body.studentClass })
+            console.log('1', studentChatRoomData.studentGroup)
             const studentCoworkCourseData = await coworkconfig.findOne({ groupId: studentData.studentChatRoomId, class: req.body.studentClass })
             // 刪除有該學生之群組名單
             studentChatRoomData.studentGroup = studentChatRoomData.studentGroup.filter(studentIdData => studentIdData !== studentId)
-            console.log(studentChatRoomData.studentGroup)
-            // await chatroomconfig.updateOne({ chatRoomId: studentData.studentChatRoomId }, {
-            //     studentGroup: studentChatRoomData.studentGroup
-            // }).then(response => {
-            //     if (!response.acknowledged) {
-            //         res.json({
-            //             message: `刪除 ${studentId} 群組名單時失敗，請再試一次`,
-            //             status: 500
-            //         })
-            //         return
-            //     }
-            // })
+            console.log('2' ,studentChatRoomData.studentGroup)
+            await chatroomconfig.updateOne({ chatRoomId: studentData.studentChatRoomId }, {
+                studentGroup: studentChatRoomData.studentGroup
+            }).then(response => {
+                if (!response.acknowledged) {
+                    res.json({
+                        message: `刪除 ${studentId} 群組名單時失敗，請再試一次`,
+                        status: 500
+                    })
+                    return
+                }
+            })
             // 刪除有該學生之合作課程名單
             // studentCoworkCourseData.studentGroup.filter(studentIdData => studentIdData !== studentId)
             // studentCoworkCourseData.coworkStatus.completeVote = new Array(studentCoworkCourseData.studentGroup.length)

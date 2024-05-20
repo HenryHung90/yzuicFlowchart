@@ -530,8 +530,6 @@ const renderStudentList = async () => {
                 })
             }
 
-            console.log(studentListUpdate)
-
             await adminClientConnect.updateStudentList(studentListUpdate, session).then(response => {
                 if (customizeOperation.serverResponseErrorDetect(response)) {
 
@@ -980,7 +978,7 @@ const renderGroup = async () => {
             $('<th>').prop({
                 className: 'groupList_groupNum',
                 scope: 'row',
-                innerHTML: index
+                innerHTML: index + 1
             })
                 .attr('rowspan', group.studentGroup.length)
                 .attr('valign', 'middle')
