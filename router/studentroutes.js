@@ -140,6 +140,27 @@ router.get('/getallcoworkcourse', async (req, res) => {
         })
     }
 })
+// 最高管理員取得所有共編資料
+router.get("/getallcourse_admin", async (req, res) => {
+    try {
+        const standardData = await standardcontent.find({})
+        const coworkData = await coworkconfig.find({groupId: req.user.studentChatRoomId})
+
+        res.json({
+            message: {
+                standardData: standardData,
+                coworkData: coworkData
+            },
+            status: 200
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            message: "管理權限取得所有課程失敗，請聯繫管理員(err)",
+            status: 500,
+        })
+    }
+})
 // 學生進入教程
 router.get("/:courseId", async (req, res) => {
     try {
@@ -474,8 +495,7 @@ router.post("/readgolist", async (req, res) => {
             studentData.studentGoList[req.body.courseId] === null
         ) {
             const standardData = await standardcontent.findOne({
-                _id: req.body.courseId,
-                access: true,
+                _id: req.body.courseId
             })
             res.json({
                 message: standardData.standardGoList,

@@ -83,6 +83,7 @@
     transition-duration: 0.5s;
     transform: translateY(-95vh);
     border-radius: 20px;
+    z-index:1004;
     box-shadow: 1px 1px 5px 3px rgb(12, 16, 32);
 }
 

@@ -26,6 +26,11 @@ const studentsConfig = new mongoose.Schema({
         type: 'boolean',
         required: true,
     },
+    // 學生帳號是否啟用
+    studentPermission: {
+        type: 'boolean',
+        required: false,
+    },
     // 學生使用的聊天室
     studentChatRoomId: {
         type: 'string',

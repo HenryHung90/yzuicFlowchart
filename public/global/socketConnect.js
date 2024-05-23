@@ -189,12 +189,12 @@ const socketConnect = {
                 if (this.selectionArea.split("-")[1] === '3') {
                     if (reciveMessage.execute) {
                         renderDemoContainer(reciveMessage.response)
-                        $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
+                        // $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
                         this.executor = this.studentId
                         // console.log("EXE", reciveMessage, this.executor = reciveMessage.studentId)
                     } else {
                         if (this.executor === reciveMessage.studentId) {
-                            $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
+                            // $('#coworkArea').data("CodeMirror").setOption('readOnly', reciveMessage.execute)
                             // console.log("LEAVE", reciveMessage, this.executor = reciveMessage.studentId)
                         }
                     }

@@ -61,6 +61,13 @@
     color: lightskyblue;
 }
 
+.studentPermission_On {
+    color: green;
+}
+.studentPermission_Off {
+    color: red;
+}
+
 /* course Container */
 .studentList_courseContainer {
     overflow: hidden;

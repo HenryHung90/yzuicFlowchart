@@ -135,46 +135,57 @@ const changePassword = () => {
 
 
 const homeInit = async () => {
-    const courseContainer = $('.goListCourse')
-    //一般課程區-------------------------------------------------------
-    $('<h2>').prop({
-        className: "goListCourse_contentTitle",
-        innerHTML: "一般課程"
-    }).appendTo(courseContainer)
-
-    if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
-        await studentClientConnect.getAllCourse().then(response => {
-            if (customizeOperation.serverResponseErrorDetect(response)) {
-                if (response.data.standardData !== null || response.data.standardData !== undefined) {
-                    renderCourse(response.data.standardData, 'personal')
-                }
-            }
-        })
-    }
-    //共編課程區-------------------------------------------------------
-    $('<h2>').prop({
-        className: "goListCourse_contentTitle",
-        innerHTML: "共編課程"
-    }).appendTo(courseContainer)
-    if (customizeOperation.getFrontEndCode('coworkStatus') === 'Y') {
-        await studentClientConnect.getAllCoworkCourse().then(response => {
-            if (customizeOperation.serverResponseErrorDetect(response)) {
-                if (response.data.coworkData !== null || response.data.coworkData !== undefined) {
-                    renderCourse(response.data.coworkData, 'cowork')
-                }
-            }
-        })
-    }
-    //確認使用者身分
+    //確認使用者身分---------------------------------------------------
     await studentClientConnect.getPermission().then(response => {
         if (customizeOperation.serverResponseErrorDetect(response)) {
             if (response.data.message) {
                 $('.dropdown-menu').append("<li><a class='dropdown-item' id='adminCenter'>Admin Center</a></li>")
                 $("#adminCenter").click((e) => { window.location.port = '28102' })
+
+                studentClientConnect.getAllCourseByAdmin().then(response => {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        renderCourse(response.data.message.standardData, 'personal')
+                        renderCourse(response.data.message.coworkData, 'cowork')
+                    }
+                })
+            } else {
+                if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
+                    studentClientConnect.getAllCourse().then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            if (response.data.standardData !== null || response.data.standardData !== undefined) {
+                                renderCourse(response.data.standardData, 'personal')
+                            }
+                        }
+                    })
+                } else {
+                    studentClientConnect.getAllCoworkCourse().then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            if (response.data.coworkData !== null || response.data.coworkData !== undefined) {
+                                renderCourse(response.data.coworkData, 'cowork')
+                            }
+                        }
+                    })
+                }
             }
         }
     })
+
+
     function renderCourse(courseList, type) {
+        const courseContainer = $('.goListCourse')
+        if (type === 'personal') {
+            //一般課程區-------------------------------------------------------
+            $('<h2>').prop({
+                className: "goListCourse_contentTitle",
+                innerHTML: "一般課程"
+            }).appendTo(courseContainer)
+        } else {
+            //共編課程區-------------------------------------------------------
+            $('<h2>').prop({
+                className: "goListCourse_contentTitle",
+                innerHTML: "共編課程"
+            }).appendTo(courseContainer)
+        }
         courseList.forEach((value, index) => {
             const goListContainer = $('<div>').prop({
                 className: 'goListCourse_contentContainer',

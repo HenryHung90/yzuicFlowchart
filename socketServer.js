@@ -108,11 +108,7 @@ const socketServer = async (io) => {
             // 完成投票額外告知完成投票
             if (isComplete) {
                 setTimeout(async () => {
-                    if (votingData.coworkStatus.process < 6) {
-                        votingData.coworkStatus.process++
-                    } else {
-                        votingData.coworkStatus.isComplete = true
-                    }
+                    votingData.coworkStatus.process < 6 ? votingData.coworkStatus.process++ : votingData.coworkStatus.isComplete = true
                     votingData.coworkStatus.completeVote = new Array(votingData.coworkStatus.completeVote.length).fill(false)
                     await coworkconfig.updateOne({ groupId: votingMessage.chatRoomId }, { coworkStatus: votingData.coworkStatus })
                 }, 500)

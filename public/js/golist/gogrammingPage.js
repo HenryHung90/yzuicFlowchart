@@ -1001,14 +1001,60 @@ const ProgrammingBox = programmingKey => {
 
         } else {
             const coworkCode = $('#coworkArea').data("CodeMirror")
-            // 執行程式, 鎖住其他人之操作
+            //執行程式, 鎖住其他人之操作
             await studentClientConnect.cowork.launchDemo(coworkCode.getValue()).then(response => {
                 if (customizeOperation.serverResponseErrorDetect(response)) {
                     socketConnect.cowork.executeProject(response.data.message)
                     renderDemoContainer(response.data.message)
-                    customizeOperation.loadingPage(false)
                 }
             })
+            // const coworkCode = $('#coworkArea').data("CodeMirror")
+            // const workerCode = `
+            // import "https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"
+            // self.onmessage = function(event) {
+            //     const code = event.data;
+            //     try {
+            //         console.log("Executing")
+            //         let exec = new Function(code)
+            //         exec()
+            //         self.postMessage({ status: 'success' });
+            //     } catch (e) {
+            //         self.postMessage({ status: 'error', message: e.message });
+            //     }
+            // };
+            // `
+
+            // const blob = new Blob([workerCode], { type: 'application/javascript' });
+            // const workerUrl = URL.createObjectURL(blob);
+            // const testingCode = coworkCode.getValue()
+            // const worker = new Worker(workerUrl, {
+            //     type: 'module'
+            // });
+            // worker.postMessage(testingCode)
+            // let timeoutId = setTimeout(() => {
+            //     worker.terminate()
+            //     console.error('worker terminated, Here may have infinite loop occured')
+            //     customizeOperation.loadingPage(false)
+            //     alert("程式有錯，超時執行")
+            // }, 2000)
+            // worker.onmessage = function (event) {
+            //     console.log(event)
+            //     clearTimeout(timeoutId)
+            //     const result = event.data
+            //     if (result.status === 'success') {
+            //         // 執行程式, 鎖住其他人之操作
+            //         studentClientConnect.cowork.launchDemo(coworkCode.getValue()).then(response => {
+            //             if (customizeOperation.serverResponseErrorDetect(response)) {
+            //                 socketConnect.cowork.executeProject(response.data.message)
+            //                 renderDemoContainer(response.data.message)
+            //             }
+            //         })
+            //     } else if (result.status === 'error') {
+            //         alert("Error\n" + result.message)
+            //         console.error('Error', result.message)
+            //     }
+            //     customizeOperation.loadingPage(false)
+            // }
         }
     }
     //rotate

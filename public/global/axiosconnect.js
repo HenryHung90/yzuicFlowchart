@@ -74,13 +74,22 @@ const studentClientConnect = {
      * @returns {object}
      * coworkData: 內含所有共編課程之連結與名稱
      */
-    // 取得所有共編教材
     getAllCoworkCourse:
         () => {
             return (
                 axios({
                     method: 'GET',
                     url: '/student/getallcoworkcourse',
+                })
+            )
+        },
+    // 管理員取得所有課程
+    getAllCourseByAdmin:
+        () => {
+            return (
+                axios({
+                    method: 'GET',
+                    url: '/student/getallcourse_admin',
                 })
             )
         },
@@ -825,6 +834,11 @@ const adminClientConnect = {
         },
     /**
      * 更新學生資料
+     * tpye 如下
+     * {addChatRoom} => 加入 Group
+     * {removeChatRoom} => 刪除 Group
+     * {switchCowork} => 合作功能開啟關閉
+     * {switchPermission} => 帳號開啟/關閉
      * @param {string} type 確認欲進行的功能以及更新資料的動作 
      * @param {string} studentId 學生學號
      * @param {string} studentClass 學生屆數
@@ -833,11 +847,12 @@ const adminClientConnect = {
      * @returns 
      */
     updateStudent:
-        (type, studentId, studentClass, switchConfirm, studentChatRoomId) => {
+        (type, studentId, studentClass, switchConfirm = null, studentChatRoomId) => {
             // type
+            // addChatRoom => 加入 Group
             // removeChatRoom => 刪除 Group
             // switchCowork => 合作功能開啟關閉
-            // addChatRoom => 加入 Group
+            // switchPermission => 帳號開啟/關閉
             return (
                 axios({
                     method: 'post',
@@ -846,7 +861,7 @@ const adminClientConnect = {
                         type: type,
                         studentId: studentId,
                         studentClass: studentClass,
-                        switchConfirm: switchConfirm || null,
+                        switchConfirm: switchConfirm,
                         studentChatRoomId: studentChatRoomId
                     }
                 })
@@ -862,10 +877,31 @@ const adminClientConnect = {
             return (
                 axios({
                     method: "post",
-                    url: '/admin/deleteStudent',
+                    url: '/admin/deletestudent',
                     data: {
                         studentList: studentList,
                         studentClass: studentClass
+                    }
+                })
+            )
+        },
+    /**
+     * 由管理員強制更新學生之密碼
+     * @param {string} studentClass 學生屆數
+     * @param {string} studentId 學生學號
+     * @param {string} newPassword 新密碼
+     * @returns 
+     */
+    changeStudentPassword:
+        (studentClass, studentId, newPassword) => {
+            return (
+                axios({
+                    method: 'post',
+                    url: '/admin/changestudentpassword',
+                    data: {
+                        studentClass: studentClass,
+                        studentId: studentId,
+                        newPassword: newPassword
                     }
                 })
             )

@@ -282,8 +282,8 @@ admin.use((err, req, res, next) => {
 //     key: fs.readFileSync('/etc/letsencrypt/live/ccj.infocom.yzu.edu.tw/privkey.pem')
 // }
 
-// const httpsServer = https.createServer(certKeyOption, app).listen(process.env.PORT_1, () => {
-//     console.log("Server is runing at " + process.env.CORS_ALLOW_CAST_MAIN + ":" + process.env.PORT_1)
+// const httpsServer = https.createServer(certKeyOption, app).listen(process.env.PORT_2, () => {
+//     console.log("Server is runing at " + process.env.CORS_ALLOW_CAST_MAIN + ":" + process.env.PORT_2)
 // })
 // const io = new Server(httpsServer)
 // //socket server management

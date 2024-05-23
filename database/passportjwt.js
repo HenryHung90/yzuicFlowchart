@@ -43,7 +43,7 @@ const date = new Date()
 const Time = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
 passport.use('login', new LocalStrategy({ usernameField: 'studentId', passwordField: 'studentPassword' }, (username, password, done) => {
-    studentConfig.findOne({ studentId: username })
+    studentConfig.findOne({ studentId: username, studentPermission: true })
         .then(async (user) => {
             if (user == null) {
                 done(null, { message: '無此用戶' })
@@ -160,7 +160,7 @@ passport.use('token', new JWTStrategy({
     failureMessage: true
 },
     (jwtPayload, done) => {
-        studentConfig.findOne({ _id: jwtPayload._id, studentId: jwtPayload.studentId })
+        studentConfig.findOne({ _id: jwtPayload._id, studentId: jwtPayload.studentId, studentPermission: true })
             .then(user => {
                 const returnUser = {
                     _id: user._id,

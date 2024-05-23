@@ -8,8 +8,8 @@
     position: fixed;
     width: 100vw;
     height: 100vh;
-    padding: 10px 50px;
-    z-index: 1003;
+    padding: 10px 10px;
+    z-index: 1005;
 }
 .chatBox {
     position: relative;

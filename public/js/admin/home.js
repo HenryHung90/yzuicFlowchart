@@ -384,15 +384,20 @@ const renderStudentList = async () => {
         className: 'studentList_operationButtonContainer container-lg row'
     }).appendTo(courseContainer)
 
-    //開啟/關閉合作功能
+    // 開啟/關閉合作功能
     $('<button>').prop({
         className: 'btn btn-primary studentList_operationButtonContainer_btn',
         innerHTML: "開啟/關閉合作"
     }).click(switchCoworkSetting).css('width', '150px').appendTo(studentControlContainer)
-    //批量刪除學生
+    //  開啟/關閉帳號
     $('<button>').prop({
         className: 'btn btn-primary studentList_operationButtonContainer_btn',
-        innerHTML: '批量刪除學生'
+        innerHTML: "開啟/關閉帳號"
+    }).click(switchPermission).css('width', '150px').appendTo(studentControlContainer)
+    // 刪除學生
+    $('<button>').prop({
+        className: 'btn btn-primary studentList_operationButtonContainer_btn',
+        innerHTML: '刪除學生'
     }).click(deleteStudent).css('width', '150px').appendTo(studentControlContainer)
     //--------------------------------------------------------------------------------
 
@@ -408,7 +413,7 @@ const renderStudentList = async () => {
     }).appendTo(studentList_Table)
     const studentList_Table_thead = $('<thead>').prop({ className: "table-light" }).appendTo(studentList_Table)
     const studentList_Table_tr = $('<tr>').appendTo(studentList_Table_thead)
-    const headList = ['編號', '學號', '姓名', '個人/合作', '設定']
+    const headList = ['編號', '學號', '姓名', '個人/合作', '帳號狀態', '設定']
     headList.forEach((value, index) => {
         if (index == 0) {
             $('<th>').prop({
@@ -507,11 +512,11 @@ const renderStudentList = async () => {
         const reader = new FileReader()
 
         reader.onload = async (evt) => {
-            const bstr = evt.target.result
-            const wb = XLSX.read(bstr, { type: "binary" })
+            const wb = XLSX.read(evt.target.result, { type: "binary" })
             const wsname = wb.SheetNames[0]
             const ws = wb.Sheets[wsname]
             const data = XLSX.utils.sheet_to_csv(ws, { header: 1 })
+
             //取得上傳屆數
             const session = $('#studentListFile').val().split("_")[1]
 
@@ -532,8 +537,8 @@ const renderStudentList = async () => {
 
             await adminClientConnect.updateStudentList(studentListUpdate, session).then(response => {
                 if (customizeOperation.serverResponseErrorDetect(response)) {
-
-                    customizeOperation.loadingPage(false)
+                    alert(response.data.message)
+                    window.location.reload()
                 }
             })
         }
@@ -556,17 +561,13 @@ const renderStudentList = async () => {
             const studentId = element.id.split("_")[1]
             if (element.checked) {
                 studentList.push(studentId)
-                confirmList.push($(`#studentList_studentAccess_${studentId}`).html() == "合作" ? true : false)
+                confirmList.push(!($(`#studentList_studentAccess_${studentId}`).html() == "合作"))
             }
         })
         if (studentList.length == 0) return alert("尚未選擇學生")
 
         if (confirm(studentList.map((studentId, index) => {
-            if (confirmList[index]) {
-                return `${studentId}:合作 -> 個人\n`
-            } else {
-                return `${studentId}:個人 -> 合作\n`
-            }
+            return `${studentId}:${confirmList[index] ? '個人 -> 合作\n' : '合作 -> 個人\n'}`
         }) + '請確認以上操作')) {
             customizeOperation.loadingPage(true)
             adminClientConnect.updateStudent('switchCowork', studentList, classSelector.val(), confirmList).then(response => {
@@ -574,6 +575,30 @@ const renderStudentList = async () => {
             })
         } else alert('cancel')
 
+    }
+
+    // 切換帳號啟閉
+    function switchPermission() {
+        // 取得所有已勾選人員
+        let studentList = []
+        let confirmList = []
+        $('.studentAccess_checkbox').each((index, element) => {
+            const studentId = element.id.split("_")[1]
+            if (element.checked) {
+                studentList.push(studentId)
+                confirmList.push(!($(`#studentList_studentPermission_${studentId}`).html() == "開啟"))
+            }
+        })
+        if (studentList.length == 0) return alert("尚未選擇學生")
+
+        if (confirm(studentList.map((studentId, index) => {
+            return `${studentId}:${confirmList[index] ? '開啟\n' : '關閉\n'}`
+        }) + '請確認以上操作')) {
+            customizeOperation.loadingPage(true)
+            adminClientConnect.updateStudent('switchPermission', studentList, classSelector.val(), confirmList).then(response => {
+                if (customizeOperation.serverResponseErrorDetect(response)) window.location.reload()
+            })
+        } else alert('cancel')
     }
 
     // 批量刪除學生
@@ -622,6 +647,14 @@ const renderStudentList = async () => {
                 innerHTML: student.studentAccess ? '合作' : '個人',
                 id: `studentList_studentAccess_${student.studentId}`
             }).appendTo(studentTr)
+
+            // studentPermission
+            $('<td>').prop({
+                className: student.studentPermission ? 'studentList_studentPermission studentPermission_On' : 'studentList_studentPermission studentPermission_Off',
+                innerHTML: student.studentPermission ? '開啟' : '關閉',
+                id: `studentList_studentPermission_${student.studentId}`
+            }).appendTo(studentTr)
+
             //----------------------------------------------------
             // student controller
             const studentControllerContainer = $('<td>').prop({
@@ -649,9 +682,10 @@ const renderStudentList = async () => {
             }).appendTo(studentControllerUL)
 
             const dropDownList = [
-                { name: "修改密碼", clickFunc: () => controllerFunc.changePassword() },
-                { name: "刪除學生", clickFunc: () => controllerFunc.deleteStudent() },
-                { name: "個人/合作", clickFunc: () => controllerFunc.switchCowork() },
+                { name: "修改密碼", clickFunc: () => controllerFunc.changePassword(student.studentClass, student.studentId) },
+                { name: "刪除學生", clickFunc: () => controllerFunc.deleteStudent(student.studentClass, student.studentId) },
+                { name: "個人/合作", clickFunc: () => controllerFunc.switchCowork(student.studentClass, student.studentId) },
+                { name: "帳號開啟/關閉", clickFunc: () => controllerFunc.switchPermision(student.studentClass, student.studentId) },
                 { name: "下載事件紀錄", clickFunc: () => controllerFunc.getListenerData(student.studentClass, student.studentId) },
                 { name: "觀看心智圖", clickFunc: () => controllerFunc.watchingList(student.studentClass, student.studentId) },
                 { name: "下載所有反思", clickFunc: () => controllerFunc.downloadReflection(student.studentClass, student.studentId) }
@@ -670,18 +704,57 @@ const renderStudentList = async () => {
     const controllerFunc = {
         // 改密碼
         changePassword:
-            () => {
+            (studentClass, studentId) => {
+                const newP = prompt("請輸入密碼")
+                const newP_check = prompt("請再次輸入密碼")
+                if (newP !== newP_check) return alert("兩次密碼不相同")
 
+                customizeOperation.loadingPage(true)
+                adminClientConnect.changeStudentPassword(studentClass, studentId, newP).then(response => {
+                    if (customizeOperation.serverResponseErrorDetect(response)) {
+                        alert(response.data.message)
+                        customizeOperation.loadingPage(false)
+                    }
+                })
             },
         // 刪學生
         deleteStudent:
-            () => {
-
+            (studentClass, studentId) => {
+                if (confirm("確認刪除以下學生?\n" + studentId)) {
+                    customizeOperation.loadingPage(true)
+                    adminClientConnect.deleteStudent([studentId], studentClass).then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            alert(response.data.message)
+                            window.location.reload()
+                        }
+                    })
+                } else alert("cancel")
             },
         // 修改個人/合作
         switchCowork:
-            () => {
-
+            (studentClass, studentId) => {
+                if (confirm("確認以下修改?\n" + `${studentId}:${$(`#studentList_studentAccess_${studentId}`).html() == "合作" ? "合作 -> 個人" : "個人 -> 合作"}`)) {
+                    customizeOperation.loadingPage(true)
+                    adminClientConnect.updateStudent('switchCowork', [studentId], studentClass, [!($(`#studentList_studentAccess_${studentId}`).html() == "合作")]).then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            alert(response.data.message)
+                            window.location.reload()
+                        }
+                    })
+                } else alert("cancel")
+            },
+        // 修改帳號開啟/關閉
+        switchPermision:
+            (studentClass, studentId) => {
+                if (confirm("確認以下修改?\n" + `${studentId}:${$(`#studentList_studentPermission_${studentId}`).html() == "開啟" ? "關閉" : "開啟"}`)) {
+                    customizeOperation.loadingPage(true)
+                    adminClientConnect.updateStudent('switchPermission', [studentId], studentClass, [!($(`#studentList_studentPermission_${studentId}`).html() == "開啟")]).then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            alert(response.data.message)
+                            window.location.reload()
+                        }
+                    })
+                } else alert("cancel")
             },
         // 下載單一學生監聽紀錄
         getListenerData:

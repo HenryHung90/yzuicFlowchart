@@ -78,13 +78,8 @@ function renderChatBox(status = "cowork") {
         .appendTo(EnterBox)
 
     const chatBox = $(".chatBox")
-    chatBox.click(e => {
-        if (chatBox.attr("id") === "chatBox_Close") {
-            openChatBox()
-        } else {
-            closeChatBox()
-        }
-    })
+    chatBox.click(e => { chatBox.attr("id") === "chatBox_Close" ? openChatBox() : closeChatBox() })
+    $('#myDiagramDiv').click(e => closeChatBox())
 
     const openChatBox = () => {
         chatBox.attr("id", "chatBox_Open")
