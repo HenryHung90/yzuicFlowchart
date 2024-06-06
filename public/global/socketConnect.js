@@ -11,6 +11,8 @@ const socketConnect = {
             studentId: customizeOperation.getFrontEndCode('studentId'),
             sendTime: customizeOperation.getNowTime('SimpleTime'),
             chatRoomId: customizeOperation.getFrontEndCode('chatRoomId'),
+            coworkStatus: customizeOperation.getFrontEndCode('coworkStatus'),
+            courseId: customizeOperation.getFrontEndCode('courseId'),
         }
         socketConnect.socket.emit('enterRoom', JSON.stringify(emitMessage))
     },
@@ -28,10 +30,9 @@ const socketConnect = {
     receiveEnterRoom: () => {
         socketConnect.socket.on('re-enterRoom', (message) => {
             const receiveMessage = JSON.parse(message)
-            MessageType.enterRoom(receiveMessage)
             // 前十則訊息接收
             if (receiveMessage.chatRoomId === undefined) {
-                for (let message of receiveMessage) {
+                for (let message of receiveMessage.reverse()) {
                     if (message.studentId === customizeOperation.getFrontEndCode('studentId')) {
                         MessageType.sendMessage(message, true)
                     } else {
@@ -39,6 +40,8 @@ const socketConnect = {
                         MessageType.receiveMessage(message, false, true)
                     }
                 }
+            } else {
+                MessageType.enterRoom(receiveMessage)
             }
 
         })
@@ -364,11 +367,10 @@ const MessageType = {
     },
 
     /**
-     * 
+     * 自己傳送的訊息
      * @param {string} message 傳出訊息
      * @param {boolean} history 是否為歷史回顧訊息
      */
-    // 自己傳送的訊息
     sendMessage: (message, history = false) => {
         const messageBox = $('<div>').prop({
             className: 'chatBox_sendMessageBox'
@@ -397,14 +399,24 @@ const MessageType = {
         $('.chatBox_MessageContent').scrollTop($('.chatBox_MessageContent')[0].scrollHeight)
         if (!history) $('#sendMsg')[0].play()
     },
-    //別人傳送的訊息
     /**
-     * 
+     * 別人傳送的訊息
      * @param {string} message 傳入訊息
      * @param {boolean} typingbubble 是否是正在輸入的氣泡訊息
      * * @param {boolean} history 是否為歷史回顧訊息
      */
     receiveMessage: (message, typingbubble = false, history = false) => {
+        const { markedHighlight } = globalThis.markedHighlight
+        const { Marked } = globalThis.marked
+        const marked = new Marked(
+            markedHighlight({
+                langPrefix: 'hljs language-',
+                highlight(code, lang, info) {
+                    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                    return hljs.highlight(code, { language }).value;
+                }
+            })
+        );
         const messageBox = $('<div>').prop({
             className: 'chatBox_receiveMessageBox'
         })
@@ -422,7 +434,7 @@ const MessageType = {
         //Message
         $('<div>').prop({
             className: 'chatBox_receiveMessage_messageBox',
-            innerHTML: `<span>${message.message}</span>`
+            innerHTML: `<span>${marked.parse(message.message || '')}</span>`
         }).appendTo(messageBox)
 
         //send Time

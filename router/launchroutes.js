@@ -139,17 +139,7 @@ router.post("/launchdemo", async (req, res) => {
         //js file write
         const jsFileName = `${directName}/public/Access/${req.user.studentId}/${fileId}/${fileId}.js`
         const jsFileContent = `try{console.log("Game Launcher...")
-${req.body.setting}
-//config
-${req.body.config}
-//preload function
-${req.body.preload}
-//create function
-${req.body.create}
-//update function
-${req.body.update}
-//custom function
-${req.body.custom}
+${req.body.codeArea}
             }catch(err){
                 if (err instanceof TypeError) {
                     console.error("TypeError",err.stack)

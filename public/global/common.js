@@ -305,35 +305,9 @@ const categoryBox = {
     },
     Programming: (data, key) => {
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
-            let codeData = [
-                { name: "setting", data: "" },
-                { name: "config", data: "" },
-                { name: "preload", data: "" },
-                { name: "create", data: "" },
-                { name: "update", data: "" },
-                { name: "custom", data: "" },
-            ]
-            // 塞入紀錄的程式內容----------------------------------
-            if (data.code !== undefined) {
-                codeData = [
-                    { name: "setting", data: data.code.setting || "" },
-                    { name: "config", data: data.code.config || "" },
-                    { name: "preload", data: data.code.preload || "" },
-                    { name: "create", data: data.code.create || "" },
-                    { name: "update", data: data.code.update || "" },
-                    { name: "custom", data: data.code.custom || "" },
-                ]
-            }
-
-            for (const CodeMirror of codeData) {
-                CodeMirrorFunc.codeMirrorProgram(
-                    CodeMirror.name,
-                    CodeMirror.data,
-                    false
-                )
-                $(`#${CodeMirror.name}`).data("CodeMirror").setSize("auto", "auto")
-            }
-            //-----------------------------------------------------
+            // 製作 Coding 區域
+            CodeMirrorFunc.codeMirrorProgram('coworkArea', data.code.code, false)
+            $('#coworkArea').data("CodeMirror").setSize("auto", 680)
 
             //hint
             if (data.hintList !== undefined) {
@@ -694,29 +668,18 @@ const GoListFunc = {
             ) {
                 customizeOperation.loadingPage(true)
                 if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
-                    const settingCode = $("#setting").data("CodeMirror")
-                    const configCode = $("#config").data("CodeMirror")
-                    const preloadCode = $("#preload").data("CodeMirror")
-                    const createCode = $("#create").data("CodeMirror")
-                    const updateCode = $("#update").data("CodeMirror")
-                    const customCode = $("#custom").data("CodeMirror")
-                    const keyCode = s.key
+                    //取得各階段程式碼
+                    const coworkCode = $('#coworkArea').data("CodeMirror")
 
+                    const keyCode = s.key
                     studentClientConnect
                         .saveCode(
-                            settingCode.getValue(),
-                            configCode.getValue(),
-                            preloadCode.getValue(),
-                            createCode.getValue(),
-                            updateCode.getValue(),
-                            customCode.getValue(),
+                            coworkCode.getValue(),
                             keyCode,
                             customizeOperation.getFrontEndCode("courseId")
                         )
                         .then(response => {
-                            if (customizeOperation.serverResponseErrorDetect(response)) {
-                                customizeOperation.loadingPage(false)
-                            }
+                            if (customizeOperation.serverResponseErrorDetect(response)) customizeOperation.loadingPage(false)
                         })
                 } else {
                     const coworkCode = $('#coworkArea').data("CodeMirror")
@@ -937,60 +900,6 @@ const GoListFunc = {
             })
             .appendTo(content_iconContainer)
         //------------------------------------------------
-        //rotate Slide Code
-        if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
-            const rotateAllIconAndSlideAllCode = () => {
-                const content_codingContainer = [
-                    ".content_coding_settingContainer",
-                    ".content_coding_configContainer",
-                    ".content_coding_preloadContainer",
-                    ".content_coding_createContainer",
-                    ".content_coding_updateContainer",
-                    ".content_coding_customContainer",
-                ]
-
-                if ($(".content_slide").attr("id") === "open") {
-                    ClickListening("", `計畫執行-收合全部程式-${$("#courseTitle").text().replace(/\s/g, "")}-任務${s.key.split("-")[0]}`)
-                    for (const codeContainer of content_codingContainer) {
-                        if ($(codeContainer).attr("id") === "open") {
-                            $(codeContainer).attr("id", "close").slideUp(300)
-                            $(".codeDownIcon").css(
-                                {
-                                    transform: "rotate(0deg)",
-                                },
-                                200
-                            )
-
-                            $(".content_slide").attr("id", "close").html("全部展開")
-                        }
-                    }
-                } else {
-                    ClickListening("", `計畫執行-展開全部程式-${$("#courseTitle").text().replace(/\s/g, "")}-任務${s.key.split("-")[0]}`)
-                    for (const codeContainer of content_codingContainer) {
-                        if ($(codeContainer).attr("id") === "close") {
-                            $(codeContainer).attr("id", "open").slideDown(300)
-                            $(".codeDownIcon").css(
-                                {
-                                    transform: "rotate(180deg)",
-                                },
-                                200
-                            )
-
-                            $(".content_slide").attr("id", "open").html("全部收合")
-                        }
-                    }
-                }
-            }
-            // 收合 button
-            $("<button>").prop({
-                className: "col-1 content_slide btn-outline-primary btn",
-                id: "open",
-                innerHTML: "全部收合",
-            }).click(e => {
-                e.stopPropagation()
-                rotateAllIconAndSlideAllCode()
-            }).appendTo(content_iconContainer)
-        }
         //question button
         $("<button>")
             .prop({

@@ -144,7 +144,7 @@ router.get('/getallcoworkcourse', async (req, res) => {
 router.get("/getallcourse_admin", async (req, res) => {
     try {
         const standardData = await standardcontent.find({})
-        const coworkData = await coworkconfig.find({groupId: req.user.studentChatRoomId})
+        const coworkData = await coworkconfig.find({ groupId: req.user.studentChatRoomId })
 
         res.json({
             message: {
@@ -753,12 +753,7 @@ router.post("/savecode", async (req, res) => {
             studentData.studentCodeList = {
                 [req.body.courseId]: {
                     [req.body.keyCode]: {
-                        setting: req.body.setting,
-                        config: req.body.config,
-                        preload: req.body.preload,
-                        create: req.body.create,
-                        update: req.body.update,
-                        custom: req.body.custom,
+                        code: req.body.codeArea
                     },
                 },
             }
@@ -767,22 +762,12 @@ router.post("/savecode", async (req, res) => {
             if (studentData.studentCodeList[req.body.courseId] === undefined || studentData.studentCodeList[req.body.courseId] === null) {
                 studentData.studentCodeList[req.body.courseId] = {
                     [req.body.keyCode]: {
-                        setting: req.body.setting,
-                        config: req.body.config,
-                        preload: req.body.preload,
-                        create: req.body.create,
-                        update: req.body.update,
-                        custom: req.body.custom,
+                        code: req.body.codeArea
                     }
                 }
             } else {
                 studentData.studentCodeList[req.body.courseId][req.body.keyCode] = {
-                    setting: req.body.setting,
-                    config: req.body.config,
-                    preload: req.body.preload,
-                    create: req.body.create,
-                    update: req.body.update,
-                    custom: req.body.custom,
+                    code: req.body.codeArea
                 }
             }
 
@@ -1070,7 +1055,6 @@ router.post("/getallstudentprogress", async (req, res) => {
         for (const { studentName, studentGoList } of studentConfigs) {
             if (studentGoList !== undefined) {
                 if (studentGoList[req.body.courseId] !== undefined && studentGoList[req.body.courseId] !== null) {
-                    console.log(123)
                     const studentProgress = studentGoList[req.body.courseId].progress || 0
 
                     if (studentProgress > returnData.length) {
@@ -1107,12 +1091,14 @@ router.post("/getmessagehistory", async (req, res) => {
             access: true,
         })
 
-        let sliceStart =
-            messageData.messageHistory.length - (11 + 11 * req.body.freshCount)
-        let sliceEnd =
-            messageData.messageHistory.length - (1 + 11 * req.body.freshCount)
+        // 50 則訊息 0 ~ 49
+        // 49 48 47 46 45 44 44 42 41 40
+        // 39 ~ 30
+        // 50 - (20) => 30
+        // 50 - (11)  => 39
+        let sliceStart = messageData.messageHistory.length - (10 * req.body.freshCount)
+        let sliceEnd = messageData.messageHistory.length - (1 + 10 * (req.body.freshCount - 1))
         let isTop = false
-
         if (sliceEnd < 0) {
             res.json({
                 status: 501,

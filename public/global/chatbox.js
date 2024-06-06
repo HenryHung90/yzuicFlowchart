@@ -5,6 +5,12 @@ import customizeOperation from "./customizeOperation.js"
 
 const chatBoxInit = () => {
     if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
+        // 傳送進入房間訊息
+        socketConnect.enterRoom()
+        // 監聽是否有人進入
+        socketConnect.receiveEnterRoom()
+
+        // 產生聊天室窗
         renderChatBox("person")
         return
     }
@@ -23,6 +29,7 @@ const chatBoxInit = () => {
         // 產生聊天室窗
         renderChatBox("cowork")
     }
+
 }
 
 function renderChatBox(status = "cowork") {
@@ -131,6 +138,8 @@ function renderChatBox(status = "cowork") {
     const sendMessage = () => {
         if ($("#Message").val() !== "") {
             ClickListening("", `FlowChart-傳送訊息-${$("#courseTitle").text().replace(/\s/g, "")}-${$("#Message").val()}`)
+            const codeData = $('#coworkArea').data("CodeMirror")
+            const codePrompt = "以下是我的程式，回覆時請包函完整程式內容\n" + codeData.getValue() + "以下是我的問題\n"
             if (status === "cowork") {
                 socketConnect.sendMessage($("#Message").val())
             } else {
@@ -146,6 +155,7 @@ function renderChatBox(status = "cowork") {
                 }, true)
                 studentClientConnect.connectChatGPT(
                     customizeOperation.getNowTime("FullTime"),
+                    codePrompt,
                     $("#Message").val(),
                     customizeOperation.getFrontEndCode("courseId"),
                     $("#courseTitle").text().replace(/\s/g, "")
@@ -168,10 +178,24 @@ function renderChatBox(status = "cowork") {
                             }
                         })
                     );
+
+                    const Origin = response.data.message.GPTreply.message.content
+                    let codeRemake = Origin.split("***修正後的程式***")[1]
+                    console.log(Origin)
+                    if (codeRemake !== null && codeRemake !== undefined) codeRemake = codeRemake.replace(/```|javascript|html|css/g, "")
+                    console.log(codeRemake)
+
+                    const hint = '//Id:55992e6e-6107-4fe8-bdc7-68f008b29469\n' +
+                        '//這裡是共編區域，請與你的夥伴一同編寫該處程式。\n' +
+                        '//以下為初始設定\n' +
+                        '//※請注意:請勿更動 parent 設定，避免造成程式無法順利執行\n'
+
+                    codeData.setValue(hint + codeRemake)
+
                     MessageType.receiveMessage({
                         studentId: '阿姆阿姆',
                         sendTime: customizeOperation.getNowTime('SecondTime'),
-                        message: marked.parse(response.data.message.GPTreply.message.content)
+                        message: marked.parse(Origin)
                         // message: marked.parse(response.data.message.message)
                     })
                     $('#bubbleText').remove()
@@ -206,7 +230,25 @@ function renderChatBox(status = "cowork") {
                         }
                     })
             } else {
+                studentClientConnect.getChatGPTHistory(customizeOperation.getFrontEndCode('courseId'), freshCount)
+                    .then(response => {
+                        if (customizeOperation.serverResponseErrorDetect(response)) {
+                            if (response.data.message == undefined) return
+                            const reverseMessage = response.data.message.reverse()
+                            const OffsetScrollTop = $(".chatBox_MessageContent")[0].scrollHeight
 
+                            for (let messageHistory of reverseMessage) {
+                                if (messageHistory.studentId === customizeOperation.getCookie("studentId")) {
+                                    MessageType.sendMessage(messageHistory, true)
+                                } else {
+                                    //別人傳則使用別人傳的模型
+                                    MessageType.receiveMessage(messageHistory, false, true)
+                                }
+                            }
+                            $(".chatBox_MessageContent").scrollTop($(".chatBox_MessageContent")[0].scrollHeight - OffsetScrollTop - 100)
+                            freshCount++
+                        }
+                    })
             }
         }
     })

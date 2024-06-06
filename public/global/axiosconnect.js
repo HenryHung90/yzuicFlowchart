@@ -249,7 +249,7 @@ const studentClientConnect = {
         },
     //saveCode
     saveCode:
-        (setting, config, preload, create, update, custom, keyCode, courseId) => {
+        (codeArea, keyCode, courseId) => {
             if (customizeOperation.getCookie('adminId')) {
                 return (
                     axios({
@@ -263,12 +263,7 @@ const studentClientConnect = {
                     url: '/student/savecode',
                     method: 'post',
                     data: {
-                        setting: setting,
-                        config: config,
-                        preload: preload,
-                        create: create,
-                        update: update,
-                        custom: custom,
+                        codeArea: codeArea,
                         keyCode: keyCode,
                         courseId: courseId
                     }
@@ -303,7 +298,7 @@ const studentClientConnect = {
         )
     },
     launchDemo:
-        (setting, config, preload, create, update, custom) => {
+        (codeArea) => {
             if (customizeOperation.getCookie('adminId')) {
                 return (
                     axios({
@@ -311,12 +306,7 @@ const studentClientConnect = {
                         method: 'post',
                         data: {
                             studentId: customizeOperation.getFrontEndCode("studentId"),
-                            setting: setting,
-                            config: config,
-                            preload: preload,
-                            create: create,
-                            update: update,
-                            custom: custom
+                            codeArea: codeArea,
                         }
 
                     })
@@ -327,12 +317,7 @@ const studentClientConnect = {
                     url: '/launch/launchdemo',
                     method: 'post',
                     data: {
-                        setting: setting,
-                        config: config,
-                        preload: preload,
-                        create: create,
-                        update: update,
-                        custom: custom
+                        codeArea: codeArea
                     }
                 })
             )
@@ -773,17 +758,37 @@ const studentClientConnect = {
      * @param {string} courseName 所在課程名稱
      */
     connectChatGPT:
-        (sendTime, message, courseId, courseName) => {
+        (sendTime, codePrompt, message, courseId, courseName) => {
             return axios({
                 method: 'post',
                 url: '/chatGPT/chat',
                 data: {
                     sendTime: sendTime,
+                    codePrompt: codePrompt,
                     message: message,
                     courseId: courseId,
                     courseName: courseName
                 }
             })
+        },
+    /**
+     * 取得與 ChatGPT 聊天歷史紀錄
+     * @param {string} courseId 課程ID
+     * @param {number} freshCount 回朔次數
+     * @returns 
+     */
+    getChatGPTHistory:
+        (courseId, freshCount) => {
+            return (
+                axios({
+                    method: 'POST',
+                    url: '/chatGPT/history',
+                    data: {
+                        freshCount: freshCount,
+                        courseId: courseId
+                    }
+                })
+            )
         }
 }
 

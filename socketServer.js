@@ -1,4 +1,5 @@
 import chatroomconfig from './models/chatroomconfig.js'
+import chatGPTconfig from './models/chatGPTconfig.js';
 import coworkconfig from './models/coworkconfig.js';
 import createDOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
@@ -33,11 +34,16 @@ const socketServer = async (io) => {
         // 收到進入房間資訊
         socket.on('enterRoom', async (message) => {
             const messageData = JSON.parse(message)
+            const chatData = messageData.coworkStatus === 'Y' ? await chatroomconfig.findOne({ access: true, chatRoomId: messageData.chatRoomId }) : await chatGPTconfig.findOne({ studentId: messageData.studentId, courseId: messageData.courseId })
+            let chatHistory
 
-            const chatData = await chatroomconfig.findOne({ access: true, chatRoomId: messageData.chatRoomId })
-            //發給自己最近 10 則訊息
-            const chatHistory = chatData.messageHistory.slice(chatData.messageHistory.length - 11, chatData.messageHistory.length - 1)
-            socket.emit('re-enterRoom', JSON.stringify(chatHistory))
+            // 50 則訊息
+            // 49 ~ 40 => 50 - 10
+            if (chatData !== null) {
+                chatData.messageHistory.length - 11 < 0 ? chatHistory = chatData.messageHistory : chatHistory = chatData.messageHistory.slice(chatData.messageHistory.length - 10, chatData.messageHistory.length)
+                socket.emit('re-enterRoom', JSON.stringify(chatHistory))
+            }
+
 
             //告訴所有人你進來了
             socket.nsp.emit('re-enterRoom', message)

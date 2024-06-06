@@ -686,9 +686,9 @@ const renderStudentList = async () => {
                 { name: "刪除學生", clickFunc: () => controllerFunc.deleteStudent(student.studentClass, student.studentId) },
                 { name: "個人/合作", clickFunc: () => controllerFunc.switchCowork(student.studentClass, student.studentId) },
                 { name: "帳號開啟/關閉", clickFunc: () => controllerFunc.switchPermision(student.studentClass, student.studentId) },
-                { name: "下載事件紀錄", clickFunc: () => controllerFunc.getListenerData(student.studentClass, student.studentId) },
+                { name: "下載事件紀錄", clickFunc: () => controllerFunc.getListenerData(student.studentClass, student.studentId, student.studentName) },
                 { name: "觀看心智圖", clickFunc: () => controllerFunc.watchingList(student.studentClass, student.studentId) },
-                { name: "下載所有反思", clickFunc: () => controllerFunc.downloadReflection(student.studentClass, student.studentId) }
+                { name: "下載所有反思", clickFunc: () => controllerFunc.downloadReflection(student.studentClass, student.studentId, student.studentName) }
             ]
 
             dropDownList.forEach(value => {
@@ -758,11 +758,11 @@ const renderStudentList = async () => {
             },
         // 下載單一學生監聽紀錄
         getListenerData:
-            (studentClass, studentId) => {
+            (studentClass, studentId, studentName) => {
                 customizeOperation.loadingPage(true)
-                adminClientConnect.getSingleStudentListener(studentClass, studentId).then(response => {
+                adminClientConnect.getSingleStudentListener(studentClass, studentId, studentName).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        customizeOperation.downloadDataToExcel(`${studentId}_listenerData`, response.data.message.sheetData, response.data.message.sheetName)
+                        customizeOperation.downloadDataToExcel(`${studentId}_${studentName}_操作監控`, response.data.message.sheetData, response.data.message.sheetName)
                         customizeOperation.loadingPage(false)
                     }
                 })
@@ -827,11 +827,11 @@ const renderStudentList = async () => {
             },
         // 下載單一學生反思
         downloadReflection:
-            (studentClass, studentId) => {
+            (studentClass, studentId, studentName) => {
                 customizeOperation.loadingPage(true)
                 adminClientConnect.getSingleStudentReflection(studentClass, studentId).then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
-                        customizeOperation.downloadDataToExcel(`${studentId}_reflectionData`, response.data.message.sheetData, response.data.message.sheetName)
+                        customizeOperation.downloadDataToExcel(`${studentId}_${studentName}_操作監控`, response.data.message.sheetData, response.data.message.sheetName)
                         customizeOperation.loadingPage(false)
                     }
                 })

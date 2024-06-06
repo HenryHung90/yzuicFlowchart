@@ -11,8 +11,6 @@ import { socketConnect } from "../../global/socketConnect.js"
 const TargetBox = () => {
     // 把 Sync 字樣刪除
     $(".content_complete").remove()
-    // 把 收合 字樣刪除
-    $(".content_slide").remove()
     // 把 Hint 刪除
     $(".content_question").remove()
     //Content Div-------------------------------------------------
@@ -48,8 +46,6 @@ const TargetBox = () => {
 const CommentBox = () => {
     // 把 Sync 字樣刪除
     $(".content_complete").remove()
-    // 把 收合 字樣刪除
-    $(".content_slide").remove()
     // 把 Hint 刪除
     $(".content_question").remove()
     //Content Div-------------------------------------------------
@@ -272,8 +268,6 @@ const CommentBox = () => {
 const UnderstandingBox = key => {
     // 把 Sync 字樣刪除
     $(".content_complete").remove()
-    // 把 收合 字樣刪除
-    $(".content_slide").remove()
     // 把 Hint 刪除
     $(".content_question").remove()
     //Content Div-------------------------------------------------
@@ -358,8 +352,6 @@ const UnderstandingBox = key => {
 const FormulatingBox = () => {
     // 把 Sync 字樣刪除
     $(".content_complete").remove()
-    // 把 收合 字樣刪除
-    $(".content_slide").remove()
     // 把 Hint 刪除
     $(".content_question").remove()
     //Content Div-------------------------------------------------
@@ -438,8 +430,6 @@ const FormulatingBox = () => {
 const WriteFormulatingBox = () => {
     // 把 Sync 字樣刪除
     $(".content_complete").remove()
-    // 把 收合 字樣刪除
-    $(".content_slide").remove()
     // 把 Hint 刪除
     $(".content_question").remove()
     //Content Div-------------------------------------------------
@@ -642,114 +632,114 @@ const ProgrammingBox = programmingKey => {
         })
         .appendTo(contentRowDiv)
 
-    if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
-        //Coding 分層
-        const content_codingContainer = [
-            {
-                title: "Setting",
-                container: "content_coding_settingContainer",
-                id: "setting",
-            },
-            {
-                title: "Config",
-                container: "content_coding_configContainer",
-                id: "config",
-            },
-            {
-                title: "Preload",
-                container: "content_coding_preloadContainer",
-                id: "preload",
-            },
-            {
-                title: "Create",
-                container: "content_coding_createContainer",
-                id: "create",
-            },
-            {
-                title: "Update",
-                container: "content_coding_updateContainer",
-                id: "update",
-            },
-            {
-                title: "Custom",
-                container: "content_coding_customContainer",
-                id: "custom",
-            },
-        ]
-        //render coding Area
-        for (const codingType of content_codingContainer) {
-            const content_CodingContainer = $("<div>")
-                .prop({
-                    className: "container-fluid content_codingContainer",
-                })
-                .appendTo(content_CodingDiv)
+    // if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
+    //     //Coding 分層
+    //     const content_codingContainer = [
+    //         {
+    //             title: "Setting",
+    //             container: "content_coding_settingContainer",
+    //             id: "setting",
+    //         },
+    //         {
+    //             title: "Config",
+    //             container: "content_coding_configContainer",
+    //             id: "config",
+    //         },
+    //         {
+    //             title: "Preload",
+    //             container: "content_coding_preloadContainer",
+    //             id: "preload",
+    //         },
+    //         {
+    //             title: "Create",
+    //             container: "content_coding_createContainer",
+    //             id: "create",
+    //         },
+    //         {
+    //             title: "Update",
+    //             container: "content_coding_updateContainer",
+    //             id: "update",
+    //         },
+    //         {
+    //             title: "Custom",
+    //             container: "content_coding_customContainer",
+    //             id: "custom",
+    //         },
+    //     ]
+    //     //render coding Area
+    //     for (const codingType of content_codingContainer) {
+    //         const content_CodingContainer = $("<div>")
+    //             .prop({
+    //                 className: "container-fluid content_codingContainer",
+    //             })
+    //             .appendTo(content_CodingDiv)
 
-            //title Area
-            const content_CodingContainer_title = $("<div>")
-                .prop({
-                    className: "row content_codingContainer_title",
-                })
-                .click(e => {
-                    rotateIconAndSlideCode(
-                        content_CodingContainer_Code,
-                        downIcon,
-                        codingType.title
-                    )
-                })
-                .appendTo(content_CodingContainer)
+    //         //title Area
+    //         const content_CodingContainer_title = $("<div>")
+    //             .prop({
+    //                 className: "row content_codingContainer_title",
+    //             })
+    //             .click(e => {
+    //                 rotateIconAndSlideCode(
+    //                     content_CodingContainer_Code,
+    //                     downIcon,
+    //                     codingType.title
+    //                 )
+    //             })
+    //             .appendTo(content_CodingContainer)
 
-            $("<h3>")
-                .prop({
-                    className: "function_title col-10",
-                    innerHTML: codingType.title,
-                })
-                .appendTo(content_CodingContainer_title)
+    //         $("<h3>")
+    //             .prop({
+    //                 className: "function_title col-10",
+    //                 innerHTML: codingType.title,
+    //             })
+    //             .appendTo(content_CodingContainer_title)
 
-            //DownIcon
-            const downIcon = $("<div>")
-                .prop({
-                    className: "col-2 codeDownIcon",
-                    innerHTML:
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" fill="white" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
-                })
-                .appendTo(content_CodingContainer_title)
+    //         //DownIcon
+    //         const downIcon = $("<div>")
+    //             .prop({
+    //                 className: "col-2 codeDownIcon",
+    //                 innerHTML:
+    //                     '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50px" fill="white" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>',
+    //             })
+    //             .appendTo(content_CodingContainer_title)
 
-            //Coding Area
-            const content_CodingContainer_Code = $("<div>")
-                .prop({
-                    className: `container-sm ${codingType.container}`,
-                    id: "open",
-                })
-                .appendTo(content_CodingContainer)
-            //textarea
-            $("<textarea>")
-                .prop({
-                    className: "form-control",
-                    id: codingType.id,
-                })
-                .appendTo(content_CodingContainer_Code)
-        }
-    } else {
-        const content_CodingContainer = $("<div>")
-            .prop({
-                className: "container-fluid content_codingContainer",
-            })
-            .appendTo(content_CodingDiv)
-        //Coding Area
-        const content_CodingContainer_Code = $("<div>")
-            .prop({
-                className: `container-sm content_coding_coworkAreaContainer`,
-                id: "open",
-            })
-            .appendTo(content_CodingContainer)
-        //textarea
-        $("<textarea>")
-            .prop({
-                className: "form-control",
-                id: 'coworkArea',
-            })
-            .appendTo(content_CodingContainer_Code)
-    }
+    //         //Coding Area
+    //         const content_CodingContainer_Code = $("<div>")
+    //             .prop({
+    //                 className: `container-sm ${codingType.container}`,
+    //                 id: "open",
+    //             })
+    //             .appendTo(content_CodingContainer)
+    //         //textarea
+    //         $("<textarea>")
+    //             .prop({
+    //                 className: "form-control",
+    //                 id: codingType.id,
+    //             })
+    //             .appendTo(content_CodingContainer_Code)
+    //     }
+    // } else {
+    const content_CodingContainer = $("<div>")
+        .prop({
+            className: "container-fluid content_codingContainer",
+        })
+        .appendTo(content_CodingDiv)
+    //Coding Area
+    const content_CodingContainer_Code = $("<div>")
+        .prop({
+            className: `container-sm content_coding_coworkAreaContainer`,
+            id: "open",
+        })
+        .appendTo(content_CodingContainer)
+    //textarea
+    $("<textarea>")
+        .prop({
+            className: "form-control",
+            id: 'coworkArea',
+        })
+        .appendTo(content_CodingContainer_Code)
+    // }
 
     //--------------------------------------------------------------
     //Button area
@@ -964,34 +954,10 @@ const ProgrammingBox = programmingKey => {
         ClickListening("", `計畫執行-執行程式-${courseTitle}-任務${missonNumber}`)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //取得各階段程式碼
-            const settingCode = $("#setting").data("CodeMirror")
-            const configCode = $("#config").data("CodeMirror")
-            const preloadCode = $("#preload").data("CodeMirror")
-            const createCode = $("#create").data("CodeMirror")
-            const updateCode = $("#update").data("CodeMirror")
-            const customCode = $("#custom").data("CodeMirror")
+            const coworkCode = $('#coworkArea').data("CodeMirror")
 
-
-            //重整Code Line 以便查詢錯誤位置
-            for (let name of [
-                "setting",
-                "config",
-                "preload",
-                "create",
-                "update",
-                "custom",
-            ]) {
-                $(`#${name}`).data("CodeMirror").setOption("firstLineNumber", CodeMirrorFunc.swtichEditorNameToStartLineNumber(name))
-            }
             await studentClientConnect
-                .launchDemo(
-                    settingCode.getValue(),
-                    configCode.getValue(),
-                    preloadCode.getValue(),
-                    createCode.getValue(),
-                    updateCode.getValue(),
-                    customCode.getValue()
-                )
+                .launchDemo(coworkCode.getValue())
                 .then(response => {
                     if (customizeOperation.serverResponseErrorDetect(response)) {
                         renderDemoContainer(response.data.message)
@@ -1058,52 +1024,41 @@ const ProgrammingBox = programmingKey => {
         }
     }
     //rotate
-    async function rotateIconAndSlideCode(container, icon, title) {
-        if (container.attr("id") === "open") {
-            ClickListening("", `計畫執行-收合${title}程式-${courseTitle}-任務${missonNumber}`)
+    // async function rotateIconAndSlideCode(container, icon, title) {
+    //     if (container.attr("id") === "open") {
+    //         ClickListening("", `計畫執行-收合${title}程式-${courseTitle}-任務${missonNumber}`)
 
-            container.attr("id", "close").slideUp(300)
-            icon.css(
-                {
-                    transform: "rotate(0deg)",
-                },
-                200
-            )
-        } else {
-            ClickListening("", `計畫執行-展開${title}程式-${courseTitle}-任務${missonNumber}`)
+    //         container.attr("id", "close").slideUp(300)
+    //         icon.css(
+    //             {
+    //                 transform: "rotate(0deg)",
+    //             },
+    //             200
+    //         )
+    //     } else {
+    //         ClickListening("", `計畫執行-展開${title}程式-${courseTitle}-任務${missonNumber}`)
 
-            container.attr("id", "open").slideDown(300)
-            icon.css(
-                {
-                    transform: "rotate(180deg)",
-                },
-                200
-            )
-        }
-    }
+    //         container.attr("id", "open").slideDown(300)
+    //         icon.css(
+    //             {
+    //                 transform: "rotate(180deg)",
+    //             },
+    //             200
+    //         )
+    //     }
+    // }
     //save code function
     async function saveCode() {
         GoListFunc.saveCodeStatus(true)
         ClickListening("", `計畫執行-儲存程式-${courseTitle}-任務${missonNumber}`)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //取得各階段程式碼
-            const settingCode = $("#setting").data("CodeMirror")
-            const configCode = $("#config").data("CodeMirror")
-            const preloadCode = $("#preload").data("CodeMirror")
-            const createCode = $("#create").data("CodeMirror")
-            const updateCode = $("#update").data("CodeMirror")
-            const customCode = $("#custom").data("CodeMirror")
-
+            const coworkCode = $('#coworkArea').data("CodeMirror")
 
             const keyCode = programmingKey
             await studentClientConnect
                 .saveCode(
-                    settingCode.getValue(),
-                    configCode.getValue(),
-                    preloadCode.getValue(),
-                    createCode.getValue(),
-                    updateCode.getValue(),
-                    customCode.getValue(),
+                    coworkCode.getValue(),
                     keyCode,
                     customizeOperation.getFrontEndCode("courseId")
                 )
@@ -1399,8 +1354,6 @@ const ProgrammingBox = programmingKey => {
 const ReflectionBox = reflectionKey => {
     // 把 Sync 字樣刪除
     $(".content_complete").remove()
-    // 把 收合 字樣刪除
-    $(".content_slide").remove()
     // 把 Hint 刪除
     $(".content_question").remove()
     //Content Div-------------------------------------------------
