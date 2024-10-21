@@ -632,7 +632,6 @@ const ProgrammingBox = programmingKey => {
         })
         .appendTo(contentRowDiv)
 
-    // if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
     //     //Coding 分層
     //     const content_codingContainer = [
     //         {
@@ -732,14 +731,23 @@ const ProgrammingBox = programmingKey => {
             id: "open",
         })
         .appendTo(content_CodingContainer)
-    //textarea
-    $("<textarea>")
-        .prop({
-            className: "form-control",
-            id: 'coworkArea',
-        })
-        .appendTo(content_CodingContainer_Code)
-    // }
+    if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
+        //textarea
+        $("<textarea>")
+            .prop({
+                className: "form-control",
+                id: 'personalArea',
+            })
+            .appendTo(content_CodingContainer_Code)
+    } else {
+        //textarea
+        $("<textarea>")
+            .prop({
+                className: "form-control",
+                id: 'coworkArea',
+            })
+            .appendTo(content_CodingContainer_Code)
+    }
 
     //--------------------------------------------------------------
     //Button area
@@ -1053,7 +1061,7 @@ const ProgrammingBox = programmingKey => {
         ClickListening("", `計畫執行-儲存程式-${courseTitle}-任務${missonNumber}`)
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             //取得各階段程式碼
-            const coworkCode = $('#coworkArea').data("CodeMirror")
+            const coworkCode = $('#personalArea').data("CodeMirror")
 
             const keyCode = programmingKey
             await studentClientConnect

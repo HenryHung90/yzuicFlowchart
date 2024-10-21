@@ -306,8 +306,8 @@ const categoryBox = {
     Programming: (data, key) => {
         if (customizeOperation.getFrontEndCode('coworkStatus') === 'N') {
             // 製作 Coding 區域
-            CodeMirrorFunc.codeMirrorProgram('coworkArea', data.code.code, false)
-            $('#coworkArea').data("CodeMirror").setSize("auto", 680)
+            CodeMirrorFunc.codeMirrorProgram('personalArea', data.code.code, false)
+            $('#personalArea').data("CodeMirror").setSize("auto", 680)
 
             //hint
             if (data.hintList !== undefined) {
@@ -669,7 +669,7 @@ const GoListFunc = {
                 customizeOperation.loadingPage(true)
                 if (customizeOperation.getFrontEndCode('coworkStatus') === "N") {
                     //取得各階段程式碼
-                    const coworkCode = $('#coworkArea').data("CodeMirror")
+                    const coworkCode = $('#personalArea').data("CodeMirror")
 
                     const keyCode = s.key
                     studentClientConnect
@@ -1224,6 +1224,7 @@ const CodeMirrorFunc = {
             cursorHeight: name == "tutorial" ? 0 : 0.85,
             readOnly: isReadOnly,
         })
+
 
         if (content == "") {
             switch (name) {
